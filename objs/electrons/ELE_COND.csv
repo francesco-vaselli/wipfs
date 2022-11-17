@@ -1,0 +1,22 @@
+GenEle_eta,,
+GenEle_phi,,
+GenEle_pt,,
+GenEle_charge,,
+GenEle_statusFlags,15 vars,
+ClosestJet_dr,,
+ClosestJet_deta,,
+ClosestJet_dphi,,
+ClosestJet_pt,,
+ClosestJet_mass,,
+ClosestJet_partonFlavour,,
+ClosestJet_hadronFlavour,,
+Pileup_gpudensity,,
+Pileup_nPU,,
+Pileup_nTrueInt,,
+Pileup_pudensity,,
+Pileup_sumEOOT,,
+Pileup_sumLOOT,,
+GenEleMother_pt,,only for b AND c otherwise fill
+GenEleMother_deta,,only for b AND c otherwise fill
+GenEleMother_dphi,,only for b AND c otherwise fill
+GenEleMother_pdgIdx,,only for b AND c otherwise fill

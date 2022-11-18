@@ -1,63 +1,63 @@
-Electron_charge,Int_t,electric charge
-Electron_cleanmask,UChar_t,simple cleaning mask with priority to leptons
-Electron_convVeto,Bool_t,pass conversion veto
-Electron_cutBased,Int_t,"cut-based ID Fall17 V2 (0:fail, 1:veto, 2:loose, 3:medium, 4:tight)"
-Electron_cutBased_Fall17_V1,Int_t,"cut-based ID Fall17 V1 (0:fail, 1:veto, 2:loose, 3:medium, 4:tight)"
-Electron_cutBased_HEEP,Bool_t,cut-based HEEP ID
-Electron_deltaEtaSC,Float_t,"delta eta (SC,ele) with sign"
-Electron_dr03EcalRecHitSumEt,Float_t,Non-PF Ecal isolation within a delta R cone of 0.3 with electron pt > 35 GeV
-Electron_dr03HcalDepth1TowerSumEt,Float_t,Non-PF Hcal isolation within a delta R cone of 0.3 with electron pt > 35 GeV
-Electron_dr03TkSumPt,Float_t,Non-PF track isolation within a delta R cone of 0.3 with electron pt > 35 GeV
-Electron_dr03TkSumPtHEEP,Float_t,Non-PF track isolation within a delta R cone of 0.3 with electron pt > 35 GeV used in HEEP ID
-Electron_dxy,Float_t,"dxy (with sign) wrt first PV, in cm"
-Electron_dxyErr,Float_t,"dxy uncertainty, in cm"
-Electron_dz,Float_t,"dz (with sign) wrt first PV, in cm"
-Electron_dzErr,Float_t,"dz uncertainty, in cm"
-Electron_eCorr,Float_t,ratio of the calibrated energy/miniaod energy
-Electron_eInvMinusPInv,Float_t,1/E_SC - 1/p_trk
-Electron_energyErr,Float_t,energy error of the cluster-track combination
-Electron_etaMinusGen,Float_t,eta
-#Electron_genPartFlav,UChar_t,"Flavour of genParticle for MC matching to status==1 electrons or photons: 1 = prompt electron (including gamma*->mu mu), 15 = electron from prompt tau, 22 = prompt photon (likely conversion), 5 = electron from b, 4 = electron from c, 3 = electron from light or unknown, 0 = unmatched"
-#Electron_genPartIdx,Int_t(index to Genpart),Index into genParticle list for MC matching to status==1 electrons or photons
-Electron_hoe,Float_t,H over E
-Electron_ip3d,Float_t,"3D impact parameter wrt first PV, in cm"
-Electron_isPFcand,Bool_t,electron is PF candidate
-#Electron_jetIdx,Int_t(index to Jet),index of the associated jet (-1 if none)
-Electron_jetPtRelv2,Float_t,Relative momentum of the lepton with respect to the closest jet after subtracting the lepton
-Electron_jetRelIso,Float_t,"Relative isolation in matched jet (1/ptRatio-1, pfRelIso04_all if no matched jet)"
-Electron_lostHits,UChar_t,number of missing inner hits
-#Electron_mass,Float_t,mass
-Electron_miniPFRelIso_all,Float_t,"mini PF relative isolation, total (with scaled rho*EA PU corrections)"
-Electron_miniPFRelIso_chg,Float_t,"mini PF relative isolation, charged component"
-Electron_mvaFall17V1Iso,Float_t,MVA Iso ID V1 score
-Electron_mvaFall17V1Iso_WP80,Bool_t,MVA Iso ID V1 WP80
-Electron_mvaFall17V1Iso_WP90,Bool_t,MVA Iso ID V1 WP90
-Electron_mvaFall17V1Iso_WPL,Bool_t,MVA Iso ID V1 loose WP
-Electron_mvaFall17V1noIso,Float_t,MVA noIso ID V1 score
-Electron_mvaFall17V1noIso_WP80,Bool_t,MVA noIso ID V1 WP80
-Electron_mvaFall17V1noIso_WP90,Bool_t,MVA noIso ID V1 WP90
-Electron_mvaFall17V1noIso_WPL,Bool_t,MVA noIso ID V1 loose WP
-Electron_mvaFall17V2Iso,Float_t,MVA Iso ID V2 score
-Electron_mvaFall17V2Iso_WP80,Bool_t,MVA Iso ID V2 WP80
-Electron_mvaFall17V2Iso_WP90,Bool_t,MVA Iso ID V2 WP90
-Electron_mvaFall17V2Iso_WPL,Bool_t,MVA Iso ID V2 loose WP
-Electron_mvaFall17V2noIso,Float_t,MVA noIso ID V2 score
-Electron_mvaFall17V2noIso_WP80,Bool_t,MVA noIso ID V2 WP80
-Electron_mvaFall17V2noIso_WP90,Bool_t,MVA noIso ID V2 WP90
-Electron_mvaFall17V2noIso_WPL,Bool_t,MVA noIso ID V2 loose WP
-Electron_mvaTTH,Float_t,TTH MVA lepton ID score
-#Electron_pdgId,Int_t,PDG code assigned by the event reconstruction (not by MC truth)
-Electron_pfRelIso03_all,Float_t,"PF relative isolation dR=0.3, total (with rho*EA PU corrections)"
-Electron_pfRelIso03_chg,Float_t,"PF relative isolation dR=0.3, charged component"
-Electron_phiMinusGen,Float_t,phi
-#Electron_photonIdx,Int_t(index to Photon),index of the associated photon (-1 if none)
-Electron_ptRatio,Float_t,p_{T}
-Electron_r9,Float_t,"R9 of the supercluster, calculated with full 5x5 region"
-Electron_scEtOverPt,Float_t,(supercluster transverse energy)/pt-1
-Electron_seedGain,UChar_t,Gain of the seed crystal
-Electron_sieie,Float_t,"sigma_IetaIeta of the supercluster, calculated with full 5x5 region"
-Electron_sip3d,Float_t,"3D impact parameter significance wrt first PV, in cm"
-Electron_tightCharge,Int_t,"Tight charge criteria (0:none, 1:isGsfScPixChargeConsistent, 2:isGsfCtfScPixChargeConsistent)"
-Electron_vidNestedWPBitmap,Int_t,"VID compressed bitmap (MinPtCut,GsfEleSCEtaMultiRangeCut,GsfEleDEtaInSeedCut,GsfEleDPhiInCut,GsfEleFull5x5SigmaIEtaIEtaCut,GsfEleHadronicOverEMEnergyScaledCut,GsfEleEInverseMinusPInverseCut,GsfEleRelPFIsoScaledCut,GsfEleConversionVetoCut,GsfEleMissingHitsCut), 3 bits per cut"
-Electron_vidNestedWPBitmapHEEP,Int_t,"VID compressed bitmap (MinPtCut,GsfEleSCEtaMultiRangeCut,GsfEleDEtaInSeedCut,GsfEleDPhiInCut,GsfEleFull5x5SigmaIEtaIEtaWithSatCut,GsfEleFull5x5E2x5OverE5x5WithSatCut,GsfEleHadronicOverEMLinearCut,GsfEleTrkPtIsoCut,GsfEleEmHadD1IsoRhoCut,GsfEleDxyCut,GsfEleMissingHitsCut,GsfEleEcalDrivenCut), 1 bits per cut"
-nElectron,UInt_t,slimmedElectrons after basic selection (pt > 5 )
+Electron_charge,Int_t,electric charge,Gaussian smearing 
+Electron_cleanmask,UChar_t,simple cleaning mask with priority to leptons,Gaussian smearing 
+Electron_convVeto,Bool_t,pass conversion veto,Gaussian smearing 
+Electron_cutBased,Int_t,"cut-based ID Fall17 V2 (0:fail, 1:veto, 2:loose, 3:medium, 4:tight)",Gaussian smearing 
+Electron_cutBased_Fall17_V1,Int_t,"cut-based ID Fall17 V1 (0:fail, 1:veto, 2:loose, 3:medium, 4:tight)",Gaussian smearing 
+Electron_cutBased_HEEP,Bool_t,cut-based HEEP ID,Gaussian smearing 
+Electron_deltaEtaSC,Float_t,"delta eta (SC,ele) with sign",ok
+Electron_dr03EcalRecHitSumEt,Float_t,Non-PF Ecal isolation within a delta R cone of 0.3 with electron pt > 35 GeV,Log(1+x)
+Electron_dr03HcalDepth1TowerSumEt,Float_t,Non-PF Hcal isolation within a delta R cone of 0.3 with electron pt > 35 GeV,Log(1+x)
+Electron_dr03TkSumPt,Float_t,Non-PF track isolation within a delta R cone of 0.3 with electron pt > 35 GeV,Log(1+x)
+Electron_dr03TkSumPtHEEP,Float_t,Non-PF track isolation within a delta R cone of 0.3 with electron pt > 35 GeV used in HEEP ID,Log(1+x)
+Electron_dxy,Float_t,"dxy (with sign) wrt first PV, in cm",arctan
+Electron_dxyErr,Float_t,"dxy uncertainty, in cm",Log(1+x)
+Electron_dz,Float_t,"dz (with sign) wrt first PV, in cm",arctan
+Electron_dzErr,Float_t,"dz uncertainty, in cm",Log(1+x)
+Electron_eCorr,Float_t,ratio of the calibrated energy/miniaod energy,arctan (centrata in 1)
+Electron_eInvMinusPInv,Float_t,1/E_SC - 1/p_trk,arctan
+Electron_energyErr,Float_t,energy error of the cluster-track combination,Log
+Electron_etaMinusGen,Float_t,eta,arctan
+#Electron_genPartFlav,UChar_t,"Flavour of genParticle for MC matching to status==1 electrons or photons: 1 = prompt electron (including gamma*->mu mu), 15 = electron from prompt tau, 22 = prompt photon (likely conversion), 5 = electron from b, 4 = electron from c, 3 = electron from light or unknown, 0 = unmatched",-
+#Electron_genPartIdx,Int_t(index to Genpart),Index into genParticle list for MC matching to status==1 electrons or photons,-
+Electron_hoe,Float_t,H over E,Log(1+x)
+Electron_ip3d,Float_t,"3D impact parameter wrt first PV, in cm",Log(1+x)
+Electron_isPFcand,Bool_t,electron is PF candidate,Gaussian smearing 
+#Electron_jetIdx,Int_t(index to Jet),index of the associated jet (-1 if none),-
+Electron_jetPtRelv2,Float_t,Relative momentum of the lepton with respect to the closest jet after subtracting the lepton,Log(1+x)
+Electron_jetRelIso,Float_t,"Relative isolation in matched jet (1/ptRatio-1, pfRelIso04_all if no matched jet)",Log(1+x)
+Electron_lostHits,UChar_t,number of missing inner hits,ok
+#Electron_mass,Float_t,mass,-
+Electron_miniPFRelIso_all,Float_t,"mini PF relative isolation, total (with scaled rho*EA PU corrections)",Log(1+x)
+Electron_miniPFRelIso_chg,Float_t,"mini PF relative isolation, charged component",Log(1+x)
+Electron_mvaFall17V1Iso,Float_t,MVA Iso ID V1 score,ok
+Electron_mvaFall17V1Iso_WP80,Bool_t,MVA Iso ID V1 WP80,Gaussian smearing 
+Electron_mvaFall17V1Iso_WP90,Bool_t,MVA Iso ID V1 WP90,Gaussian smearing 
+Electron_mvaFall17V1Iso_WPL,Bool_t,MVA Iso ID V1 loose WP,Gaussian smearing 
+Electron_mvaFall17V1noIso,Float_t,MVA noIso ID V1 score,ok
+Electron_mvaFall17V1noIso_WP80,Bool_t,MVA noIso ID V1 WP80,Gaussian smearing 
+Electron_mvaFall17V1noIso_WP90,Bool_t,MVA noIso ID V1 WP90,Gaussian smearing 
+Electron_mvaFall17V1noIso_WPL,Bool_t,MVA noIso ID V1 loose WP,Gaussian smearing 
+Electron_mvaFall17V2Iso,Float_t,MVA Iso ID V2 score,ok
+Electron_mvaFall17V2Iso_WP80,Bool_t,MVA Iso ID V2 WP80,Gaussian smearing 
+Electron_mvaFall17V2Iso_WP90,Bool_t,MVA Iso ID V2 WP90,Gaussian smearing 
+Electron_mvaFall17V2Iso_WPL,Bool_t,MVA Iso ID V2 loose WP,Gaussian smearing 
+Electron_mvaFall17V2noIso,Float_t,MVA noIso ID V2 score,ok
+Electron_mvaFall17V2noIso_WP80,Bool_t,MVA noIso ID V2 WP80,Gaussian smearing 
+Electron_mvaFall17V2noIso_WP90,Bool_t,MVA noIso ID V2 WP90,Gaussian smearing 
+Electron_mvaFall17V2noIso_WPL,Bool_t,MVA noIso ID V2 loose WP,Gaussian smearing 
+Electron_mvaTTH,Float_t,TTH MVA lepton ID score,ok
+#Electron_pdgId,Int_t,PDG code assigned by the event reconstruction (not by MC truth),-
+Electron_pfRelIso03_all,Float_t,"PF relative isolation dR=0.3, total (with rho*EA PU corrections)",Log(1+x)
+Electron_pfRelIso03_chg,Float_t,"PF relative isolation dR=0.3, charged component",Log(1+x)
+Electron_phiMinusGen,Float_t,phi,arctan
+#Electron_photonIdx,Int_t(index to Photon),index of the associated photon (-1 if none),-
+Electron_ptRatio,Float_t,p_{T},arctan
+Electron_r9,Float_t,"R9 of the supercluster, calculated with full 5x5 region",Gaussian 
+#Electron_scEtOverPt,Float_t,(supercluster transverse energy)/pt-1,-
+Electron_seedGain,UChar_t,Gain of the seed crystal,Gaussian smearing 
+Electron_sieie,Float_t,"sigma_IetaIeta of the supercluster, calculated with full 5x5 region",ok
+Electron_sip3d,Float_t,"3D impact parameter significance wrt first PV, in cm",Log(1+x)
+Electron_tightCharge,Int_t,"Tight charge criteria (0:none, 1:isGsfScPixChargeConsistent, 2:isGsfCtfScPixChargeConsistent)",Gaussian smearing 
+Electron_vidNestedWPBitmap,Int_t,"VID compressed bitmap (MinPtCut,GsfEleSCEtaMultiRangeCut,GsfEleDEtaInSeedCut,GsfEleDPhiInCut,GsfEleFull5x5SigmaIEtaIEtaCut,GsfEleHadronicOverEMEnergyScaledCut,GsfEleEInverseMinusPInverseCut,GsfEleRelPFIsoScaledCut,GsfEleConversionVetoCut,GsfEleMissingHitsCut), 3 bits per cut",Decoding + Gaussian smearing 
+Electron_vidNestedWPBitmapHEEP,Int_t,"VID compressed bitmap (MinPtCut,GsfEleSCEtaMultiRangeCut,GsfEleDEtaInSeedCut,GsfEleDPhiInCut,GsfEleFull5x5SigmaIEtaIEtaWithSatCut,GsfEleFull5x5E2x5OverE5x5WithSatCut,GsfEleHadronicOverEMLinearCut,GsfEleTrkPtIsoCut,GsfEleEmHadD1IsoRhoCut,GsfEleDxyCut,GsfEleMissingHitsCut,GsfEleEcalDrivenCut), 1 bits per cut",Decoding + Gaussian smearing 
+nElectron,UInt_t,slimmedElectrons after basic selection (pt > 5 ),ok

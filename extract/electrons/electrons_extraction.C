@@ -275,80 +275,139 @@ auto genElectronIdx_maker(ROOT::VecOps::RVec<int> &genpart_idx,
   return electron_idx;
 }
 
+int isInteresting(int &pdgId) {
+  /* Check if pdgId is compatible with c or b quarks
+   */
+  int num = abs(pdgId);
+  if ((pdgId == 4) || (pdgId == 5)) {
+    return 1;
+  }
+  return 0;
+}
+
 auto mother_genpart_pt(ROOT::VecOps::RVec<int> &mother_idx,
                        ROOT::VecOps::RVec<int> &genpart_pdgId,
                        ROOT::VecOps::RVec<float> &genpart_pt,
                        ROOT::VecOps::RVec<float> &ele_pt) {
-
+  /* If GenPartMother of MGenElectron is b or c quark, computes its pt
+   */
   auto ele_size = ele_pt.size();
-  auto genpart_size = genpart_pdgId.size();
   ROOT::VecOps::RVec<float> mother_pt;
-  mother_pt.reserve(ele_size);
 
   for (size_t i = 0; i < ele_size; i++) {
-    mother_pt.emplace_back(-10);
-    if (genpart_pdgId[mother_idx[i]] isInteresting) {
-      mother_pt[i] = genpart_pt[mother_idx[i]];
-    }
-  }
-  return mother_pt;
-}
-
-int Interesting(int &pdgId) {
-  int num = abs(pdgId);
-  int digit;
-  int res = 0;
-
-  const int b = 5;
-  const int c = 4;
-
-  while (num != 0) {
-    digit = num % 10;
-    num = num / 10;
-    if (digit == b || digit == c) {
-      res = 1;
-      break;
-    }
-  }
-
-  return res;
-}
-
-auto var_mother_genpart_pt(ROOT::VecOps::RVec<int> &mother_idx,
-                           ROOT::VecOps::RVec<int> &genpart_pdgId,
-                           ROOT::VecOps::RVec<float> &genpart_pt,
-                           ROOT::VecOps::RVec<float> &ele_pt) {
-
-  auto ele_size = ele_pt.size();
-  auto genpart_size = genpart_pdgId.size();
-  ROOT::VecOps::RVec<float> mother_pt;
-  mother_pt.reserve(ele_size);
-
-  const int b = 5;
-  const int c = 4;
-
-  for (size_t i = 0; i < ele_size; i++) {
-    mother_pt.emplace_back(-10);
-    idx = mother_idx[i];
+    mother_pt.emplace_back(0);
+    int idx = mother_idx[i];
+    int pdgId;
     while (idx >= 0) {
       pdgId = genpart_pdgId[idx];
-      if (Interesting(pdgId) == 1) {
+      if (isInteresting(pdgId) == 1) {
         mother_pt[i] = genpart_pt[idx];
-        break;
-      } else {
-        idx = mother_idx[idx];
       }
+      idx = mother_idx[idx];
     }
   }
 
   return mother_pt;
+}
+
+auto mother_genpart_pdgId(ROOT::VecOps::RVec<int> &mother_idx,
+                          ROOT::VecOps::RVec<int> &genpart_pdgId,
+                          ROOT::VecOps::RVec<int> &ele_pdgId) {
+  /* If GenPartMother of MGenElectron is b or c quark, save its pdgId
+   */
+  auto ele_size = ele_pdgId.size();
+  ROOT::VecOps::RVec<int> mother_pdgId;
+
+  for (size_t i = 0; i < ele_size; i++) {
+    mother_pdgId.emplace_back(0);
+    int idx = mother_idx[i];
+    int pdgId;
+    while (idx >= 0) {
+      pdgId = genpart_pdgId[idx];
+      if (isInteresting(pdgId) == 1) {
+        mother_pdgId[i] = genpart_pdgId[idx];
+      }
+      idx = mother_idx[idx];
+    }
+  }
+
+  return mother_pdgId;
+}
+
+auto mother_genpart_deta(ROOT::VecOps::RVec<int> &mother_idx,
+                         ROOT::VecOps::RVec<int> &genpart_pdgId,
+                         ROOT::VecOps::RVec<float> &genpart_eta,
+                         ROOT::VecOps::RVec<float> &ele_eta) {
+  /* If GenPartMother of MGenElectron is b or c quark, computes deta between the
+   * two particles
+   */
+
+  auto ele_size = ele_eta.size();
+  ROOT::VecOps::RVec<float> mother_deta;
+
+  for (size_t i = 0; i < ele_size; i++) {
+    mother_deta.emplace_back(0.5);
+    int idx = mother_idx[i];
+    int pdgId;
+    while (idx >= 0) {
+      pdgId = genpart_pdgId[idx];
+      if (isInteresting(pdgId) == 1) {
+        mother_deta[i] = ele_eta[i] - genpart_eta[idx];
+      }
+      idx = mother_idx[idx];
+    }
+  }
+
+  return mother_deta;
+}
+
+auto mother_genpart_dphi(ROOT::VecOps::RVec<int> &mother_idx,
+                         ROOT::VecOps::RVec<int> &genpart_pdgId,
+                         ROOT::VecOps::RVec<float> &genpart_phi,
+                         ROOT::VecOps::RVec<float> &ele_phi) {
+  /* If GenPartMother of MGenElectron is b or c quark, computes dphi between the
+   * two particles
+   */
+
+  auto ele_size = ele_phi.size();
+  ROOT::VecOps::RVec<float> mother_dphi;
+
+  for (size_t i = 0; i < ele_size; i++) {
+    mother_dphi.emplace_back(0.5);
+    int idx = mother_idx[i];
+    int pdgId;
+    while (idx >= 0) {
+      pdgId = genpart_pdgId[idx];
+      if (isInteresting(pdgId) == 1) {
+        mother_dphi[i] = TVector2::Phi_mpi_pi(ele_phi[i] - genpart_phi[idx]);
+      }
+      idx = mother_idx[idx];
+    }
+  }
+
+  return mother_dphi;
 }
 
 void electrons_extraction() {
 
-  // ROOT::EnableImplicitMT();
+  ROOT::EnableImplicitMT();
+  /*
+  /store/mc/RunIISummer20UL18NanoAODv2/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v15_L1v1-v1/230000/0088F3A1-0457-AB4D-836B-AC3022A0E34F.root
+  /store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/00000/28FE3773-9C94-5E42-B6FB-64C997636881.root
+  /store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/00000/89142AF0-003E-5549-A6C9-5C0A3FA912A4.root
+  /store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/10000/C600FF22-6CBA-6E4B-8FCF-192910F79D84.root
+  /store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/10000/E1688267-29A9-D049-8B5F-FE4910D3A262.root
+  /store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/20000/3A2B272C-E0EB-1748-A658-E5B58BBCFCBF.root
+  /store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/20000/40E28BE3-1A22-9D40-A482-2BAA3E9ABC24.root
+  */
 
-  ROOT::RDataFrame d("Events", "047F4368-97D4-1A4E-B896-23C6C72DD2BE.root");
+  TFile *f = TFile::Open(
+      "root://cmsxrootd.fnal.gov///store/mc/RunIISummer20UL18NanoAODv2/"
+      "TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8/NANOAODSIM/"
+      "106X_upgrade2018_realistic_v15_L1v1-v1/230000/"
+      "0088F3A1-0457-AB4D-836B-AC3022A0E34F.root");
+
+  ROOT::RDataFrame d("Events", f);
 
   auto d_matched =
       d.Define("MGenPartIdx", "Electron_genPartIdx[Electron_genPartIdx >= 0]")
@@ -360,8 +419,18 @@ void electrons_extraction() {
           .Define("MGenElectron_pt", "Take(GenPart_pt, MGenElectronIdx)")
           .Define("MGenElectron_pdgId", "Take(GenPart_pdgId, MGenElectronIdx)")
           .Define("MGenElectron_charge", charge, {"MGenElectron_pdgId"})
-          .Define("MGenElectron_genPartIdxMother",
-                  "GenPart_genPartIdxMother[MGenElectronMask]")
+          .Define("MGenPartMother_pdgId", mother_genpart_pdgId,
+                  {"GenPart_genPartIdxMother", "GenPart_pdgId",
+                   "MGenElectron_pdgId"})
+          .Define("MGenPartMother_pt", mother_genpart_pt,
+                  {"GenPart_genPartIdxMother", "GenPart_pdgId", "GenPart_pt",
+                   "MGenElectron_pt"})
+          .Define("MGenPartMother_deta", mother_genpart_deta,
+                  {"GenPart_genPartIdxMother", "GenPart_pdgId", "GenPart_eta",
+                   "MGenElectron_eta"})
+          .Define("MGenPartMother_dphi", mother_genpart_dphi,
+                  {"GenPart_genPartIdxMother", "GenPart_pdgId", "GenPart_phi",
+                   "MGenElectron_phi"})
           .Define("MGenElectron_statusFlags",
                   "Take(GenPart_statusFlags, MGenElectronIdx)")
           .Define("MGenElectron_statusFlag0",
@@ -797,9 +866,115 @@ void electrons_extraction() {
                   },
                   {"Electron_vidNestedWPBitmapHEEP"});
 
-  auto h = d_matched.Histo1D("MGenElectron_genPartIdxMother");
-  auto c = new TCanvas();
-  h->Draw();
-  c->SaveAs("extraction.pdf");
-  c->Close();
+  vector<string> col_to_save = {
+    "MGenElectron_eta",
+    "MGenElectron_phi",
+    "MGenElectron_pt",
+    "MGenElectron_charge",
+    "MGenPartMother_pdgId",
+    "MGenPartMother_pt",
+    "MGenPartMother_deta",
+    "MGenPartMother_dphi",
+    "MGenElectron_statusFlag0",
+    "MGenElectron_statusFlag1",
+    "MGenElectron_statusFlag2",
+    "MGenElectron_statusFlag3",
+    "MGenElectron_statusFlag4",
+    "MGenElectron_statusFlag5",
+    "MGenElectron_statusFlag6",
+    "MGenElectron_statusFlag7",
+    "MGenElectron_statusFlag8",
+    "MGenElectron_statusFlag9",
+    "MGenElectron_statusFlag10",
+    "MGenElectron_statusFlag11",
+    "MGenElectron_statusFlag12",
+    "MGenElectron_statusFlag13",
+    "MGenElectron_statusFlag14",
+    "ClosestJet_dr",
+    "ClosestJet_dphi",
+    "ClosestJet_deta",
+    "ClosestJet_pt",
+    "ClosestJet_mass",
+    "ClosestJet_EncodedPartonFlavour_light",
+    "ClosestJet_EncodedPartonFlavour_gluon",
+    "ClosestJet_EncodedPartonFlavour_c",
+    "ClosestJet_EncodedPartonFlavour_b",
+    "ClosestJet_EncodedPartonFlavour_undefined",
+    "ClosestJet_EncodedHadronFlavour_b",
+    "ClosestJet_EncodedHadronFlavour_c",
+    "ClosestJet_EncodedHadronFlavour_light",
+    "MElectron_charge",
+    "MElectron_convVeto",
+    "MElectron_cutBased",
+    "MElectron_cutBased_Fall17_V1",
+    "MElectron_dr03TkSumPt",
+    "MElectron_dr03TkSumPtHEEP",
+    "MElectron_dxy",
+    "MElectron_dxyErr",
+    "MElectron_dz",
+    "MElectron_dzErr",
+    "MElectron_eCorr",
+    "MElectron_eInvMinusPInv",
+    "MElectron_energyErr",
+    "MElectron_etaMinusGen",
+    "MElectron_hoe",
+    "MElectron_ip3d",
+    "MElectron_isPFcand",
+    "MElectron_jetPtRelv2",
+    "MElectron_jetRelIso",
+    "MElectron_lostHits",
+    "MElectron_miniPFRelIso_all",
+    "MElectron_miniPFRelIso_chg",
+    "MElectron_mvaFall17V1Iso",
+    "MElectron_mvaFall17V1Iso_WP80",
+    "MElectron_mvaFall17V1Iso_WP90",
+    "MElectron_mvaFall17V1Iso_WPL",
+    "MElectron_mvaFall17V1noIso",
+    "MElectron_mvaFall17V1noIso_WP80",
+    "MElectron_mvaFall17V1noIso_WP90",
+    "MElectron_mvaFall17V1noIso_WPL",
+    "MElectron_mvaFall17V2Iso",
+    "MElectron_mvaFall17V2Iso_WP80",
+    "MElectron_mvaFall17V2Iso_WP90",
+    "MElectron_mvaFall17V2Iso_WPL",
+    "MElectron_mvaFall17V2noIso",
+    "MElectron_mvaFall17V2noIso_WP80",
+    "MElectron_mvaFall17V2noIso_WP90",
+    "MElectron_mvaFall17V2noIso_WPL",
+    "MElectron_mvaTTH",
+    "MElectron_pfRelIso03_all",
+    "MElectron_pfRelIso03_chg",
+    "MElectron_phiMinusGen",
+    "MElectron_ptRatio",
+    "MElectron_r9",
+    "MElectron_seedGain",
+    "MElectron_sieie",
+    "MElectron_sip3d",
+    "MElectron_tightCharge",
+    "MElectron_vidNestedWPBitmap0",
+    "MElectron_vidNestedWPBitmap1",
+    "MElectron_vidNestedWPBitmap2",
+    "MElectron_vidNestedWPBitmap3",
+    "MElectron_vidNestedWPBitmap4",
+    "MElectron_vidNestedWPBitmap5",
+    "MElectron_vidNestedWPBitmap6",
+    "MElectron_vidNestedWPBitmap7",
+    "MElectron_vidNestedWPBitmap8",
+    "MElectron_vidNestedWPBitmap9",
+    "MElectron_vidNestedWPBitmapHEEP0",
+    "MElectron_vidNestedWPBitmapHEEP1",
+    "MElectron_vidNestedWPBitmapHEEP2",
+    "MElectron_vidNestedWPBitmapHEEP3",
+    "MElectron_vidNestedWPBitmapHEEP4",
+    "MElectron_vidNestedWPBitmapHEEP5",
+    "MElectron_vidNestedWPBitmapHEEP6",
+    "MElectron_vidNestedWPBitmapHEEP7",
+    "MElectron_vidNestedWPBitmapHEEP8",
+    "MElectron_vidNestedWPBitmapHEEP9",
+    "MElectron_vidNestedWPBitmapHEEP10",
+    "MElectron_vidNestedWPBitmapHEEP11"
+  };
+
+  d_matched.Snapshot("MElectrons", "MElectrons_v1.root");
+
 }

@@ -860,7 +860,7 @@ void electrons_extraction() {
                     int bit = 11;
                     return BitwiseDecoder(ints, bit);
                   },
-                  {"Electron_vidNestedWPBitmapHEEP"});
+                  {"MElectron_vidNestedWPBitmapHEEP"});
 
   vector<string> col_to_save = {"MGenElectron_eta",
                                 "MGenElectron_phi",

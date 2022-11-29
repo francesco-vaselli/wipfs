@@ -283,7 +283,7 @@ void gen_jet_graph(){
 	ROOT::RDataFrame d("Events",f);
 
 	// create first mask 
-	auto d_def = d.Define("JetMask","Jet_genJetIdx < 0 || Jet_genJetIdx > nGenJet");
+	auto d_def = d.Define("JetMask","Jet_genJetIdx < 0 || Jet_genJetIdx >= nGenJet");
 	// Optionally print columns names
 	// auto v2 = d_matched.GetColumnNames();
 	// for (auto &&colName : v2) std::cout <<"\""<< colName<<"\", ";

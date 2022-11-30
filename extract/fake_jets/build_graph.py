@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     # define pandas df for fast manipulation
     df = tree.arrays(library="pd", entry_stop=10) # .reset_index(drop=True).astype("float32").dropna()
-    print(df)
+    print(df[0], '\n', df[1], '\n', df[2])
 
     # numerical errors check
     df = df[~df.isin([np.nan, np.inf, -np.inf]).any(1)]

@@ -297,7 +297,7 @@ void gen_jet_graph(){
 
 	// Define variables to save
 	vector<string> col_to_save = 
-		{"nGenJet", "GenJet_eta", "GenJet_mass", "GenJet_phi", "GenJet_pt", 
+		{"nGenJet", "nGenPart", "GenJet_eta", "GenJet_mass", "GenJet_phi", "GenJet_pt", 
         "GenJet_partonFlavour", "GenJet_hadronFlavour", "GenPart_eta",
 		"GenPart_genPartIdxMother", "GenPart_mass", "GenPart_pdgId", "GenPart_phi",
 		"GenPart_pt", "GenPart_status", "GenPart_statusFlags", "Pileup_gpudensity", 

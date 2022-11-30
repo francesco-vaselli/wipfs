@@ -16,7 +16,7 @@ if __name__ == "__main__":
     print(vars_to_save)
 
     # define pandas df for fast manipulation
-    df = tree.arrays(["GenJet_mass", "GenJet_phi", "GenJet_pt", 
+    df = tree.arrays(["GenJet_mass", "GenJet_eta", "GenJet_phi", "GenJet_pt", 
         "GenJet_partonFlavour", "GenJet_hadronFlavour"], library="pd", entry_stop=10) # .reset_index(drop=True).astype("float32").dropna()
     print(df)
         # df[0], '\n', df[1], '\n', df[2])

@@ -16,8 +16,10 @@ if __name__ == "__main__":
     print(vars_to_save)
 
     # define pandas df for fast manipulation
-    df = tree.arrays(library="pd", entry_stop=10) # .reset_index(drop=True).astype("float32").dropna()
-    print(df[0], '\n', df[1], '\n', df[2])
+    df = tree.arrays(["GenJet_mass", "GenJet_phi", "GenJet_pt", 
+        "GenJet_partonFlavour", "GenJet_hadronFlavour"], library="pd", entry_stop=10) # .reset_index(drop=True).astype("float32").dropna()
+    print(df)
+        # df[0], '\n', df[1], '\n', df[2])
 
     # numerical errors check
     df = df[~df.isin([np.nan, np.inf, -np.inf]).any(1)]

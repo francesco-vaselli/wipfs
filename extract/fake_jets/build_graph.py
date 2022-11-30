@@ -16,7 +16,7 @@ if __name__ == "__main__":
     print(vars_to_save)
 
     # define pandas df for fast manipulation
-    df = tree.arrays(library="pd", entry_stop=10).reset_index(drop=True).astype("float32").dropna()
+    df = tree.arrays(library="pd", entry_stop=10) # .reset_index(drop=True).astype("float32").dropna()
     print(df)
 
     # numerical errors check

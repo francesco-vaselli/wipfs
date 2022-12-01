@@ -8,7 +8,7 @@ import uproot
 np.random.seed(0)
 
 dict = {
-    "MGenElectron_eta": (False, False, (np.log1p, [0, 0])),
+    "MGenElectron_eta": ([-0.5, 0.5], False, False),
     "MGenElectron_phi": (False, False, False),
     "MGenElectron_pt": (False, False, False),
     "MGenElectron_charge": (False, False, False),
@@ -141,6 +141,7 @@ def preprocessing(column_name, operation, df):
         print(f"Saturating in range {range}...")
         val = df[column_name].values
         df[column_name] = np.where(val < range[0], range[0], val)
+        val = df[column_name].values
         df[column_name] = np.where(val > range[1], range[1], val)
         print("Done")
 
@@ -160,7 +161,6 @@ def preprocessing(column_name, operation, df):
         print("Done")
 
     return df[column_name]
-
 
 if __name__ == "__main__":
 

@@ -179,8 +179,10 @@ if __name__ == "__main__":
     df = df[~df.isin([np.nan, np.inf, -np.inf]).any(1)]
 
     for column_name, operation in dict.items():
-        fig = plt.figure()
-        ax = df[column_name].hist()
+        fig, axs = plt.subplots(1, 2)
+        plt.suptitle(f"{column_name}")
+        axs[0].hist(df[column_name], bins=50, histtype='step')
         df[column_name] = preprocessing(column_name, operation, df)
-        ax_pre = df[column_name].hist()
-        plt.show()
+        axs[1].hist(df[column_name], bins=50, histtype='step')
+        plt.savefig(f"preprocessing_fig/{column_name}.pdf", format="pdf")
+        plt.close(fig)

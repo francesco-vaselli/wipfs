@@ -1,0 +1,562 @@
+{
+"MGenElectron_eta": [
+false,
+false,
+false
+],
+"MGenElectron_phi": [
+false,
+false,
+false
+],
+"MGenElectron_pt": [
+false,
+false,
+false
+],
+"MGenElectron_charge": [
+false,
+false,
+false
+],
+"MGenPartMother_pdgId": [
+false,
+false,
+false
+],
+"MGenPartMother_pt": [
+false,
+false,
+false
+],
+"MGenPartMother_deta": [
+false,
+false,
+false
+],
+"MGenPartMother_dphi": [
+false,
+false,
+false
+],
+"MGenElectron_statusFlag0": [
+false,
+false,
+false
+],
+"MGenElectron_statusFlag1": [
+false,
+false,
+false
+],
+"MGenElectron_statusFlag2": [
+false,
+false,
+false
+],
+"MGenElectron_statusFlag3": [
+false,
+false,
+false
+],
+"MGenElectron_statusFlag4": [
+false,
+false,
+false
+],
+"MGenElectron_statusFlag5": [
+false,
+false,
+false
+],
+"MGenElectron_statusFlag6": [
+false,
+false,
+false
+],
+"MGenElectron_statusFlag7": [
+false,
+false,
+false
+],
+"MGenElectron_statusFlag8": [
+false,
+false,
+false
+],
+"MGenElectron_statusFlag9": [
+false,
+false,
+false
+],
+"MGenElectron_statusFlag10": [
+false,
+false,
+false
+],
+"MGenElectron_statusFlag11": [
+false,
+false,
+false
+],
+"MGenElectron_statusFlag12": [
+false,
+false,
+false
+],
+"MGenElectron_statusFlag13": [
+false,
+false,
+false
+],
+"MGenElectron_statusFlag14": [
+false,
+false,
+false
+],
+"ClosestJet_dr": [
+false,
+false,
+false
+],
+"ClosestJet_dphi": [
+false,
+false,
+false
+],
+"ClosestJet_deta": [
+false,
+false,
+false
+],
+"ClosestJet_pt": [
+false,
+false,
+false
+],
+"ClosestJet_mass": [
+false,
+false,
+false
+],
+"ClosestJet_EncodedPartonFlavour_light": [
+false,
+false,
+false
+],
+"ClosestJet_EncodedPartonFlavour_gluon": [
+false,
+false,
+false
+],
+"ClosestJet_EncodedPartonFlavour_c": [
+false,
+false,
+false
+],
+"ClosestJet_EncodedPartonFlavour_b": [
+false,
+false,
+false
+],
+"ClosestJet_EncodedPartonFlavour_undefined": [
+false,
+false,
+false
+],
+"ClosestJet_EncodedHadronFlavour_b": [
+false,
+false,
+false
+],
+"ClosestJet_EncodedHadronFlavour_c": [
+false,
+false,
+false
+],
+"ClosestJet_EncodedHadronFlavour_light": [
+false,
+false,
+false
+],
+"MElectron_charge": [
+false,
+false,
+false
+],
+"MElectron_convVeto": [
+false,
+false,
+false
+],
+"MElectron_cutBased": [
+false,
+false,
+false
+],
+"MElectron_cutBased_Fall17_V1": [
+false,
+false,
+false
+],
+"MElectron_dr03TkSumPt": [
+false,
+false,
+false
+],
+"MElectron_dr03TkSumPtHEEP": [
+false,
+false,
+false
+],
+"MElectron_dxy": [
+false,
+false,
+false
+],
+"MElectron_dxyErr": [
+false,
+false,
+false
+],
+"MElectron_dz": [
+false,
+false,
+false
+],
+"MElectron_dzErr": [
+false,
+false,
+false
+],
+"MElectron_eCorr": [
+false,
+false,
+false
+],
+"MElectron_eInvMinusPInv": [
+false,
+false,
+false
+],
+"MElectron_energyErr": [
+false,
+false,
+false
+],
+"MElectron_etaMinusGen": [
+false,
+false,
+false
+],
+"MElectron_hoe": [
+false,
+false,
+false
+],
+"MElectron_ip3d": [
+false,
+false,
+false
+],
+"MElectron_isPFcand": [
+false,
+false,
+false
+],
+"MElectron_jetPtRelv2": [
+false,
+false,
+false
+],
+"MElectron_jetRelIso": [
+false,
+false,
+false
+],
+"MElectron_lostHits": [
+false,
+false,
+false
+],
+"MElectron_miniPFRelIso_all": [
+false,
+false,
+false
+],
+"MElectron_miniPFRelIso_chg": [
+false,
+false,
+false
+],
+"MElectron_mvaFall17V1Iso": [
+false,
+false,
+false
+],
+"MElectron_mvaFall17V1Iso_WP80": [
+false,
+false,
+false
+],
+"MElectron_mvaFall17V1Iso_WP90": [
+false,
+false,
+false
+],
+"MElectron_mvaFall17V1Iso_WPL": [
+false,
+false,
+false
+],
+"MElectron_mvaFall17V1noIso": [
+false,
+false,
+false
+],
+"MElectron_mvaFall17V1noIso_WP80": [
+false,
+false,
+false
+],
+"MElectron_mvaFall17V1noIso_WP90": [
+false,
+false,
+false
+],
+"MElectron_mvaFall17V1noIso_WPL": [
+false,
+false,
+false
+],
+"MElectron_mvaFall17V2Iso": [
+false,
+false,
+false
+],
+"MElectron_mvaFall17V2Iso_WP80": [
+false,
+false,
+false
+],
+"MElectron_mvaFall17V2Iso_WP90": [
+false,
+false,
+false
+],
+"MElectron_mvaFall17V2Iso_WPL": [
+false,
+false,
+false
+],
+"MElectron_mvaFall17V2noIso": [
+false,
+false,
+false
+],
+"MElectron_mvaFall17V2noIso_WP80": [
+false,
+false,
+false
+],
+"MElectron_mvaFall17V2noIso_WP90": [
+false,
+false,
+false
+],
+"MElectron_mvaFall17V2noIso_WPL": [
+false,
+false,
+false
+],
+"MElectron_mvaTTH": [
+false,
+false,
+false
+],
+"MElectron_pfRelIso03_all": [
+false,
+false,
+false
+],
+"MElectron_pfRelIso03_chg": [
+false,
+false,
+false
+],
+"MElectron_phiMinusGen": [
+false,
+false,
+false
+],
+"MElectron_ptRatio": [
+false,
+false,
+false
+],
+"MElectron_r9": [
+false,
+false,
+false
+],
+"MElectron_seedGain": [
+false,
+false,
+false
+],
+"MElectron_sieie": [
+false,
+false,
+false
+],
+"MElectron_sip3d": [
+false,
+false,
+false
+],
+"MElectron_tightCharge": [
+false,
+false,
+false
+],
+"MElectron_vidNestedWPBitmap0": [
+false,
+false,
+false
+],
+"MElectron_vidNestedWPBitmap1": [
+false,
+false,
+false
+],
+"MElectron_vidNestedWPBitmap2": [
+false,
+false,
+false
+],
+"MElectron_vidNestedWPBitmap3": [
+false,
+false,
+false
+],
+"MElectron_vidNestedWPBitmap4": [
+false,
+false,
+false
+],
+"MElectron_vidNestedWPBitmap5": [
+false,
+false,
+false
+],
+"MElectron_vidNestedWPBitmap6": [
+false,
+false,
+false
+],
+"MElectron_vidNestedWPBitmap7": [
+false,
+false,
+false
+],
+"MElectron_vidNestedWPBitmap8": [
+false,
+false,
+false
+],
+"MElectron_vidNestedWPBitmap9": [
+false,
+false,
+false
+],
+"MElectron_vidNestedWPBitmapHEEP0": [
+false,
+false,
+false
+],
+"MElectron_vidNestedWPBitmapHEEP1": [
+false,
+false,
+false
+],
+"MElectron_vidNestedWPBitmapHEEP2": [
+false,
+false,
+false
+],
+"MElectron_vidNestedWPBitmapHEEP3": [
+false,
+false,
+false
+],
+"MElectron_vidNestedWPBitmapHEEP4": [
+false,
+false,
+false
+],
+"MElectron_vidNestedWPBitmapHEEP5": [
+false,
+false,
+false
+],
+"MElectron_vidNestedWPBitmapHEEP6": [
+false,
+false,
+false
+],
+"MElectron_vidNestedWPBitmapHEEP7": [
+false,
+false,
+false
+],
+"MElectron_vidNestedWPBitmapHEEP8": [
+false,
+false,
+false
+],
+"MElectron_vidNestedWPBitmapHEEP9": [
+false,
+false,
+false
+],
+"MElectron_vidNestedWPBitmapHEEP10": [
+false,
+false,
+false
+],
+"MElectron_vidNestedWPBitmapHEEP11": [
+false,
+false,
+false
+],
+"Pileup_gpudensity": [
+false,
+false,
+false
+],
+"Pileup_nPU": [
+false,
+false,
+false
+],
+"Pileup_nTrueInt": [
+false,
+false,
+false
+],
+"Pileup_pudensity": [
+false,
+false,
+false
+],
+"Pileup_sumEOOT": [
+false,
+false,
+false
+],
+"Pileup_sumLOOT": [
+false,
+false,
+false
+]
+}

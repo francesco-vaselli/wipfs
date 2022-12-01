@@ -6,7 +6,9 @@ import numpy as np
 import sys
 import torch  # we use pytorch
 import torch_geometric
-from torch_geometric.data import HeteroData  # and the "geometric" package to help handling GNNs
+from torch_geometric.data import (
+    Data,
+)  # and the "geometric" package to help handling GNNs
 from torch_cluster import (
     knn_graph,
 )  # utility to search for  nearest neighbor on a graph
@@ -17,17 +19,17 @@ import matplotlib.pyplot as plt
 STOP = 10
 KNN = 3
 
+
 def graph_builder(gen_jets, gen_parts, global_f, fake_target, k):
 
-    data = HeteroData()
-    # Create two node types "gen part" and "gen jet" holding a feature matrix:
-    data['gen_jet'].x = torch.tensor(gen_jets)
-    data['gen_part'].x = torch.tensor(gen_parts)
+    data = Data(globf=torch.tensor(global_f))
+    data.x = torch.vstack((torch.tensor(gen_jets), torch.tensor(gen_parts)))
     data.y = torch.tensor(fake_target)
 
     data.edge_index = knn_graph(data.x[:, [1, 2]], k=k)
 
     return data
+
 
 if __name__ == "__main__":
 
@@ -50,6 +52,17 @@ if __name__ == "__main__":
         library="pd",
         entry_stop=STOP,
     ).astype("float32")
+    dfgj["GenJet_pdgId"] = 100 * np.abs(dfgj.GenJet_hadronFlavour.values) + np.abs(
+        dfgj.GenJet_partonFlavour.values
+    )
+    dfgj["GenJet_status"] = np.ones(len(dfgj))
+    dfgj["GenJet_statusFlags"] = np.zeros(len(dfgj))
+    dfgj = dfgj.drop(
+        columns=[
+            "GenJet_partonFlavour",
+            "GenJet_hadronFlavour",
+        ]
+    )
     print(dfgj)
 
     # define pandas df for fast manipulation
@@ -67,6 +80,7 @@ if __name__ == "__main__":
         library="pd",
         entry_stop=STOP,
     ).astype("float32")
+    dfgp = dfgp[np.abs(dfgp.GenPart_eta) <= 5]
     print(dfgp)
 
     # define pandas df for fast manipulation
@@ -90,6 +104,9 @@ if __name__ == "__main__":
         library="pd",
         entry_stop=STOP,
     ).astype("float32")
+    dfft = dfft.reindex(
+        pd.MultiIndex.from_product([np.arange(len(dfgl)), np.arange(10)]), fill_value=0
+    )
     print(dfft)
 
     for i in range(len(dfgj)):
@@ -102,6 +119,23 @@ if __name__ == "__main__":
             k=KNN,
         )
 
-        g = torch_geometric.utils.to_networkx(graph.to_homogeneous())
-        nx.draw(g)
-        plt.savefig('graph.png')
+        g = torch_geometric.utils.to_networkx(graph)
+        x = graph.x
+        # for j in (enumerate(x)):
+        #   print(j)
+        fig, ax = plt.subplots()
+        nx.draw(g, {i: [p[1], p[2]] for i, p in enumerate(x)}, node_size=(25), ax=ax)
+        limits = plt.axis("on")
+        ax.set_xlabel(r"$\eta$")
+        ax.set_ylabel(r"$\phi$")
+        ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
+        plt.scatter(
+            graph.y[:, 1][
+                ((np.array(graph.y[:, 1]) != 0) | (np.array(graph.y[:, 0]) != 0))
+            ],
+            graph.y[:, 0][
+                ((np.array(graph.y[:, 1]) != 0) | (np.array(graph.y[:, 0]) != 0))
+            ],
+            color="red",
+        )
+        plt.savefig("graph.png")

@@ -641,6 +641,15 @@ void electrons_extraction() {
                   "Electron_cutBased[Electron_MGenElectronMask]")
           .Define("MElectron_cutBased_Fall17_V1",
                   "Electron_cutBased_Fall17_V1[Electron_MGenElectronMask]")
+          .Define("MElectron_cutBased_HEEP",
+                  "Electron_cutBased_HEEP[Electron_MGenElectronMask]")
+          .Define("MElectron_deltaEtaSC",
+                  "Electron_deltaEtaSC[Electron_MGenElectronMask]")
+          .Define("MElectron_dr03EcalRecHitSumEt",
+                  "Electron_dr03EcalRecHitSumEt[Electron_MGenElectronMask]")
+          .Define(
+              "MElectron_dr03HcalDepth1TowerSumEt",
+              "Electron_dr03HcalDepth1TowerSumEt[Electron_MGenElectronMask]")
           .Define("MElectron_dr03TkSumPt",
                   "Electron_dr03TkSumPt[Electron_MGenElectronMask]")
           .Define("MElectron_dr03TkSumPtHEEP",
@@ -902,6 +911,10 @@ void electrons_extraction() {
                                 "MElectron_convVeto",
                                 "MElectron_cutBased",
                                 "MElectron_cutBased_Fall17_V1",
+                                "MElectron_cutBased_HEEP",
+                                "MElectron_deltaEtaSC",
+                                "MElectron_dr03EcalRecHitSumEt",
+                                "MElectron_dr03HcalDepth1TowerSumEt",
                                 "MElectron_dr03TkSumPt",
                                 "MElectron_dr03TkSumPtHEEP",
                                 "MElectron_dxy",

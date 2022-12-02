@@ -6,12 +6,18 @@ import numpy as np
 from matplotlib import pyplot as plt
 import uproot
 
+import warnings
+warnings.filterwarnings("ignore") # temporary for MatPlotLibDeprecationWarning bug
+
+from dictionary import vars_dictionary  # operation dictionary
+
 np.random.seed(0)  # fixed seed for gaussian random smearing
 
 
 def make_dataset(tree, version, dictionary=False, *args, **kwargs):
     """
-    Print dictionary of TTree variables and their preprocessing operations and return corresponding pandas dataframe. Sets default operations to False
+    Given the TTree, returns the corresponding pandas dataframe.
+    If dictionary is True, an empty dictionary of TTree variables is dumped on .txt file (to be copied on dictionary.py).
     """
     df = (
         tree.arrays(library="pd", *args, **kwargs)
@@ -21,57 +27,92 @@ def make_dataset(tree, version, dictionary=False, *args, **kwargs):
     )
 
     if dictionary:
-        vars_to_save = tree.keys()
-        d = {name: [False, False, False] for name in vars_to_save}
+        val = input("Are you sure to make a new empty vars_dictionary? (y/n)\n")
+        if val == "y":
+            print("Rewriting...")
+            vars_to_save = tree.keys()
+            d = {name: [] for name in vars_to_save}
 
-        with open(f"vars_dictionary_v{version}.txt", "w") as file:
-            file.write(json.dumps(d, indent=""))
+            with open(f"vars_dictionary_v{version}.txt", "w") as file:
+                for key, value in d.items():
+                    file.write(f'"{key}": {value},\n')
 
-        file.close()
-
+            file.close()
+        else:
+            print("Aborting...")
+            return df
+        print("Done.")
     return df
 
 
-def read_dictionary(version):
+def saturation(df, column_name, interval):
     """
-    Read operation dictionary from file
+    Performs saturation on given column.
     """
-    with open(f"vars_dictionary_v{version}.txt") as file:
-        data = file.read()
-    d = json.loads(data)
-    file.close()
-    return d
+    print(f"Saturating in range {interval}...")
+    val = df[column_name].values
+    df[column_name] = np.where(val < interval[0], interval[0], val)
+    val = df[column_name].values
+    df[column_name] = np.where(val > interval[1], interval[1], val)
+    print("Done.")
+    return df[column_name]
 
 
-def process_column(column_name, operation, df):
+def gaus_smearing(df, column_name, sigma, interval):
     """
-    Process the single dataframe column as specified in the operation list
+    Performs gaussian smearing on given column. If interval is specified, random gaussian data are asseigned to column in interval.
     """
-    print(f"{column_name}:")
-    if operation[0]:
-        range = operation[0]
-        print(f"Saturating in range {range}...")
-        val = df[column_name].values
-        df[column_name] = np.where(val < range[0], range[0], val)
-        val = df[column_name].values
-        df[column_name] = np.where(val > range[1], range[1], val)
-        print("Done")
-
-    if operation[1]:
-        sigma = operation[1]
-        print(f"Gaussian smearing with sigma {sigma}")
+    val = df[column_name].values
+    if interval != None:
+        mask_condition = np.logical_and(val >= interval[0], val <= interval[1])
+        loc = np.mean(val[mask_condition])
+        print(
+            f"Creating gaussian data (loc={loc}, scale={sigma}) in range {interval}..."
+        )
+        val[mask_condition] = np.random.normal(
+            loc=loc, scale=sigma, size=val[mask_condition].shape
+        )
+    else:
+        print(f"Smearing with sigma={sigma}...")
         df[column_name] = df[column_name].apply(
             lambda x: x + sigma * np.random.normal()
         )
-        print("Done")
+    print("Done.")
+    return df[column_name]
 
-    if operation[2]:
-        func = operation[2][0]
-        p = operation[2][1]
-        print(f"Applying {func}(x * {p[0]} + {p[1]})")
-        df[column_name] = df[column_name].apply(lambda x: func(x * p[0] + p[1]))
-        print("Done")
 
+def transform(df, column_name, function, p):
+    """
+    Performs a function tranformation on column
+    """
+    print(f"Applying {function} with parameters {p}...")
+    df[column_name] = df[column_name].apply(lambda x: function(x * p[0] + p[1]))
+    print("Done.")
+    return df[column_name]
+
+
+def process_column_var(column_name, operations, df):
+    """
+    Processes single dataframe column. Operation type is specified by string.
+    """
+    print(f"Processing {column_name}...")
+    for op in operations:
+        if op[0] == "s":
+            interval = op[1]
+            df[column_name] = saturation(df, column_name, interval)
+
+        if op[0] == "g":
+            sigma = op[1]
+            mask_condition = op[2]
+            df[column_name] = gaus_smearing(df, column_name, sigma, mask_condition)
+
+        if op[0] == "t":
+            function = op[1]
+            p = op[2]
+            df[column_name] = transform(df, column_name, function, p)
+
+        else:
+            return df[column_name]
     return df[column_name]
 
 
@@ -84,9 +125,9 @@ def preprocessing(df, vars_dictionary):
     for column_name, operation in vars_dictionary.items():
         fig, axs = plt.subplots(1, 2)
         plt.suptitle(f"{column_name}")
-        axs[0].hist(df[column_name], bins=50, histtype="step")
-        df[column_name] = process_column(column_name, operation, df)
-        axs[1].hist(df[column_name], bins=50, histtype="step")
+        axs[0].hist(df[column_name], bins=30, histtype="step")
+        df[column_name] = process_column_var(column_name, operation, df)
+        axs[1].hist(df[column_name], bins=30, histtype="step")
         plt.savefig(f"preprocessing_fig/{column_name}.pdf", format="pdf")
         plt.close()  # produces MatplotlibDeprecationWarning. It is a bug (https://github.com/matplotlib/matplotlib/issues/23921)
 
@@ -98,11 +139,9 @@ def preprocessing(df, vars_dictionary):
 if __name__ == "__main__":
 
     f = sys.argv[1]
-    tree = uproot.open(f"MElectrons_v{f}.root:MElectrons")
+    tree = uproot.open(f"MElectrons_v{f}.root:MElectrons", num_workers=8)
 
-    df = make_dataset(tree, version=f, dictionary=True, entry_stop=10000)
-
-    vars_dictionary = read_dictionary(version=f)
+    df = make_dataset(tree, version=f, dictionary=False)
 
     df = preprocessing(df, vars_dictionary)
 

@@ -9,15 +9,27 @@ auto DeltaPhiMEFJ(ROOT::VecOps::RVec<float> &PhiJ) {
 
   auto size = PhiJ.size();
   ROOT::VecOps::RVec<float> dphis;
-  dphis.reserve(size);
-  Double_t dphi0 = -0.1;
-  dphis.emplace_back(dphi0);
+  dphis.reserve(size-1);
   for (size_t i = 1; i < size; i++) {
     Double_t dphi = TVector2::Phi_mpi_pi(PhiJ[0] - PhiJ[i]);
     dphis.emplace_back(dphi);
   }
   return dphis;
 }
+
+auto ABSDeltaEtaMEFJ(ROOT::VecOps::RVec<float> &EtaJ) {
+  /* Calculates the absolute value of DeltaEta between most energetic FakeJet and
+  all others FakeJets
+  */
+  auto size = EtaJ.size();
+  ROOT::VecOps::RVec<float> detas;
+  detas.reserve(size-1);
+  for (size_t i = 1; i < size; i++) {
+    Double_t deta = TMath::Abs(EtaJ[0] - EtaJ[i]);
+    detas.emplace_back(deta);
+  }
+  return detas;
+  
 
 auto DeltaPhi(ROOT::VecOps::RVec<float> &Phi1,
               ROOT::VecOps::RVec<float> &Phi2) {
@@ -330,7 +342,8 @@ void gen_jet_graph() {
   auto d_matched = d_def.Define("FJet_phi", "Jet_phi[JetMask]")
                        .Define("FJet_eta", "Jet_eta[JetMask]")
                        .Define("FJet_pt", "Jet_pt[JetMask]")
-                       .Define("FJet_dphi", DeltaPhiMEFJ, {"FJet_phi"});
+                       .Define("FJet_dphi", DeltaPhiMEFJ, {"FJet_phi"})
+                       .Define("FJet_deta", ABSDeltaEtaMEFJ, {"FJet_eta"});
 
   // Define variables to save
   vector<string> col_to_save = {"nGenJet",
@@ -359,18 +372,39 @@ void gen_jet_graph() {
                                 "FJet_phi",
                                 "FJet_eta",
                                 "FJet_pt",
-                                "FJet_dphi"};
+                                "FJet_dphi",
+                                "FJet_deta"};
 
   // finally process columns and save to .root file
   d_matched.Snapshot("FJets", "FJets.root", col_to_save);
 
   gStyle->SetOptStat(0);
-  auto h = d_matched.Histo1D({"FJet_dphi", "FJet_dphi", 100, -0.15, 6.35},
+  auto h = d_matched.Histo1D({"FJet_dphi", "FJet_dphi", 100, 0, 3.14},
                              "FJet_dphi");
   auto c = new TCanvas();
   h->Draw();
   c->SaveAs("FJet_dphi.png");
-  ffig = new TFile("FJet_dphi.root", "RECREATE");
+  TFile *ffig = new TFile("FJet_dphi.root", "RECREATE");
   h->Write();
   ffig->Close();
+
+  auto h2 = d_matched.Histo1D({"FJet_deta", "FJet_deta", 100, 0, 5},
+                              "FJet_deta");
+  auto c2 = new TCanvas();
+  h2->Draw();
+  c2->SaveAs("FJet_deta.png");
+  TFile *ffig2 = new TFile("FJet_deta.root", "RECREATE");
+  h2->Write();
+  ffig2->Close();
+
+  auto h3 = d_matched.Histo2D({"FJet_dphi_vs_deta", "FJet_dphi_vs_deta", 100,
+                               0, 3.14, 100, 0, 5},
+                              "FJet_dphi", "FJet_deta");
+  auto c3 = new TCanvas();
+  h3->Draw("colz");
+  c3->SaveAs("FJet_dphi_vs_deta.png");
+  TFile *ffig3 = new TFile("FJet_dphi_vs_deta.root", "RECREATE");
+  h3->Write();
+  ffig3->Close();
+  
 }

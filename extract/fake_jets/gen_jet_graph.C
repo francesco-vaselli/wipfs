@@ -11,8 +11,8 @@ auto DeltaPhiMEFJ(ROOT::VecOps::RVec<float> &PhiJ) {
   ROOT::VecOps::RVec<float> dphis;
   dphis.reserve(size);
   Double_t dphi0 = -0.1;
-  dhpis.emplace_back(dphi0);
-  for (size_t i = 0; i < size; i++) {
+  dphis.emplace_back(dphi0);
+  for (size_t i = 1; i < size; i++) {
     Double_t dphi = TVector2::Phi_mpi_pi(PhiJ[0] - PhiJ[i]);
     dphis.emplace_back(dphi);
   }

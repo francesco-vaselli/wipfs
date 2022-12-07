@@ -129,6 +129,6 @@ dmypy.json
 .pyre/
 
 # Local fcattafesta temporary datasets
-extract/electrons/MElectrons_v1.root
-extract/electrons/047F4368-97D4-1A4E-B896-23C6C72DD2BE.root
+extract/electrons/*.root
+extract/electrons/*.h5df
 

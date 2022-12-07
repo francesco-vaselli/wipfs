@@ -1,6 +1,24 @@
 // Open a NanoAOD file and extract Gen-level condtioning AND reco targets for
 // trainings Working fine with ROOT 6.22
 
+auto DeltaPhiMEFJ(ROOT::VecOps::RVec<float> &PhiJ) {
+
+  /* Calculates the DeltaPhi between most energetic FakeJet and
+  all others FakeJets
+   */
+
+  auto size = PhiJ.size();
+  ROOT::VecOps::RVec<float> dphis;
+  dphis.reserve(size);
+  Double_t dphi0 = -0.1;
+  dhpis.emplace_back(dphi0);
+  for (size_t i = 0; i < size; i++) {
+    Double_t dphi = TVector2::Phi_mpi_pi(PhiJ[0] - PhiJ[i]);
+    dphis.emplace_back(dphi);
+  }
+  return dphis;
+}
+
 auto DeltaPhi(ROOT::VecOps::RVec<float> &Phi1,
               ROOT::VecOps::RVec<float> &Phi2) {
 
@@ -311,7 +329,8 @@ void gen_jet_graph() {
   // Lines commented out are variables missing in some NanoAODs
   auto d_matched = d_def.Define("FJet_phi", "Jet_phi[JetMask]")
                        .Define("FJet_eta", "Jet_eta[JetMask]")
-                       .Define("FJet_pt", "Jet_pt[JetMask]");
+                       .Define("FJet_pt", "Jet_pt[JetMask]")
+                       .Define("FJet_dphi", DeltaPhiMEFJ, {"FJet_phi"});
 
   // Define variables to save
   vector<string> col_to_save = {"nGenJet",
@@ -339,7 +358,8 @@ void gen_jet_graph() {
                                 "event",
                                 "FJet_phi",
                                 "FJet_eta",
-                                "FJet_pt"};
+                                "FJet_pt",
+                                "FJet_dphi"};
 
   // finally process columns and save to .root file
   d_matched.Snapshot("FJets", "FJets.root", col_to_save);

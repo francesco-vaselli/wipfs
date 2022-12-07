@@ -65,6 +65,10 @@ if __name__ == "__main__":
     )
     print(dfgj)
 
+    dfgj1 = dfgj.iloc[0]
+    # a pandas df equal to dfgj but without stats
+    dfgj2 = dfgj.drop(columns=["GenJet_status", "GenJet_statusFlags"])
+
     # define pandas df for fast manipulation
     dfgp = tree.arrays(
         [
@@ -139,3 +143,5 @@ if __name__ == "__main__":
             color="red",
         )
         plt.savefig("graph.png")
+
+

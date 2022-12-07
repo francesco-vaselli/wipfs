@@ -25,7 +25,7 @@ auto ABSDeltaEtaMEFJ(ROOT::VecOps::RVec<float> &EtaJ) {
   */
   auto size = EtaJ.size();
   ROOT::VecOps::RVec<float> detas;
-  detas.reserve(size-1);
+  detas.reserve(size);
   Double_t deta0 = -0.1; 
   detas.emplace_back(deta0);
   for (size_t i = 1; i < size; i++) {

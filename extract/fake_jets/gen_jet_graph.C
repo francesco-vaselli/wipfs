@@ -9,7 +9,9 @@ auto DeltaPhiMEFJ(ROOT::VecOps::RVec<float> &PhiJ) {
 
   auto size = PhiJ.size();
   ROOT::VecOps::RVec<float> dphis;
-  dphis.reserve(size-1);
+  dphis.reserve(size);
+  Double_t dphi0 = -0.1; 
+  dphis.emplace_back(dphi0);
   for (size_t i = 1; i < size; i++) {
     Double_t dphi = TVector2::Phi_mpi_pi(PhiJ[0] - PhiJ[i]);
     dphis.emplace_back(dphi);
@@ -24,11 +26,14 @@ auto ABSDeltaEtaMEFJ(ROOT::VecOps::RVec<float> &EtaJ) {
   auto size = EtaJ.size();
   ROOT::VecOps::RVec<float> detas;
   detas.reserve(size-1);
+  Double_t deta0 = -0.1; 
+  detas.emplace_back(deta0);
   for (size_t i = 1; i < size; i++) {
     Double_t deta = TMath::Abs(EtaJ[0] - EtaJ[i]);
     detas.emplace_back(deta);
   }
   return detas;
+}
   
 
 auto DeltaPhi(ROOT::VecOps::RVec<float> &Phi1,
@@ -397,6 +402,7 @@ void gen_jet_graph() {
   h2->Write();
   ffig2->Close();
 
+
   auto h3 = d_matched.Histo2D({"FJet_dphi_vs_deta", "FJet_dphi_vs_deta", 100,
                                0, 3.14, 100, 0, 5},
                               "FJet_dphi", "FJet_deta");
@@ -406,5 +412,5 @@ void gen_jet_graph() {
   TFile *ffig3 = new TFile("FJet_dphi_vs_deta.root", "RECREATE");
   h3->Write();
   ffig3->Close();
-  
+
 }

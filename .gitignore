@@ -130,5 +130,5 @@ dmypy.json
 
 # Local fcattafesta temporary datasets
 extract/electrons/*.root
-extract/electrons/*.h5df
+extract/electrons/*.hdf5
 

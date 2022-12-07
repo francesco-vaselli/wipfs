@@ -369,4 +369,7 @@ void gen_jet_graph() {
   auto c = new TCanvas();
   h->Draw();
   c->SaveAs("FJet_dphi.png");
+  ffig = new TFile("FJet_dphi.root", "RECREATE");
+  h->Write();
+  ffig->Close();
 }

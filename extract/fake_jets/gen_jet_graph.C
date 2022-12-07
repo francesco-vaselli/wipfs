@@ -364,7 +364,8 @@ void gen_jet_graph() {
   // finally process columns and save to .root file
   d_matched.Snapshot("FJets", "FJets.root", col_to_save);
 
-  auto h = d_matched.Histo1D({"FJet_dphi", "FJet_dphi", 100, 0, 3.2},
+  gStyle->SetOptStat(0);
+  auto h = d_matched.Histo1D({"FJet_dphi", "FJet_dphi", 100, -0.15, 6.35},
                              "FJet_dphi");
   auto c = new TCanvas();
   h->Draw();

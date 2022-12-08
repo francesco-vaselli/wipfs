@@ -218,35 +218,13 @@ def create_transform(num_flow_steps, param_dim, context_dim, base_transform_kwar
         [
             transforms.CompositeTransform(
                 [
-                    create_block_transform(param_dim, block_size=int(param_dim/2)),
+                    create_block_transform(param_dim, block_size=3),
                     create_base_transform(
-                        i, param_dim, context_dim=context_dim, block_size=int(param_dim/2), **base_transform_kwargs
+                        i, param_dim, context_dim=context_dim, block_size=3, **base_transform_kwargs
                     ),
                 ]
             )
-            for i in range(2)
-        ]
-        + [
-            transforms.CompositeTransform(
-                [
-                    create_block_transform(param_dim, block_size=int(param_dim/4)),
-                    create_base_transform(
-                        i, param_dim, context_dim=context_dim, block_size=int(param_dim/4), **base_transform_kwargs
-                    ),
-                ]
-            )
-            for i in range(2, 6)
-        ]
-        + [
-            transforms.CompositeTransform(
-                [
-                    create_block_transform(param_dim, block_size=int(param_dim/2)),
-                    create_base_transform(
-                        i, param_dim, context_dim=context_dim, block_size=int(param_dim/2), **base_transform_kwargs
-                    ),
-                ]
-            )
-            for i in range(6, num_flow_steps)
+            for i in range(num_flow_steps)
         ]
         + [transforms.LULinear(param_dim, identity_init=True) ]
     )

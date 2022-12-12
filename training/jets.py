@@ -15,8 +15,13 @@ import torch.multiprocessing as mp
 from nflows import distributions, flows, transforms, utils
 import nflows.nn.nets as nn_
 import pandas as pd
-from wipfs.utils.masks import create_block_binary_mask
-from wipfs.utils.permutations import BlockPermutation
+
+import sys
+
+sys.path.insert(0, '../utils/')
+
+from masks import create_block_binary_mask
+from permutations import BlockPermutation
 
 
 # define hyperparams
@@ -84,7 +89,7 @@ def create_block_transform(param_dim, block_size):
 
     return transforms.CompositeTransform(
         [
-            transforms.BlockPermutation(features=param_dim, block_size=block_size),
+            BlockPermutation(features=param_dim, block_size=block_size),
             transforms.LULinear(param_dim, identity_init=True),
         ]
     )
@@ -420,7 +425,7 @@ def save_model(epoch, model, scheduler, train_history, test_history, model_dir=N
     if model_dir is None:
         raise NameError("Model directory must be specified.")
 
-    filename = f"model_jets_final_@epoch_{epoch}.pt"
+    filename = f"model_jets_new_coupling_@epoch_{epoch}.pt"
 
     p = Path(model_dir)
     p.mkdir(parents=True, exist_ok=True)
@@ -495,11 +500,11 @@ def load_model(model_dir=None, filename=None):
 if __name__ == "__main__":
 
     # define the train and validations datasets
-    train_ds = MyDataset(["../jetData/Ajets_and_muons1+.hdf5"], limit=5000000)
+    train_ds = MyDataset(["./datasets/Ajets_and_muons1+.hdf5"], limit=5000000)
     train_loader = DataLoader(
         train_ds, batch_size=batch_size, shuffle=True, pin_memory=True, num_workers=9
     )
-    test_ds = MyDataset(["../jetData/Ajets_and_muons7+.hdf5"], limit=400000)
+    test_ds = MyDataset(["./datasets/Ajets_and_muons7+.hdf5"], limit=400000)
     test_loader = DataLoader(
         test_ds, batch_size=batch_size, shuffle=False, pin_memory=True, num_workers=9
     )

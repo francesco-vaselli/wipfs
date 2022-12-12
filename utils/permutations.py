@@ -1,6 +1,6 @@
 import torch
 from nflows.transforms.permutations import Permutation
-
+import nflows.utils.typechecks as check
 
 class BlockPermutation(Permutation):
     """Permutes just a block of lenght `block_size` at a time.

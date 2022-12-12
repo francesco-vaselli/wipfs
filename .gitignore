@@ -129,6 +129,6 @@ dmypy.json
 .pyre/
 
 # Local fcattafesta temporary datasets
-extract/electrons/*.root
-extract/electrons/*.hdf5
-
+*.root
+*.hdf5
+/training/saves/

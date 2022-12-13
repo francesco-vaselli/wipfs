@@ -425,7 +425,7 @@ def save_model(epoch, model, scheduler, train_history, test_history, model_dir=N
     if model_dir is None:
         raise NameError("Model directory must be specified.")
 
-    filename = f"model_jets_new_coupling_@epoch_{epoch}.pt"
+    filename = f"model_jets_bsize3_nlayer23_@epoch_{epoch}.pt"
 
     p = Path(model_dir)
     p.mkdir(parents=True, exist_ok=True)
@@ -519,7 +519,7 @@ if __name__ == "__main__":
     }
 
     # create model
-    flow = create_NDE_model(17, 14, 8, param_dict)
+    flow = create_NDE_model(17, 14, 23, param_dict)
 
     # print total params number and stuff
     total_params = sum(p.numel() for p in flow.parameters() if p.requires_grad)

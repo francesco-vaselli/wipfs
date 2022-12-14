@@ -11,8 +11,11 @@ import torch.multiprocessing as mp
 from nflows import distributions, flows, transforms, utils
 import nflows.nn.nets as nn_
 
+from pathlib import Path
 import sys
-sys.path.insert(0, '../utils/')
+import os
+
+sys.path.insert(0, os.path.join("..", "utils"))
 from masks import create_block_binary_mask
 from permutations import BlockPermutation
 
@@ -54,6 +57,7 @@ def create_block_transform(param_dim, block_size):
             transforms.LULinear(param_dim, identity_init=True),
         ]
     )
+
 
 def create_base_transform(
     i,
@@ -184,15 +188,19 @@ def create_transform(num_flow_steps, param_dim, context_dim, base_transform_kwar
         [
             transforms.CompositeTransform(
                 [
-                    create_block_transform(param_dim, block_size=3),
+                    create_block_transform(param_dim, block_size=block_size),
                     create_base_transform(
-                        i, param_dim, context_dim=context_dim, block_size=3, **base_transform_kwargs
+                        i,
+                        param_dim,
+                        context_dim=context_dim,
+                        block_size=block_size,
+                        **base_transform_kwargs,
                     ),
                 ]
             )
             for i in range(num_flow_steps)
         ]
-        + [transforms.LULinear(param_dim, identity_init=True) ]
+        + [transforms.LULinear(param_dim, identity_init=True)]
     )
     return transform
 
@@ -366,7 +374,7 @@ def train(model, train_loader, test_loader, epochs=total_epochs, output_freq=100
                 scheduler,
                 train_history,
                 test_history,
-                model_dir="./saves",
+                model_dir=os.path.join(".", "saves"),
             )
             print("saving model")
 
@@ -477,10 +485,15 @@ if __name__ == "__main__":
         "batch_norm": True,
         "num_bins": 128,
         "hidden_dim": 298,
+        "block_size": 3,
     }
 
+    input_dim = 17
+    context_dim = 14
+    num_flow_steps = 23
+
     # create model
-    flow = create_NDE_model(17, 14, 23, param_dict)
+    flow = create_NDE_model(input_dim, context_dim, num_flow_steps, param_dict)
 
     # print total params number and stuff
     total_params = sum(p.numel() for p in flow.parameters() if p.requires_grad)

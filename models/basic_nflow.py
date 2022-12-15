@@ -27,7 +27,7 @@ batch_size = 2048
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-def create_linear_transform(param_dim):
+def create_random_transform(param_dim):
     """Create the composite linear transform PLU.
     Arguments:
         input_dim {int} -- dimension of the space
@@ -73,6 +73,8 @@ def create_base_transform(
     tail_bound=1.0,
     apply_unconditional_transform=False,
     base_transform_type="rq-coupling",
+    mask_type="block-binary",
+    block_size=1,
 ):
     """
     NOTE: we are now using block masking
@@ -124,9 +126,16 @@ def create_base_transform(
         activation_fn = F.relu  # Default
         print("Invalid activation function specified. Using ReLU.")
 
+    if mask_type == "block-binary":
+        mask = create_block_binary_mask(param_dim, block_size)
+    elif mask_type == "alternating-binary":
+        mask = utils.create_alternating_binary_mask(param_dim, even=(i % 2 == 0))
+    else:
+        raise ValueError
+
     if base_transform_type == "rq-coupling":
         return transforms.PiecewiseRationalQuadraticCouplingTransform(
-            mask=mask_dict['mask'](param_dim, *mask_dict['pars']),
+            mask=mask,
             transform_net_create_fn=(
                 lambda in_features, out_features: nn_.ResidualNet(
                     in_features=in_features,
@@ -165,7 +174,13 @@ def create_base_transform(
         raise ValueError
 
 
-def create_transform(num_flow_steps, param_dim, masked_dict, context_dim, transform_dict, base_transform_kwargs):
+def create_transform(
+    num_flow_steps,
+    param_dim,
+    context_dim,
+    base_transform_kwargs,
+    transform_type="block-permutation",
+):
     """Build a sequence of NSF transforms, which maps parameters x into the
     base distribution u (noise). Transforms are conditioned on strain data y.
     Note that the forward map is f^{-1}(x, y).
@@ -184,15 +199,22 @@ def create_transform(num_flow_steps, param_dim, masked_dict, context_dim, transf
         Transform -- the constructed transform
     """
 
+    if transform_type == "block-permutation":
+        block_size = base_transform_kwargs["block_size"]
+        selected_transform = create_block_transform(param_dim, block_size)
+    elif trasnform_type == "random-permutation":
+        selected_transform == create_random_transform(param_dim)
+    else:
+        raise ValueError
+
     transform = transforms.CompositeTransform(
         [
             transforms.CompositeTransform(
                 [
-                    transform_dict['transform'](param_dim, *transform_dict['pars']),
+                    selected_transform,
                     create_base_transform(
                         i,
                         param_dim,
-                        masked_dict,
                         context_dim=context_dim,
                         **base_transform_kwargs,
                     ),
@@ -205,7 +227,9 @@ def create_transform(num_flow_steps, param_dim, masked_dict, context_dim, transf
     return transform
 
 
-def create_NDE_model(input_dim, context_dim, num_flow_steps, base_transform_kwargs):
+def create_NDE_model(
+    input_dim, context_dim, num_flow_steps, base_transform_kwargs, transform_type
+):
     """Build NSF (neural spline flow) model. This uses the nsf module
     available at https://github.com/bayesiains/nsf.
     This models the posterior distribution p(x|y).
@@ -225,7 +249,7 @@ def create_NDE_model(input_dim, context_dim, num_flow_steps, base_transform_kwar
 
     distribution = distributions.StandardNormal((input_dim,))
     transform = create_transform(
-        num_flow_steps, input_dim, context_dim, base_transform_kwargs
+        num_flow_steps, input_dim, context_dim, base_transform_kwargs, transform_type
     )
     flow = flows.Flow(transform, distribution)
 
@@ -237,6 +261,7 @@ def create_NDE_model(input_dim, context_dim, num_flow_steps, base_transform_kwar
         "num_flow_steps": num_flow_steps,
         "context_dim": context_dim,
         "base_transform_kwargs": base_transform_kwargs,
+        "transform_type": transform_type,
     }
 
     return flow

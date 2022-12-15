@@ -351,7 +351,7 @@ def test_epoch(flow, test_loader, epoch, device=None):
         return test_loss
 
 
-def train(model, train_loader, test_loader, epochs, output_freq=100):
+def train(model, train_loader, test_loader, epochs, optimizer, device, output_freq=100):
     """Train the model.
     Args:
             epochs:     number of epochs to train for

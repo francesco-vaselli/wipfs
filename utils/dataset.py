@@ -1,4 +1,5 @@
 import h5py
+import torch
 from torch.utils.data import Dataset, DataLoader
 
 class MyDataset(Dataset):

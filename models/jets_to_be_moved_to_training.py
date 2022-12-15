@@ -1,4 +1,8 @@
-import basic_nflow
+import torch
+from torch.utils.data import DataLoader
+from torch import optim
+
+from basic_nflow import create_NDE_model, train
 
 import sys
 import os
@@ -55,4 +59,4 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(flow.parameters(), lr=lr)
     flow.to(device)
 
-    trh, tsh = train(flow, train_loader, test_loader)
+    trh, tsh = train(flow, train_loader, test_loader, total_epochs, optimizer, device)

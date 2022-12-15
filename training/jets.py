@@ -223,9 +223,9 @@ def create_transform(num_flow_steps, param_dim, context_dim, base_transform_kwar
         [
             transforms.CompositeTransform(
                 [
-                    create_block_transform(param_dim, block_size=3),
+                    create_block_transform(param_dim, block_size=7),
                     create_base_transform(
-                        i, param_dim, context_dim=context_dim, block_size=3, **base_transform_kwargs
+                        i, param_dim, context_dim=context_dim, block_size=7, **base_transform_kwargs
                     ),
                 ]
             )
@@ -425,7 +425,7 @@ def save_model(epoch, model, scheduler, train_history, test_history, model_dir=N
     if model_dir is None:
         raise NameError("Model directory must be specified.")
 
-    filename = f"model_jets_bsize3_nlayer23_@epoch_{epoch}.pt"
+    filename = f"model_jets_bsize7_nlayer15_@epoch_{epoch}.pt"
 
     p = Path(model_dir)
     p.mkdir(parents=True, exist_ok=True)
@@ -519,7 +519,7 @@ if __name__ == "__main__":
     }
 
     # create model
-    flow = create_NDE_model(17, 14, 23, param_dict)
+    flow = create_NDE_model(17, 14, 15, param_dict)
 
     # print total params number and stuff
     total_params = sum(p.numel() for p in flow.parameters() if p.requires_grad)

@@ -204,7 +204,7 @@ def create_transform(
                         i,
                         param_dim,
                         context_dim=context_dim,
-                        **base_transform_kwargs,
+                        **base_transform_kwargs
                     ),
                 ]
             )

@@ -1,11 +1,7 @@
-import pandas as pd
-import h5py
-
 import torch
 from torch import nn
 from torch import optim
 from torch.nn import functional as F
-from torch.utils.data import Dataset, DataLoader
 import torch.multiprocessing as mp
 
 from nflows import distributions, flows, transforms, utils
@@ -18,13 +14,6 @@ import os
 sys.path.insert(0, os.path.join("..", "utils"))
 from masks import create_block_binary_mask
 from permutations import BlockPermutation
-
-
-# define hyperparams
-lr = 1e-5
-total_epochs = 600
-batch_size = 2048
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def create_random_transform(param_dim):
@@ -62,7 +51,6 @@ def create_block_transform(param_dim, block_size):
 def create_base_transform(
     i,
     param_dim,
-    mask_dict,
     context_dim=None,
     hidden_dim=512,
     num_transform_blocks=2,
@@ -363,7 +351,7 @@ def test_epoch(flow, test_loader, epoch, device=None):
         return test_loss
 
 
-def train(model, train_loader, test_loader, epochs=total_epochs, output_freq=100):
+def train(model, train_loader, test_loader, epochs, output_freq=100):
     """Train the model.
     Args:
             epochs:     number of epochs to train for
@@ -374,10 +362,10 @@ def train(model, train_loader, test_loader, epochs=total_epochs, output_freq=100
 
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
         optimizer,
-        T_max=total_epochs,
+        T_max=epochs,
     )
 
-    for epoch in range(0, total_epochs + 1):
+    for epoch in range(0, epochs + 1):
 
         print(
             "Learning rate: {}".format(optimizer.state_dict()["param_groups"][0]["lr"])
@@ -489,47 +477,3 @@ def load_model(model_dir=None, filename=None):
         train_history,
         test_history,
     )
-
-
-if __name__ == "__main__":
-
-    # define the train and validations datasets
-    train_ds = MyDataset(["./datasets/Ajets_and_muons1+.hdf5"], limit=5000000)
-    train_loader = DataLoader(
-        train_ds, batch_size=batch_size, shuffle=True, pin_memory=True, num_workers=9
-    )
-    test_ds = MyDataset(["./datasets/Ajets_and_muons7+.hdf5"], limit=400000)
-    test_loader = DataLoader(
-        test_ds, batch_size=batch_size, shuffle=False, pin_memory=True, num_workers=9
-    )
-
-    # define additional model parameters
-    param_dict = {
-        "num_transform_blocks": 10,
-        "activation": "relu",
-        "batch_norm": True,
-        "num_bins": 128,
-        "hidden_dim": 298,
-        "block_size": 3,
-    }
-
-    input_dim = 17
-    context_dim = 14
-    num_flow_steps = 23
-
-    # create model
-    flow = create_NDE_model(input_dim, context_dim, num_flow_steps, param_dict)
-
-    # print total params number and stuff
-    total_params = sum(p.numel() for p in flow.parameters() if p.requires_grad)
-    print(device)
-    print(total_params)
-    print(len(train_ds))
-    print(len(train_loader.dataset))
-
-    # set optimizer, send to device and train
-    # remember that the model is being saved every 10 epochs
-    optimizer = torch.optim.Adam(flow.parameters(), lr=lr)
-    flow.to(device)
-
-    trh, tsh = train(flow, train_loader, test_loader)

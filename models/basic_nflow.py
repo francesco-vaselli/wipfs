@@ -12,8 +12,8 @@ import sys
 import os
 
 sys.path.insert(0, os.path.join("..", "utils"))
-from masks import create_block_binary_mask
-from permutations import BlockPermutation
+from masks import create_block_binary_mask, create_identity_mask
+from permutations import BlockPermutation, IdentityPermutation
 
 
 def create_random_transform(param_dim):
@@ -43,6 +43,21 @@ def create_block_transform(param_dim, block_size):
     return transforms.CompositeTransform(
         [
             BlockPermutation(features=param_dim, block_size=block_size),
+            transforms.LULinear(param_dim, identity_init=True),
+        ]
+    )
+
+
+def create_identity_transform(param_dim):
+    """Create the composite block transform PLU.
+    Arguments:
+        input_dim {int} -- dimension of the space
+    Returns:
+        Transform -- nde.Transform object
+    """
+    return transforms.CompositeTransform(
+        [
+            IdentityPermutation(features=param_dim),
             transforms.LULinear(param_dim, identity_init=True),
         ]
     )
@@ -118,6 +133,8 @@ def create_base_transform(
         mask = create_block_binary_mask(param_dim, block_size)
     elif mask_type == "alternating-binary":
         mask = utils.create_alternating_binary_mask(param_dim, even=(i % 2 == 0))
+    elif mask_type == "identity":
+        mask = create_identity_mask(param_dim)
     else:
         raise ValueError
 
@@ -190,8 +207,10 @@ def create_transform(
     if transform_type == "block-permutation":
         block_size = base_transform_kwargs["block_size"]
         selected_transform = create_block_transform(param_dim, block_size)
-    elif trasnform_type == "random-permutation":
+    elif transform_type == "random-permutation":
         selected_transform == create_random_transform(param_dim)
+    elif transform_type == "no-permutation":
+        selected_transform = create_identity_transform(param_dim)
     else:
         raise ValueError
 
@@ -201,10 +220,7 @@ def create_transform(
                 [
                     selected_transform,
                     create_base_transform(
-                        i,
-                        param_dim,
-                        context_dim=context_dim,
-                        **base_transform_kwargs
+                        i, param_dim, context_dim=context_dim, **base_transform_kwargs
                     ),
                 ]
             )

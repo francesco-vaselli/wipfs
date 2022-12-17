@@ -2,6 +2,7 @@ import torch
 from nflows.transforms.permutations import Permutation
 import nflows.utils.typechecks as check
 
+
 class BlockPermutation(Permutation):
     """Permutes just a block of lenght `block_size` at a time.
     NOTE: we are moving a number of elements equal to `block_size` to the right."""
@@ -19,4 +20,17 @@ class BlockPermutation(Permutation):
                     torch.arange(features)[:block_size],
                 ]
             )
+        )
+
+
+class IdentityPermutation(Permutation):
+    """Permutes just a block of lenght `block_size` at a time.
+    NOTE: we are moving a number of elements equal to `block_size` to the right."""
+
+    def __init__(self, features, dim=1):
+        if not check.is_positive_int(features):
+            raise ValueError("Number of features must be a positive integer.")
+
+        super().__init__(
+                torch.arange(features),
         )

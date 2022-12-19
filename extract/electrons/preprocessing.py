@@ -7,7 +7,8 @@ from matplotlib import pyplot as plt
 import uproot
 
 import warnings
-warnings.filterwarnings("ignore") # temporary for MatPlotLibDeprecationWarning bug
+
+warnings.filterwarnings("ignore")  # temporary for MatPlotLibDeprecationWarning bug
 
 from dictionary import vars_dictionary  # operation dictionary
 
@@ -121,13 +122,13 @@ def preprocessing(df, vars_dictionary):
     df = df[~df.isin([np.nan, np.inf, -np.inf]).any(axis="columns")]
 
     for column_name, operation in vars_dictionary.items():
-       fig, axs = plt.subplots(1, 2)
-       plt.suptitle(f"{column_name}")
-       axs[0].hist(df[column_name], bins=30, histtype="step")
-       df[column_name] = process_column_var(column_name, operation, df)
-       axs[1].hist(df[column_name], bins=30, histtype="step")
-       plt.savefig(f"figures/{column_name}.pdf", format="pdf")
-       plt.close()  # produces MatplotlibDeprecationWarning. It is a bug (https://github.com/matplotlib/matplotlib/issues/23921)
+        fig, axs = plt.subplots(1, 2)
+        plt.suptitle(f"{column_name}")
+        axs[0].hist(df[column_name], bins=30, histtype="step")
+        df[column_name] = process_column_var(column_name, operation, df)
+        axs[1].hist(df[column_name], bins=30, histtype="step")
+        plt.savefig(f"figures/{column_name}.pdf", format="pdf")
+        plt.close()  # produces MatplotlibDeprecationWarning. It is a bug (https://github.com/matplotlib/matplotlib/issues/23921)
 
     df = df[~df.isin([np.nan, np.inf, -np.inf]).any(axis="columns")]
 
@@ -142,7 +143,7 @@ if __name__ == "__main__":
     df = make_dataset(tree, version=f, dictionary=False)
 
     df = preprocessing(df, vars_dictionary)
-
+    print(df.columns)
     file = h5py.File(f"electrons_v{f}.hdf5", "w")
 
     dset = file.create_dataset("data", data=df.values, dtype="f4")

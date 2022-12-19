@@ -907,6 +907,12 @@ void extraction() {
                                 "ClosestJet_EncodedHadronFlavour_b",
                                 "ClosestJet_EncodedHadronFlavour_c",
                                 "ClosestJet_EncodedHadronFlavour_light",
+                                "Pileup_gpudensity",
+                                "Pileup_nPU",
+                                "Pileup_nTrueInt",
+                                "Pileup_pudensity",
+                                "Pileup_sumEOOT",
+                                "Pileup_sumLOOT",
                                 "MElectron_charge",
                                 "MElectron_convVeto",
                                 "MElectron_cutBased",
@@ -980,13 +986,7 @@ void extraction() {
                                 "MElectron_vidNestedWPBitmapHEEP8",
                                 "MElectron_vidNestedWPBitmapHEEP9",
                                 "MElectron_vidNestedWPBitmapHEEP10",
-                                "MElectron_vidNestedWPBitmapHEEP11",
-                                "Pileup_gpudensity",
-                                "Pileup_nPU",
-                                "Pileup_nTrueInt",
-                                "Pileup_pudensity",
-                                "Pileup_sumEOOT",
-                                "Pileup_sumLOOT"};
+                                "MElectron_vidNestedWPBitmapHEEP11"};
 
   d_matched.Snapshot("MElectrons", "MElectrons_v1.root", col_to_save);
 }

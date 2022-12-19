@@ -30,23 +30,33 @@ if __name__ == "__main__":
     )
 
     # define additional model parameters
-    base_param_dict = {
+    flow_param_dict = {
+        "input_dim" : 17,
+        "context_dim" : 14,
+        "num_flow_steps" : 15,
+
+        "base_param_dict" : {
         "num_transform_blocks": 10,
         "activation": "relu",
         "batch_norm": True,
         "num_bins": 128,
         "hidden_dim": 298,
         "block_size": 3,
-	"mask_type" : "identity"
+	    "mask_type" : "identity"
+        },
+
+        "transform_type" : "no-permutation"   
     }
     
+    '''
     input_dim = 17
     context_dim = 14
     num_flow_steps = 10
     transform_type = "no-permutation"
+    '''
 
     # create model
-    flow = create_NDE_model(input_dim, context_dim, num_flow_steps, base_param_dict, transform_type)
+    flow = create_NDE_model(**flow_param_dict)
 
     # print total params number and stuff
     total_params = sum(p.numel() for p in flow.parameters() if p.requires_grad)

@@ -22,10 +22,7 @@ def create_block_binary_mask(features, block_size):
 
 def create_identity_mask(features):
     """
-    Creates a binary mask of a given dimension which splits its masking into blocks of a given size.
-    :param features: Dimension of mask.
-    :param block_size: Size of blocks to split mask into.
-    :return: Binary mask split into blocks of type torch.Tensor
+    Leaves input unchanged.
     """
     if not check.is_positive_int(features):
         raise ValueError("Number of features must be a positive integer.")

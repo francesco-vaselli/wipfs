@@ -1,0 +1,54 @@
+import pandas as pd
+import numpy as np
+import uproot
+import awkward as ak
+import h5py
+
+
+if __name__ == '__main__':
+
+    tree = uproot.open(f"~/wipfs/extract/fake_jets/FJets.root:FJets", num_workers=20)
+    # define pandas df for fast manipulation
+    # define pandas df for fast manipulation
+    dfgl = tree.arrays(
+        [
+            "Pileup_gpudensity",
+            "Pileup_nPU",
+            "Pileup_nTrueInt",
+            "Pileup_pudensity",
+            "Pileup_sumEOOT",
+            "Pileup_sumLOOT",
+        ],
+        library="pd",
+        entry_stop=STOP,
+    ).astype("float32")
+    print(dfgl)
+
+    # define pandas df for fast manipulation
+    dfft = tree.arrays(
+        ["FJet_pt", "FJet_eta", "FJet_phi"],
+        library="ak",
+        entry_stop=STOP,
+    ).astype("float32")
+
+    num_fakes = dfft.reset_index(level=1).index.value_counts(sort=False).reindex(np.arange(len(dfgl)), fill_value=0).values
+    # fill missing fakes with 0s. seems to be cutting excess fakes per event
+    dfft = dfft.reindex(pd.MultiIndex.from_product([np.arange(len(dfgl)), np.arange(10)]), fill_value=0) 
+
+    # fill missing fakes with nonphysical values
+    dfft['FJet_pt'] = [i if i != 0 else np.random.normal(-10, 1) for i in dfft['FJet_pt'].values]
+    dfft['FJet_eta'] = [i if i != 0 else np.random.normal(-20, 1) for i in dfft['FJet_eta'].values]
+    dfft['FJet_phi'] = [i if i != 0 else np.random.normal(-20, 1) for i in dfft['FJet_phi'].values]
+
+    # get all fake in one event on the same row
+    # NOTE: we now have all pts, then all etas, then all phis
+    dfft.unstack(level=-1)
+    print(dfft)
+
+    df = pd.concat([dfft, dfgl, pd.DataFrame(num_fakes, columns=['num_fakes'])], axis=1)
+
+    file = h5py.File(f"fake_jets.hdf5", "w")
+
+    dset = file.create_dataset("data", data=df.values, dtype="f4")
+
+    file.close()

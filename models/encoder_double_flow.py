@@ -67,11 +67,10 @@ class Encoder(nn.Module):
         return m, v
 
 
-
 # Model
-class PointFlow(nn.Module):
+class FakeDoubleFlow(nn.Module):
     def __init__(self, args):
-        super(PointFlow, self).__init__()
+        super(FakeDoubleFlow, self).__init__()
         self.input_dim = args["input_dim"]
         self.zdim = args["zdim"]
         self.use_latent_flow = args["use_latent_flow"]
@@ -84,12 +83,14 @@ class PointFlow(nn.Module):
         self.latent_flow_param_dict = args["latent_flow_param_dict"]
         self.reco_flow_param_dict = args["reco_flow_param_dict"]
         self.encoder = Encoder(
-                zdim=args.zdim, input_dim=args.input_dim,
-                use_deterministic_encoder=args.use_deterministic_encoder)
+            zdim=args.zdim,
+            input_dim=args.input_dim,
+            use_deterministic_encoder=args.use_deterministic_encoder,
+        )
         self.latent_NDE_model = create_NDE_model(**self.latent_flow_param_dict)
         self.reco_NDE_model = create_NDE_model(**self.reco_flow_param_dict)
 
-    ''' should not be used with our nflow
+    """ should not be used with our nflow
     @staticmethod
     def sample_gaussian(size, truncate_std=None, gpu=None):
         y = torch.randn(*size).float()
@@ -97,7 +98,7 @@ class PointFlow(nn.Module):
         if truncate_std is not None:
             truncated_normal(y, mean=0, std=1, trunc_std=truncate_std)
         return y
-    '''
+    """
 
     @staticmethod
     def reparameterize_gaussian(mean, logvar):
@@ -107,7 +108,7 @@ class PointFlow(nn.Module):
 
     @staticmethod
     def gaussian_entropy(logvar):
-        const = 0.5 * float(logvar.size(1)) * (1. + np.log(np.pi * 2))
+        const = 0.5 * float(logvar.size(1)) * (1.0 + np.log(np.pi * 2))
         ent = 0.5 * logvar.sum(dim=1, keepdim=False) + const
         return ent
 
@@ -118,16 +119,26 @@ class PointFlow(nn.Module):
 
     def make_optimizer(self, args):
         def _get_opt_(params):
-            if args["optimizer"] == 'adam':
-                optimizer = optim.Adam(params, lr=args["lr"], betas=(args["beta1"], args["beta2"]),
-                                       weight_decay=args["weight_decay"])
-            elif args["optimizer"] == 'sgd':
-                optimizer = torch.optim.SGD(params, lr=args["lr"], momentum=args["momentum"])
+            if args["optimizer"] == "adam":
+                optimizer = optim.Adam(
+                    params,
+                    lr=args["lr"],
+                    betas=(args["beta1"], args["beta2"]),
+                    weight_decay=args["weight_decay"],
+                )
+            elif args["optimizer"] == "sgd":
+                optimizer = torch.optim.SGD(
+                    params, lr=args["lr"], momentum=args["momentum"]
+                )
             else:
                 assert 0, "args.optimizer should be either 'adam' or 'sgd'"
             return optimizer
-        opt = _get_opt_(list(self.encoder.parameters()) + list(self.latent_NDE_model.parameters())
-                        + list(list(self.reco_NDE_model.parameters())))
+
+        opt = _get_opt_(
+            list(self.encoder.parameters())
+            + list(self.latent_NDE_model.parameters())
+            + list(list(self.reco_NDE_model.parameters()))
+        )
         return opt
 
     # we pass y as conditioning variable
@@ -149,20 +160,26 @@ class PointFlow(nn.Module):
 
         # Compute the prior probability P(z)
         if self.use_latent_flow:
+            """
             w, delta_log_pw = self.latent_cnf(z, None, torch.zeros(batch_size, 1).to(z))
             log_pw = standard_normal_logprob(w).view(batch_size, -1).sum(1, keepdim=True)
             delta_log_pw = delta_log_pw.view(batch_size, 1)
             log_pz = log_pw - delta_log_pw
+            """
+            log_pz = self.latent_NDE_model.log_prob(z, context=y)
         else:
             log_pz = torch.zeros(batch_size, 1).to(z)
 
         # Compute the reconstruction likelihood P(X|z)
         z_new = z.view(*z.size())
-        z_new = z_new + (log_pz * 0.).mean()
+        z_new = z_new + (log_pz * 0.0).mean()
+        """
         y, delta_log_py = self.point_cnf(x, z_new, torch.zeros(batch_size, num_points, 1).to(x))
         log_py = standard_normal_logprob(y).view(batch_size, -1).sum(1, keepdim=True)
         delta_log_py = delta_log_py.view(batch_size, num_points, 1).sum(1)
         log_px = log_py - delta_log_py
+        """
+        log_px = self.reco_NDE_model.log_prob(x, context=z_new)
 
         # Loss
         entropy_loss = -entropy.mean() * self.entropy_weight
@@ -172,6 +189,8 @@ class PointFlow(nn.Module):
         loss.backward()
         opt.step()
 
+        return loss
+        """
         # LOGGING (after the training)
         if self.distributed:
             entropy_log = reduce_tensor(entropy.mean())
@@ -198,6 +217,7 @@ class PointFlow(nn.Module):
             'prior_nats': prior_nats,
             'recon_nats': recon_nats,
         }
+        """
 
     def encode(self, x):
         z_mu, z_sigma = self.encoder(x)
@@ -208,18 +228,25 @@ class PointFlow(nn.Module):
 
     def decode(self, z, num_points, truncate_std=None):
         # transform points from the prior to a point cloud, conditioned on a shape code
-        y = self.sample_gaussian((z.size(0), num_points, self.input_dim), truncate_std)
-        x = self.point_cnf(y, z, reverse=True).view(*y.size())
-        return y, x
+        x = self.reco_NDE_model.sample(num_points, context=z)
+        return x
 
-    def sample(self, batch_size, num_points, truncate_std=None, truncate_std_latent=None, gpu=None):
-        assert self.use_latent_flow, "Sampling requires `self.use_latent_flow` to be True."
+    def sample(
+        self,
+        y,
+        batch_size,
+        num_points,
+        truncate_std=None,
+        truncate_std_latent=None,
+        gpu=None,
+    ):
+        assert (
+            self.use_latent_flow
+        ), "Sampling requires `self.use_latent_flow` to be True."
         # Generate the shape code from the prior
-        w = self.sample_gaussian((batch_size, self.zdim), truncate_std_latent, gpu=gpu)
-        z = self.latent_cnf(w, None, reverse=True).view(*w.size())
+        z = self.latent_NDE_model.sample(1, context=y)
         # Sample points conditioned on the shape code
-        y = self.sample_gaussian((batch_size, num_points, self.input_dim), truncate_std, gpu=gpu)
-        x = self.point_cnf(y, z, reverse=True).view(*y.size())
+        x = self.reco_NDE_model.sample(num_points, context=z)
         return z, x
 
     def reconstruct(self, x, num_points=None, truncate_std=None):
@@ -227,3 +254,6 @@ class PointFlow(nn.Module):
         z = self.encode(x)
         _, x = self.decode(z, num_points, truncate_std)
         return x
+
+
+

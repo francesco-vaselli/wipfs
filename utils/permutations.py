@@ -24,8 +24,7 @@ class BlockPermutation(Permutation):
 
 
 class IdentityPermutation(Permutation):
-    """Permutes just a block of lenght `block_size` at a time.
-    NOTE: we are moving a number of elements equal to `block_size` to the right."""
+    """Leaves input unchanged."""
 
     def __init__(self, features, dim=1):
         if not check.is_positive_int(features):

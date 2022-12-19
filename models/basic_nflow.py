@@ -367,7 +367,7 @@ def test_epoch(flow, test_loader, epoch, device=None):
         return test_loss
 
 
-def train(model, train_loader, test_loader, epochs, optimizer, device, output_freq=100):
+def train(model, train_loader, test_loader, epochs, optimizer, device, name, output_freq=100):
     """Train the model.
     Args:
             epochs:     number of epochs to train for
@@ -403,6 +403,7 @@ def train(model, train_loader, test_loader, epochs, optimizer, device, output_fr
                 scheduler,
                 train_history,
                 test_history,
+		name,
                 model_dir=os.path.join(".", "saves"),
             )
             print("saving model")
@@ -410,7 +411,7 @@ def train(model, train_loader, test_loader, epochs, optimizer, device, output_fr
     return train_history, test_history
 
 
-def save_model(epoch, model, scheduler, train_history, test_history, model_dir=None):
+def save_model(epoch, model, scheduler, train_history, test_history, name, model_dir=None):
     """Save a model and optimizer to file.
     Args:
         model:      model to be saved
@@ -423,7 +424,7 @@ def save_model(epoch, model, scheduler, train_history, test_history, model_dir=N
     if model_dir is None:
         raise NameError("Model directory must be specified.")
 
-    filename = f"model_jets_no_coupling_@epoch_{epoch}.pt"
+    filename = name + f"_@epoch_{epoch}.pt"
 
     p = Path(model_dir)
     p.mkdir(parents=True, exist_ok=True)

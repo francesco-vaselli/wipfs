@@ -4,6 +4,8 @@ import torch.nn.functional as F
 from torch import optim
 from torch import nn
 
+from basic_nflow import create_NDE_model
+
 
 class Encoder(nn.Module):
     def __init__(self, zdim, input_dim=3, use_deterministic_encoder=False):
@@ -79,13 +81,15 @@ class PointFlow(nn.Module):
         self.entropy_weight = args["entropy_weight"]
         self.distributed = args["distributed"]
         self.truncate_std = None
-        self.flow_param_dict = args["flow_param_dict"]
+        self.latent_flow_param_dict = args["latent_flow_param_dict"]
+        self.reco_flow_param_dict = args["reco_flow_param_dict"]
         self.encoder = Encoder(
                 zdim=args.zdim, input_dim=args.input_dim,
                 use_deterministic_encoder=args.use_deterministic_encoder)
-        self.point_cnf = get_point_cnf(args)
-        self.latent_cnf = get_latent_cnf(args) if args.use_latent_flow else nn.Sequential()
+        self.latent_NDE_model = create_NDE_model(**self.latent_flow_param_dict)
+        self.reco_NDE_model = create_NDE_model(**self.reco_flow_param_dict)
 
+    ''' should not be used with our nflow
     @staticmethod
     def sample_gaussian(size, truncate_std=None, gpu=None):
         y = torch.randn(*size).float()
@@ -93,6 +97,7 @@ class PointFlow(nn.Module):
         if truncate_std is not None:
             truncated_normal(y, mean=0, std=1, trunc_std=truncate_std)
         return y
+    '''
 
     @staticmethod
     def reparameterize_gaussian(mean, logvar):
@@ -108,24 +113,25 @@ class PointFlow(nn.Module):
 
     def multi_gpu_wrapper(self, f):
         self.encoder = f(self.encoder)
-        self.point_cnf = f(self.point_cnf)
-        self.latent_cnf = f(self.latent_cnf)
+        self.latent_NDE_model = f(self.latent_NDE_model)
+        self.reco_NDE_model = f(self.reco_NDE_model)
 
     def make_optimizer(self, args):
         def _get_opt_(params):
-            if args.optimizer == 'adam':
-                optimizer = optim.Adam(params, lr=args.lr, betas=(args.beta1, args.beta2),
-                                       weight_decay=args.weight_decay)
-            elif args.optimizer == 'sgd':
-                optimizer = torch.optim.SGD(params, lr=args.lr, momentum=args.momentum)
+            if args["optimizer"] == 'adam':
+                optimizer = optim.Adam(params, lr=args["lr"], betas=(args["beta1"], args["beta2"]),
+                                       weight_decay=args["weight_decay"])
+            elif args["optimizer"] == 'sgd':
+                optimizer = torch.optim.SGD(params, lr=args["lr"], momentum=args["momentum"])
             else:
                 assert 0, "args.optimizer should be either 'adam' or 'sgd'"
             return optimizer
-        opt = _get_opt_(list(self.encoder.parameters()) + list(self.point_cnf.parameters())
-                        + list(list(self.latent_cnf.parameters())))
+        opt = _get_opt_(list(self.encoder.parameters()) + list(self.latent_NDE_model.parameters())
+                        + list(list(self.reco_NDE_model.parameters())))
         return opt
 
-    def forward(self, x, opt, step, writer=None):
+    # we pass y as conditioning variable
+    def forward(self, x, y, opt, step, writer=None):
         opt.zero_grad()
         batch_size = x.size(0)
         num_points = x.size(1)

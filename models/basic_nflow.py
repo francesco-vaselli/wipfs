@@ -423,7 +423,7 @@ def save_model(epoch, model, scheduler, train_history, test_history, model_dir=N
     if model_dir is None:
         raise NameError("Model directory must be specified.")
 
-    filename = f"model_jets_bsize3_nlayer23_@epoch_{epoch}.pt"
+    filename = f"model_jets_no_coupling_@epoch_{epoch}.pt"
 
     p = Path(model_dir)
     p.mkdir(parents=True, exist_ok=True)

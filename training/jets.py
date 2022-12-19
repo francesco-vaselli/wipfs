@@ -42,7 +42,7 @@ if __name__ == "__main__":
     
     input_dim = 17
     context_dim = 14
-    num_flow_steps = 15
+    num_flow_steps = 10
     transform_type = "no-permutation"
 
     # create model

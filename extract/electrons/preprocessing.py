@@ -14,7 +14,9 @@ from dictionary import vars_dictionary  # operation dictionary
 
 np.random.seed(0)  # fixed seed for gaussian random smearing
 
-
+# NOTE: uproot 5 update has changed the way to access the TTree
+# as a multiindex pandas dataframe, in case of future errors the sintax should be:
+# df = ak.to_dataframe(tree.arrays(library="ak", *args, **kwargs))
 def make_dataset(tree, version, dictionary=False, *args, **kwargs):
     """
     Given the TTree, returns the corresponding pandas dataframe.

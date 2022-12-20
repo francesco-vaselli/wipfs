@@ -19,7 +19,7 @@ if __name__ == "__main__":
     args = {
         'zdim': 128,
         'input_dim': 3,
-        'optimizer': 'adam'
+        'optimizer': 'adam',
         'lr': 0.001,
         'weight_decay': 0.0,
         'beta1': 0.9,

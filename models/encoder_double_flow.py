@@ -153,9 +153,9 @@ class FakeDoubleFlow(nn.Module):
         latent_NDE_params = sum(p.numel() for p in self.latent_NDE_model.parameters() if p.requires_grad)
         reco_NDE_params = sum(p.numel() for p in self.reco_NDE_model.parameters() if p.requires_grad)
         dummy_bs = 2048
-        print("Encoder params: ", summary(self.encoder, input_size=(dummy_bs, self.input_dim))
-        print("Latent NDE params: ", summary(self.latent_NDE_model, input_size=(dummy_bs, self.zdim+1))
-        print("Reco NDE params: ", summary(self.reco_NDE_params, input_size=(dummy_bs, 30))
+        print("Encoder params: ", summary(self.encoder, input_size=(dummy_bs, self.input_dim)))
+        print("Latent NDE params: ", summary(self.latent_NDE_model, input_size=(dummy_bs, self.zdim+1)))
+        print("Reco NDE params: ", summary(self.reco_NDE_params, input_size=(dummy_bs, 30)))
         print("Total params: ", encorder_params + latent_NDE_params + reco_NDE_params)
 
     """ should not be used with our nflow

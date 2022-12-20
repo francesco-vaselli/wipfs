@@ -50,9 +50,9 @@ class FakesDataset(Dataset):
         self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
         self._archives = None
 
-        y = self.archives[0]["data"][:limit, x_dim : (x_dim + y_dim + 1)]
+        y = self.archives[0]["data"][:limit, x_dim : (x_dim + y_dim)]
         x = self.archives[0]["data"][:limit, 0:x_dim]
-        N = self.archives[0]["data"][:limit, (y_dim + x_dim + 1) : (y_dim + x_dim + 2)]
+        N = self.archives[0]["data"][:limit, (y_dim + x_dim) : (y_dim + x_dim + 1)]
         self.x_train = torch.tensor(x, dtype=torch.float32)  # .to(device)
         self.y_train = torch.tensor(y, dtype=torch.float32)  # .to(device)
         self.N_train = torch.tensor(N, dtype=torch.float32)  # .to(device)

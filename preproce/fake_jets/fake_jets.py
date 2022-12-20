@@ -29,7 +29,7 @@ if __name__ == '__main__':
     # define pandas df for fast manipulation
     dfft = tree.arrays(
         ["FJet_pt", "FJet_eta", "FJet_phi"],
-        library="ak",
+        library="pd",
         entry_stop=STOP,
     ).astype("float32")
 

@@ -18,8 +18,8 @@ if __name__ == "__main__":
     # the args dictionary defining all the parameters for the FakeDoubleFlow model
     args = {
         'distributed' : False,
-        'zdim': 128,
-        'input_dim': 3,
+        'zdim': 30,
+        'input_dim': 30,
         'optimizer': 'adam',
         'lr': 0.001,
         'weight_decay': 0.0,
@@ -31,8 +31,8 @@ if __name__ == "__main__":
         'use_deterministic_encoder': False,
         'use_latent_flow': True,
         'latent_flow_param_dict': {
-            "input_dim" : 17,
-            "context_dim" : 14,
+            "input_dim" : 31,
+            "context_dim" : 6,
             "num_flow_steps" : 15,
 
             "base_transform_kwargs" : {
@@ -41,15 +41,15 @@ if __name__ == "__main__":
             "batch_norm": True,
             "num_bins": 128,
             "hidden_dim": 298,
-            "block_size": 3,
+            "block_size": 10,
             "mask_type" : "identity"
             },
 
             "transform_type" : "no-permutation" 
         },
         'reco_flow_param_dict': {
-                    "input_dim" : 17,
-            "context_dim" : 14,
+            "input_dim" : 30,
+            "context_dim" : 31,
             "num_flow_steps" : 15,
 
             "base_transform_kwargs" : {
@@ -58,7 +58,7 @@ if __name__ == "__main__":
             "batch_norm": True,
             "num_bins": 128,
             "hidden_dim": 298,
-            "block_size": 3,
+            "block_size": 10,
             "mask_type" : "identity"
             },
 

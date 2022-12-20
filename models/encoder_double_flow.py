@@ -102,7 +102,7 @@ class SimplerEncoder(nn.Module):
             self.fc_bn2_v = nn.BatchNorm1d(64)
 
     def forward(self, x):
-        # x = x.transpose(0, 1) # changed transpose
+        x = x.transpose(1, 2) # changed transpose
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = (self.bn3(self.conv3(x)))

@@ -7,6 +7,8 @@ import torch.multiprocessing as mp
 from nflows import distributions, flows, transforms, utils
 import nflows.nn.nets as nn_
 
+from torchinfo import summary
+
 from pathlib import Path
 import sys
 import os

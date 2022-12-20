@@ -35,7 +35,7 @@ if __name__ == "__main__":
             "context_dim" : 14,
             "num_flow_steps" : 15,
 
-            "base_param_dict" : {
+            "base_transform_kwargs" : {
             "num_transform_blocks": 10,
             "activation": "relu",
             "batch_norm": True,
@@ -52,7 +52,7 @@ if __name__ == "__main__":
             "context_dim" : 14,
             "num_flow_steps" : 15,
 
-            "base_param_dict" : {
+            "base_transform_kwargs" : {
             "num_transform_blocks": 10,
             "activation": "relu",
             "batch_norm": True,

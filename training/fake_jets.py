@@ -69,9 +69,9 @@ if __name__ == "__main__":
     # create the model
     model = FakeDoubleFlow(args)
 
-    # print total params number and stuff
-    total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    print(total_params)
+    # print total params number and stuff NOW IN MODEL DEFINITION
+    # total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    # print(total_params)
 
     # define dataset
     train_ds = FakesDataset(["./datasets/fake_jets.hdf5"], x_dim=30, y_dim=6, limit=1000000)

@@ -147,6 +147,15 @@ class FakeDoubleFlow(nn.Module):
         self.latent_NDE_model = create_NDE_model(**self.latent_flow_param_dict)
         self.reco_NDE_model = create_NDE_model(**self.reco_flow_param_dict)
 
+        # params printout
+        encorder_params = sum(p.numel() for p in self.encoder.parameters() if p.requires_grad)
+        latent_NDE_params = sum(p.numel() for p in self.latent_NDE_model.parameters() if p.requires_grad)
+        reco_NDE_params = sum(p.numel() for p in self.reco_NDE_model.parameters() if p.requires_grad)
+        print("Encoder params: ", encorder_params)
+        print("Latent NDE params: ", latent_NDE_params)
+        print("Reco NDE params: ", reco_NDE_params)
+        print("Total params: ", encorder_params + latent_NDE_params + reco_NDE_params)
+
     """ should not be used with our nflow
     @staticmethod
     def sample_gaussian(size, truncate_std=None, gpu=None):

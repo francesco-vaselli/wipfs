@@ -78,4 +78,4 @@ if __name__ == "__main__":
     train_loader = DataLoader(
             train_ds, batch_size=BATCH_SIZE, shuffle=True, pin_memory=True, num_workers=9
         )
-    print(train_loader.next())
+    print(next(iter(train_loader)))

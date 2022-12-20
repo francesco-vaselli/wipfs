@@ -70,6 +70,7 @@ if __name__ == "__main__":
 
     # print total params number and stuff
     total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    print(total_params)
 
     # define dataset
     train_ds = FakesDataset(["./datasets/fake_jets.hdf5"], limit=1000000)

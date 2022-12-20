@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
     # get all fake in one event on the same row
     # NOTE: we now have all pts, then all etas, then all phis
-    dfft.unstack(level=-1)
+    dfft.unstack(level=-1).T.reset_index(drop=True).T
     print(dfft)
 
     df = pd.concat([dfft, dfgl, pd.DataFrame(num_fakes, columns=['num_fakes'])], axis=1)

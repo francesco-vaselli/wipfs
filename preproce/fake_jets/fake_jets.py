@@ -4,6 +4,8 @@ import uproot
 import awkward as ak
 import h5py
 
+STOP = None
+
 
 if __name__ == '__main__':
 

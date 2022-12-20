@@ -67,6 +67,63 @@ class Encoder(nn.Module):
         return m, v
 
 
+class SimplerEncoder(nn.Module):
+    def __init__(self, zdim, input_dim=3, use_deterministic_encoder=False):
+        super(SimplerEncoder, self).__init__()
+        self.use_deterministic_encoder = use_deterministic_encoder
+        self.zdim = zdim
+        self.conv1 = nn.Conv1d(input_dim, 64, 1)
+        self.conv2 = nn.Conv1d(64, 64, 1)
+        self.conv3 = nn.Conv1d(64, 128, 1)
+        self.bn1 = nn.BatchNorm1d(64)
+        self.bn2 = nn.BatchNorm1d(64)
+        self.bn3 = nn.BatchNorm1d(128)
+
+        if self.use_deterministic_encoder:
+            self.fc1 = nn.Linear(512, 256)
+            self.fc2 = nn.Linear(256, 128)
+            self.fc_bn1 = nn.BatchNorm1d(256)
+            self.fc_bn2 = nn.BatchNorm1d(128)
+            self.fc3 = nn.Linear(128, zdim)
+        else:
+            # Mapping to [c], cmean
+            self.fc1_m = nn.Linear(128, 128)
+            self.fc2_m = nn.Linear(128, 64)
+            self.fc3_m = nn.Linear(64, zdim)
+            self.fc_bn1_m = nn.BatchNorm1d(128)
+            self.fc_bn2_m = nn.BatchNorm1d(64)
+
+            # Mapping to [c], cmean
+            self.fc1_v = nn.Linear(128, 128)
+            self.fc2_v = nn.Linear(128, 64)
+            self.fc3_v = nn.Linear(64, zdim)
+            self.fc_bn1_v = nn.BatchNorm1d(128)
+            self.fc_bn2_v = nn.BatchNorm1d(64)
+
+    def forward(self, x):
+        x = x.transpose(1, 2)
+        x = F.relu(self.bn1(self.conv1(x)))
+        x = F.relu(self.bn2(self.conv2(x)))
+        x = (self.bn3(self.conv3(x)))
+        x = torch.max(x, 2, keepdim=True)[0]
+        x = x.view(-1, 128)
+
+        if self.use_deterministic_encoder:
+            ms = F.relu(self.fc_bn1(self.fc1(x)))
+            ms = F.relu(self.fc_bn2(self.fc2(ms)))
+            ms = self.fc3(ms)
+            m, v = ms, 0
+        else:
+            m = F.relu(self.fc_bn1_m(self.fc1_m(x)))
+            m = F.relu(self.fc_bn2_m(self.fc2_m(m)))
+            m = self.fc3_m(m)
+            v = F.relu(self.fc_bn1_v(self.fc1_v(x)))
+            v = F.relu(self.fc_bn2_v(self.fc2_v(v)))
+            v = self.fc3_v(v)
+
+        return m, v
+
+
 # Model
 class FakeDoubleFlow(nn.Module):
     def __init__(self, args):
@@ -82,7 +139,7 @@ class FakeDoubleFlow(nn.Module):
         self.truncate_std = None
         self.latent_flow_param_dict = args["latent_flow_param_dict"]
         self.reco_flow_param_dict = args["reco_flow_param_dict"]
-        self.encoder = Encoder(
+        self.encoder = SimplerEncoder(
             zdim=args['zdim'],
             input_dim=args['input_dim'],
             use_deterministic_encoder=args['use_deterministic_encoder'],

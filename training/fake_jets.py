@@ -74,7 +74,7 @@ if __name__ == "__main__":
     print(total_params)
 
     # define dataset
-    train_ds = FakesDataset(["./datasets/fake_jets.hdf5"], limit=1000000)
+    train_ds = FakesDataset(["./datasets/fake_jets.hdf5"], x_dim=30, y_dim=6, limit=1000000)
     train_loader = DataLoader(
             train_ds, batch_size=BATCH_SIZE, shuffle=True, pin_memory=True, num_workers=9
         )

@@ -46,8 +46,12 @@ if __name__ == '__main__':
     print(dfft)
 
     df = pd.concat([dfft, dfgl, pd.DataFrame(num_fakes, columns=['num_fakes'])], axis=1)
+    df["num_fakes"] = df["num_fakes"].apply(
+        lambda x: x + 0.1 * np.random.normal()
+    )
+    print(df)
 
-    file = h5py.File(f"fake_jets.hdf5", "w")
+    file = h5py.File(f"../training/datasets/fake_jets.hdf5", "w")
 
     dset = file.create_dataset("data", data=df.values, dtype="f4")
 

@@ -107,7 +107,7 @@ class SimplerEncoder(nn.Module):
         x = F.relu(self.bn2(self.conv2(x)))
         x = (self.bn3(self.conv3(x)))
         x = torch.max(x, 2, keepdim=True)[0]
-        x = x.view(-1, 128)
+        x = x.view(-1, 256)
 
         if self.use_deterministic_encoder:
             ms = F.relu(self.fc_bn1(self.fc1(x)))

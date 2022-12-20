@@ -3,6 +3,7 @@ import numpy as np
 import torch.nn.functional as F
 from torch import optim
 from torch import nn
+from torchinfo import summary
 
 from basic_nflow import create_NDE_model
 
@@ -73,11 +74,11 @@ class SimplerEncoder(nn.Module):
         self.use_deterministic_encoder = use_deterministic_encoder
         self.zdim = zdim
         self.conv1 = nn.Conv1d(input_dim, 64, 1)
-        self.conv2 = nn.Conv1d(64, 64, 1)
-        self.conv3 = nn.Conv1d(64, 128, 1)
+        self.conv2 = nn.Conv1d(64, 128, 1)
+        self.conv3 = nn.Conv1d(128, 256, 1)
         self.bn1 = nn.BatchNorm1d(64)
-        self.bn2 = nn.BatchNorm1d(64)
-        self.bn3 = nn.BatchNorm1d(128)
+        self.bn2 = nn.BatchNorm1d(128)
+        self.bn3 = nn.BatchNorm1d(256)
 
         if self.use_deterministic_encoder:
             self.fc1 = nn.Linear(512, 256)
@@ -87,14 +88,14 @@ class SimplerEncoder(nn.Module):
             self.fc3 = nn.Linear(128, zdim)
         else:
             # Mapping to [c], cmean
-            self.fc1_m = nn.Linear(128, 128)
+            self.fc1_m = nn.Linear(256, 128)
             self.fc2_m = nn.Linear(128, 64)
             self.fc3_m = nn.Linear(64, zdim)
             self.fc_bn1_m = nn.BatchNorm1d(128)
             self.fc_bn2_m = nn.BatchNorm1d(64)
 
             # Mapping to [c], cmean
-            self.fc1_v = nn.Linear(128, 128)
+            self.fc1_v = nn.Linear(256, 128)
             self.fc2_v = nn.Linear(128, 64)
             self.fc3_v = nn.Linear(64, zdim)
             self.fc_bn1_v = nn.BatchNorm1d(128)
@@ -139,7 +140,7 @@ class FakeDoubleFlow(nn.Module):
         self.truncate_std = None
         self.latent_flow_param_dict = args["latent_flow_param_dict"]
         self.reco_flow_param_dict = args["reco_flow_param_dict"]
-        self.encoder = Encoder(
+        self.encoder = SimplerEncoder(
             zdim=args['zdim'],
             input_dim=args['input_dim'],
             use_deterministic_encoder=args['use_deterministic_encoder'],
@@ -151,9 +152,10 @@ class FakeDoubleFlow(nn.Module):
         encorder_params = sum(p.numel() for p in self.encoder.parameters() if p.requires_grad)
         latent_NDE_params = sum(p.numel() for p in self.latent_NDE_model.parameters() if p.requires_grad)
         reco_NDE_params = sum(p.numel() for p in self.reco_NDE_model.parameters() if p.requires_grad)
-        print("Encoder params: ", encorder_params)
-        print("Latent NDE params: ", latent_NDE_params)
-        print("Reco NDE params: ", reco_NDE_params)
+        dummy_bs = 2048
+        print("Encoder params: ", summary(self.encoder, input_size=(dummy_bs, self.input_dim))
+        print("Latent NDE params: ", summary(self.latent_NDE_model, input_size=(dummy_bs, self.zdim))
+        print("Reco NDE params: ", summary(self.reco_NDE_params, input_size=(dummy_bs, 30))
         print("Total params: ", encorder_params + latent_NDE_params + reco_NDE_params)
 
     """ should not be used with our nflow

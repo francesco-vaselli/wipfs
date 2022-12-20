@@ -83,9 +83,9 @@ class FakeDoubleFlow(nn.Module):
         self.latent_flow_param_dict = args["latent_flow_param_dict"]
         self.reco_flow_param_dict = args["reco_flow_param_dict"]
         self.encoder = Encoder(
-            zdim=args.zdim,
-            input_dim=args.input_dim,
-            use_deterministic_encoder=args.use_deterministic_encoder,
+            zdim=args['zdim'],
+            input_dim=args['input_dim'],
+            use_deterministic_encoder=args['use_deterministic_encoder'],
         )
         self.latent_NDE_model = create_NDE_model(**self.latent_flow_param_dict)
         self.reco_NDE_model = create_NDE_model(**self.reco_flow_param_dict)

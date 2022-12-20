@@ -18,7 +18,7 @@ if __name__ == "__main__":
     # the args dictionary defining all the parameters for the FakeDoubleFlow model
     args = {
         'distributed' : False,
-        'zdim': 30,
+        'zdim': 15,
         'input_dim': 30,
         'optimizer': 'adam',
         'lr': 0.001,
@@ -33,36 +33,36 @@ if __name__ == "__main__":
         'latent_flow_param_dict': {
             "input_dim" : 31,
             "context_dim" : 6,
-            "num_flow_steps" : 15,
+            "num_flow_steps" : 10,
 
             "base_transform_kwargs" : {
-            "num_transform_blocks": 10,
+            "num_transform_blocks": 6, # DNN layers per coupling
             "activation": "relu",
             "batch_norm": True,
             "num_bins": 128,
-            "hidden_dim": 298,
+            "hidden_dim": 128,
             "block_size": 10,
-            "mask_type" : "identity"
+            "mask_type" : "block-binary"
             },
 
-            "transform_type" : "no-permutation" 
+            "transform_type" : "block-permutation" 
         },
         'reco_flow_param_dict': {
             "input_dim" : 30,
-            "context_dim" : 31,
-            "num_flow_steps" : 15,
+            "context_dim" : 16,
+            "num_flow_steps" : 10,
 
             "base_transform_kwargs" : {
-            "num_transform_blocks": 10,
+            "num_transform_blocks": 6, # DNN layers per coupling
             "activation": "relu",
             "batch_norm": True,
             "num_bins": 128,
-            "hidden_dim": 298,
+            "hidden_dim": 128,
             "block_size": 10,
-            "mask_type" : "identity"
+            "mask_type" : "block-binary"
             },
 
-            "transform_type" : "no-permutation" 
+            "transform_type" : "block-permutation" 
         },
     }
 

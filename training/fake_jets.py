@@ -17,6 +17,7 @@ BATCH_SIZE = 2048
 if __name__ == "__main__":
     # the args dictionary defining all the parameters for the FakeDoubleFlow model
     args = {
+        'distributed' : False,
         'zdim': 128,
         'input_dim': 3,
         'optimizer': 'adam',

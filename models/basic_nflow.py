@@ -159,6 +159,18 @@ def create_base_transform(
             apply_unconditional_transform=apply_unconditional_transform,
         )
 
+        # model printout
+        print(summary(nn_.ResidualNet(
+                    in_features=in_features,
+                    out_features=out_features,
+                    hidden_features=hidden_dim,
+                    context_features=context_dim,
+                    num_blocks=num_transform_blocks,
+                    activation=activation_fn,
+                    dropout_probability=dropout_probability,
+                    use_batch_norm=batch_norm,
+                ), (1, in_features)))
+
     elif base_transform_type == "rq-autoregressive":
         return transforms.MaskedPiecewiseRationalQuadraticAutoregressiveTransform(
             features=param_dim,

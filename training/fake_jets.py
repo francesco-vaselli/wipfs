@@ -7,7 +7,7 @@ import os
 
 sys.path.insert(0, os.path.join("..", "utils"))
 sys.path.insert(0, os.path.join("..", "models"))
-from dataset import FakeDataset
+from dataset import FakesDataset
 from basic_nflow import create_NDE_model
 from encoder_double_flow import FakeDoubleFlow
 
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
     # define dataset
-    train_ds = FakeDataset(["./datasets/fake_jets.hdf5"], limit=1000000)
+    train_ds = FakesDataset(["./datasets/fake_jets.hdf5"], limit=1000000)
     train_loader = DataLoader(
             train_ds, batch_size=BATCH_SIZE, shuffle=True, pin_memory=True, num_workers=9
         )

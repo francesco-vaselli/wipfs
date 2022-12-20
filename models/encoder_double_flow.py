@@ -139,7 +139,7 @@ class FakeDoubleFlow(nn.Module):
         self.truncate_std = None
         self.latent_flow_param_dict = args["latent_flow_param_dict"]
         self.reco_flow_param_dict = args["reco_flow_param_dict"]
-        self.encoder = SimplerEncoder(
+        self.encoder = Encoder(
             zdim=args['zdim'],
             input_dim=args['input_dim'],
             use_deterministic_encoder=args['use_deterministic_encoder'],

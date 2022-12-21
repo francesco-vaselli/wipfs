@@ -113,13 +113,13 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
         worker_init_fn=init_np_seed)
 
     # save dataset statistics
-    if not args.distributed or (args.rank % ngpus_per_node == 0):
-        np.save(os.path.join(save_dir, "train_set_mean.npy"), tr_dataset.all_points_mean)
-        np.save(os.path.join(save_dir, "train_set_std.npy"), tr_dataset.all_points_std)
-        np.save(os.path.join(save_dir, "train_set_idx.npy"), np.array(tr_dataset.shuffle_idx))
-        np.save(os.path.join(save_dir, "val_set_mean.npy"), te_dataset.all_points_mean)
-        np.save(os.path.join(save_dir, "val_set_std.npy"), te_dataset.all_points_std)
-        np.save(os.path.join(save_dir, "val_set_idx.npy"), np.array(te_dataset.shuffle_idx))
+    # if not args.distributed or (args.rank % ngpus_per_node == 0):
+    #     np.save(os.path.join(save_dir, "train_set_mean.npy"), tr_dataset.all_points_mean)
+    #     np.save(os.path.join(save_dir, "train_set_std.npy"), tr_dataset.all_points_std)
+    #     np.save(os.path.join(save_dir, "train_set_idx.npy"), np.array(tr_dataset.shuffle_idx))
+    #     np.save(os.path.join(save_dir, "val_set_mean.npy"), te_dataset.all_points_mean)
+    #     np.save(os.path.join(save_dir, "val_set_std.npy"), te_dataset.all_points_std)
+    #     np.save(os.path.join(save_dir, "val_set_idx.npy"), np.array(te_dataset.shuffle_idx))
 
     # load classification dataset if needed
     # if args.eval_classification:

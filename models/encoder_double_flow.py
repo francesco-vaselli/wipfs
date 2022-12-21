@@ -148,13 +148,13 @@ class FakeDoubleFlow(nn.Module):
         self.reco_NDE_model = create_NDE_model(**self.reco_flow_param_dict)
 
         # params printout
-        encorder_params = sum(p.numel() for p in self.encoder.parameters() if p.requires_grad)
-        latent_NDE_params = sum(p.numel() for p in self.latent_NDE_model.parameters() if p.requires_grad)
-        reco_NDE_params = sum(p.numel() for p in self.reco_NDE_model.parameters() if p.requires_grad)
-        print("Encoder params: ", self.encoder)
-        print("Latent NDE params: ", self.latent_NDE_model)
-        print("Reco NDE params: ", self.reco_NDE_model)
-        print("Total params: ", encorder_params + latent_NDE_params + reco_NDE_params)
+        # encorder_params = sum(p.numel() for p in self.encoder.parameters() if p.requires_grad)
+        # latent_NDE_params = sum(p.numel() for p in self.latent_NDE_model.parameters() if p.requires_grad)
+        # reco_NDE_params = sum(p.numel() for p in self.reco_NDE_model.parameters() if p.requires_grad)
+        # print("Encoder params: ", self.encoder)
+        # print("Latent NDE params: ", self.latent_NDE_model)
+        # print("Reco NDE params: ", self.reco_NDE_model)
+        # print("Total params: ", encorder_params + latent_NDE_params + reco_NDE_params)
 
     """ should not be used with our nflow
     @staticmethod

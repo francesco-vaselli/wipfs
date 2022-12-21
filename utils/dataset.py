@@ -42,7 +42,7 @@ class FakesDataset(Dataset):
         Dataset (Pytorch Dataset): Pytorch Dataset class
     """
 
-    def __init__(self, h5_paths, start=0, limit=-1, x_dim, y_dim):
+    def __init__(self, h5_paths, x_dim, y_dim, start=0, limit=-1):
 
         # we must fix a convention for parametrizing slices
 

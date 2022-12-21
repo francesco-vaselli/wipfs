@@ -33,13 +33,13 @@ if __name__ == "__main__":
         'latent_flow_param_dict': {
             "input_dim" : 16,
             "context_dim" : 6,
-            "num_flow_steps" : 6,
+            "num_flow_steps" : 8,
 
             "base_transform_kwargs" : {
             "num_transform_blocks": 5, # DNN layers per coupling
             "activation": "relu",
             "batch_norm": True,
-            "num_bins": 128,
+            "num_bins": 16,
             "hidden_dim": 128,
             "block_size": 8,
             "mask_type" : "block-binary"
@@ -56,7 +56,7 @@ if __name__ == "__main__":
             "num_transform_blocks": 5, # DNN layers per coupling
             "activation": "relu",
             "batch_norm": True,
-            "num_bins": 128,
+            "num_bins": 16,
             "hidden_dim": 128,
             "block_size": 10,
             "mask_type" : "block-binary"

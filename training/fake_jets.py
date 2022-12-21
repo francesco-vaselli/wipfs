@@ -76,11 +76,11 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
     elif args.gpu is not None:  # Single process, single GPU per process
         torch.cuda.set_device(args.gpu)
         model = model.cuda(args.gpu)
-    else:  # Single process, multiple GPUs per process
-        def _transform_(m):
-            return nn.DataParallel(m)
-        model = model.cuda()
-        model.multi_gpu_wrapper(_transform_)
+    # else:  # Single process, multiple GPUs per process
+    #     def _transform_(m):
+    #         return nn.DataParallel(m)
+    #     model = model.cuda()
+    #     model.multi_gpu_wrapper(_transform_)
 
     # resume checkpoints
     start_epoch = 0

@@ -165,11 +165,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
         if args.distributed:
             train_sampler.set_epoch(epoch)
 
-        # adjust the learning rate
-        if (epoch + 1) % args.exp_decay_freq == 0:
-            scheduler.step(epoch=epoch)
-            if writer is not None:
-                writer.add_scalar('lr/optimizer', scheduler.get_lr()[0], epoch)
+        
 
         # train for one epoch
         for bidx, data in enumerate(train_loader):
@@ -193,6 +189,12 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
                 print("TRAIN: [Rank %d] Epoch %d Batch [%2d/%2d] Time [%3.2fs] Entropy %2.5f LatentNats %2.5f PointNats %2.5f"
                       % (args.rank, epoch, bidx, len(train_loader), duration, entropy_avg_meter.avg,
                          latent_nats_avg_meter.avg, point_nats_avg_meter.avg))
+
+        # adjust the learning rate
+        if (epoch + 1) % args.exp_decay_freq == 0:
+            scheduler.step()
+            if writer is not None:
+                writer.add_scalar('lr/optimizer', scheduler.get_lr()[0], epoch)
 
         if not args.no_validation and (epoch + 1) % args.val_freq == 0:
             # evaluate on the validation set

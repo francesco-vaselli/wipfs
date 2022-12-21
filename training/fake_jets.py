@@ -1,6 +1,7 @@
 import torch
 from torch.utils.data import DataLoader
 from torch import optim
+from tensorboardX import SummaryWriter
 
 import sys
 import os
@@ -10,62 +11,69 @@ sys.path.insert(0, os.path.join("..", "models"))
 from dataset import FakesDataset
 from basic_nflow import create_NDE_model
 from encoder_double_flow import FakeDoubleFlow
+from args_fake_jets import get_args
 
+# define hyperparams
+lr = 1e-4
+total_epochs = 600
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 BATCH_SIZE = 2048
 
 
 if __name__ == "__main__":
     # the args dictionary defining all the parameters for the FakeDoubleFlow model
-    args = {
-        'distributed' : False,
-        'zdim': 15,
-        'input_dim': 30,
-        'optimizer': 'adam',
-        'lr': 0.001,
-        'weight_decay': 0.0,
-        'beta1': 0.9,
-        'beta2': 0.999,
-        'entropy_weight': 1.0,
-        'prior_weight': 1.0,
-        'recon_weight': 1.0,
-        'use_deterministic_encoder': False,
-        'use_latent_flow': True,
-        'latent_flow_param_dict': {
-            "input_dim" : 16,
-            "context_dim" : 6,
-            "num_flow_steps" : 6,
+    # args = {
+    #     'distributed' : False,
+    #     'zdim': 15,
+    #     'input_dim': 30,
+    #     'optimizer': 'adam',
+    #     'lr': 0.001,
+    #     'weight_decay': 0.0,
+    #     'beta1': 0.9,
+    #     'beta2': 0.999,
+    #     'entropy_weight': 1.0,
+    #     'prior_weight': 1.0,
+    #     'recon_weight': 1.0,
+    #     'use_deterministic_encoder': False,
+    #     'use_latent_flow': True,
+    #     'latent_flow_param_dict': {
+    #         "input_dim" : 16,
+    #         "context_dim" : 6,
+    #         "num_flow_steps" : 6,
 
-            "base_transform_kwargs" : {
-            "num_transform_blocks": 5, # DNN layers per coupling
-            "activation": "relu",
-            "batch_norm": True,
-            "num_bins": 16,
-            "hidden_dim": 128,
-            "block_size": 8,
-            "mask_type" : "block-binary"
-            },
+    #         "base_transform_kwargs" : {
+    #         "num_transform_blocks": 5, # DNN layers per coupling
+    #         "activation": "relu",
+    #         "batch_norm": True,
+    #         "num_bins": 16,
+    #         "hidden_dim": 128,
+    #         "block_size": 8,
+    #         "mask_type" : "block-binary"
+    #         },
 
-            "transform_type" : "block-permutation" 
-        },
-        'reco_flow_param_dict': {
-            "input_dim" : 30,
-            "context_dim" : 16,
-            "num_flow_steps" : 9,
+    #         "transform_type" : "block-permutation" 
+    #     },
+    #     'reco_flow_param_dict': {
+    #         "input_dim" : 30,
+    #         "context_dim" : 16,
+    #         "num_flow_steps" : 9,
 
-            "base_transform_kwargs" : {
-            "num_transform_blocks": 5, # DNN layers per coupling
-            "activation": "relu",
-            "batch_norm": True,
-            "num_bins": 16,
-            "hidden_dim": 128,
-            "block_size": 10,
-            "mask_type" : "block-binary"
-            },
+    #         "base_transform_kwargs" : {
+    #         "num_transform_blocks": 5, # DNN layers per coupling
+    #         "activation": "relu",
+    #         "batch_norm": True,
+    #         "num_bins": 16,
+    #         "hidden_dim": 128,
+    #         "block_size": 10,
+    #         "mask_type" : "block-binary"
+    #         },
 
-            "transform_type" : "block-permutation" 
-        },
-    }
+    #         "transform_type" : "block-permutation" 
+    #     },
+    # }
 
+    # get settings
+    args = get_args()
     # create the model
     model = FakeDoubleFlow(args)
 
@@ -78,4 +86,5 @@ if __name__ == "__main__":
     train_loader = DataLoader(
             train_ds, batch_size=BATCH_SIZE, shuffle=True, pin_memory=True, num_workers=9
         )
-    print(next(iter(train_loader))[0].size(), next(iter(train_loader))[1].size(), next(iter(train_loader))[2].size())
+    # control printout    
+    # print(next(iter(train_loader))[0].size(), next(iter(train_loader))[1].size(), next(iter(train_loader))[2].size())

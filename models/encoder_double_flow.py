@@ -129,21 +129,21 @@ class SimplerEncoder(nn.Module):
 class FakeDoubleFlow(nn.Module):
     def __init__(self, args):
         super(FakeDoubleFlow, self).__init__()
-        self.input_dim = args["input_dim"]
-        self.zdim = args["zdim"]
-        self.use_latent_flow = args["use_latent_flow"]
-        self.use_deterministic_encoder = args["use_deterministic_encoder"]
-        self.prior_weight = args["prior_weight"]
-        self.recon_weight = args["recon_weight"]
-        self.entropy_weight = args["entropy_weight"]
-        self.distributed = args["distributed"]
+        self.input_dim = args.input_dim
+        self.zdim = args.zdim
+        self.use_latent_flow = args.use_latent_flow
+        self.use_deterministic_encoder = args.use_deterministic_encoder
+        self.prior_weight = args.prior_weight
+        self.recon_weight = args.recon_weight
+        self.entropy_weight = args.entropy_weight
+        self.distributed = args.distributed
         self.truncate_std = None
-        self.latent_flow_param_dict = args["latent_flow_param_dict"]
-        self.reco_flow_param_dict = args["reco_flow_param_dict"]
+        self.latent_flow_param_dict = args.latent_flow_param_dict
+        self.reco_flow_param_dict = args.reco_flow_param_dict
         self.encoder = SimplerEncoder(
-            zdim=args['zdim'],
-            input_dim=args['input_dim'],
-            use_deterministic_encoder=args['use_deterministic_encoder'],
+            zdim=args.zdim,
+            input_dim=args.input_dim,
+            use_deterministic_encoder=args.use_deterministic_encoder,
         )
         self.latent_NDE_model = create_NDE_model(**self.latent_flow_param_dict)
         self.reco_NDE_model = create_NDE_model(**self.reco_flow_param_dict)
@@ -187,16 +187,16 @@ class FakeDoubleFlow(nn.Module):
 
     def make_optimizer(self, args):
         def _get_opt_(params):
-            if args["optimizer"] == "adam":
+            if args.optimizer == "adam":
                 optimizer = optim.Adam(
                     params,
-                    lr=args["lr"],
-                    betas=(args["beta1"], args["beta2"]),
-                    weight_decay=args["weight_decay"],
+                    lr=args.lr,
+                    betas=(args.beta1, args.beta2),
+                    weight_decay=args.weight_decay,
                 )
-            elif args["optimizer"] == "sgd":
+            elif args.optimizer == "sgd":
                 optimizer = torch.optim.SGD(
-                    params, lr=args["lr"], momentum=args["momentum"]
+                    params, lr=args.lr, momentum=args.momentum
                 )
             else:
                 assert 0, "args.optimizer should be either 'adam' or 'sgd'"
@@ -258,9 +258,7 @@ class FakeDoubleFlow(nn.Module):
         loss = entropy_loss + prior_loss + recon_loss
         loss.backward()
         opt.step()
-
-        return loss
-        """
+        
         # LOGGING (after the training)
         if self.distributed:
             entropy_log = reduce_tensor(entropy.mean())
@@ -287,7 +285,7 @@ class FakeDoubleFlow(nn.Module):
             'prior_nats': prior_nats,
             'recon_nats': recon_nats,
         }
-        """
+        
 
     def encode(self, x):
         z_mu, z_sigma = self.encoder(x)

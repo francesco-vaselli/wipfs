@@ -68,7 +68,7 @@ def add_args(parser):
     
 
     # training options
-    parser.add_argument('--use_latent_flow', action='store_true',
+    parser.add_argument('--use_latent_flow', type=bool, default=True,
                         help='Whether to use the latent flow to model the prior.')
     parser.add_argument('--use_deterministic_encoder', action='store_true',
                         help='Whether to use a deterministic encoder.')

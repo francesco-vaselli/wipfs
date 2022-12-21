@@ -53,7 +53,7 @@ class FakesDataset(Dataset):
         y = self.archives[0]["data"][:limit, x_dim : (x_dim + y_dim)]
         x = self.archives[0]["data"][:limit, 0:x_dim]
         N = self.archives[0]["data"][:limit, (y_dim + x_dim) : (y_dim + x_dim + 1)]
-        self.x_train = torch.tensor(x, dtype=torch.float32)  # .to(device)
+        self.x_train = torch.tensor(x, dtype=torch.float32).view(-1, 1, x_dim)  # .to(device)
         self.y_train = torch.tensor(y, dtype=torch.float32)  # .to(device)
         self.N_train = torch.tensor(N, dtype=torch.float32)  # .to(device)
 

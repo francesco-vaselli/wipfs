@@ -234,6 +234,7 @@ class FakeDoubleFlow(nn.Module):
             delta_log_pw = delta_log_pw.view(batch_size, 1)
             log_pz = log_pw - delta_log_pw
             """
+            print(z.size(), y.size())
             log_pz = self.latent_NDE_model.log_prob(z, context=y)
         else:
             log_pz = torch.zeros(batch_size, 1).to(z)

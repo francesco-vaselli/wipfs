@@ -4,56 +4,6 @@ NONLINEARITIES = ["tanh", "relu", "softplus", "elu", "swish", "square", "identit
 SOLVERS = ["dopri5", "bdf", "rk4", "midpoint", 'adams', 'explicit_adams', 'fixed_adams']
 LAYERS = ["ignore", "concat", "concat_v2", "squash", "concatsquash", "scale", "concatscale"]
 
-    # # the args dictionary defining all the parameters for the FakeDoubleFlow model
-    # args = {
-    #     'distributed' : False,
-    #     'zdim': 15,
-    #     'input_dim': 30,
-    #     'optimizer': 'adam',
-    #     'lr': 0.001,
-    #     'weight_decay': 0.0,
-    #     'beta1': 0.9,
-    #     'beta2': 0.999,
-    #     'entropy_weight': 1.0,
-    #     'prior_weight': 1.0,
-    #     'recon_weight': 1.0,
-    #     'use_deterministic_encoder': False,
-    #     'use_latent_flow': True,
-    #     'latent_flow_param_dict': {
-    #         "input_dim" : 16,
-    #         "context_dim" : 6,
-    #         "num_flow_steps" : 6,
-
-    #         "base_transform_kwargs" : {
-    #         "num_transform_blocks": 5, # DNN layers per coupling
-    #         "activation": "relu",
-    #         "batch_norm": True,
-    #         "num_bins": 16,
-    #         "hidden_dim": 128,
-    #         "block_size": 8,
-    #         "mask_type" : "block-binary"
-    #         },
-
-    #         "transform_type" : "block-permutation" 
-    #     },
-    #     'reco_flow_param_dict': {
-    #         "input_dim" : 30,
-    #         "context_dim" : 16,
-    #         "num_flow_steps" : 9,
-
-    #         "base_transform_kwargs" : {
-    #         "num_transform_blocks": 5, # DNN layers per coupling
-    #         "activation": "relu",
-    #         "batch_norm": True,
-    #         "num_bins": 16,
-    #         "hidden_dim": 128,
-    #         "block_size": 10,
-    #         "mask_type" : "block-binary"
-    #         },
-
-    #         "transform_type" : "block-permutation" 
-    #     },
-    # }
 
 def add_args(parser):
 
@@ -126,7 +76,7 @@ def add_args(parser):
                         help='Dimension of the shape code')
     parser.add_argument('--optimizer', type=str, default='adam',
                         help='Optimizer to use', choices=['adam', 'adamax', 'sgd'])
-    parser.add_argument('--batch_size', type=int, default=50,
+    parser.add_argument('--batch_size', type=int, default=2048,
                         help='Batch size (of datasets) for training')
     parser.add_argument('--lr', type=float, default=1e-3,
                         help='Learning rate for the Adam optimizer.')
@@ -138,8 +88,8 @@ def add_args(parser):
                         help='Momentum for SGD')
     parser.add_argument('--weight_decay', type=float, default=0.,
                         help='Weight decay for the optimizer.')
-    parser.add_argument('--epochs', type=int, default=100,
-                        help='Number of epochs for training (default: 100)')
+    parser.add_argument('--epochs', type=int, default=500,
+                        help='Number of epochs for training (default: 500)')
     parser.add_argument('--seed', type=int, default=None,
                         help='Seed for initializing training. ')
     parser.add_argument('--recon_weight', type=float, default=1.,
@@ -182,7 +132,7 @@ def add_args(parser):
                         help='Number of data loading threads')
 
     # logging and saving frequency
-    parser.add_argument('--log_name', type=str, default=None, help="Name for the log dir")
+    parser.add_argument('--log_name', type=str, default='saves_fakes', help="Name for the log dir")
     parser.add_argument('--viz_freq', type=int, default=10)
     parser.add_argument('--val_freq', type=int, default=10)
     parser.add_argument('--log_freq', type=int, default=10)
@@ -251,3 +201,55 @@ def get_args():
     parser = get_parser()
     args = parser.parse_args()
     return args
+
+
+# # the old args dictionary defining all the parameters for the FakeDoubleFlow model
+# args = {
+#     'distributed' : False,
+#     'zdim': 15,
+#     'input_dim': 30,
+#     'optimizer': 'adam',
+#     'lr': 0.001,
+#     'weight_decay': 0.0,
+#     'beta1': 0.9,
+#     'beta2': 0.999,
+#     'entropy_weight': 1.0,
+#     'prior_weight': 1.0,
+#     'recon_weight': 1.0,
+#     'use_deterministic_encoder': False,
+#     'use_latent_flow': True,
+#     'latent_flow_param_dict': {
+#         "input_dim" : 16,
+#         "context_dim" : 6,
+#         "num_flow_steps" : 6,
+
+#         "base_transform_kwargs" : {
+#         "num_transform_blocks": 5, # DNN layers per coupling
+#         "activation": "relu",
+#         "batch_norm": True,
+#         "num_bins": 16,
+#         "hidden_dim": 128,
+#         "block_size": 8,
+#         "mask_type" : "block-binary"
+#         },
+
+#         "transform_type" : "block-permutation" 
+#     },
+#     'reco_flow_param_dict': {
+#         "input_dim" : 30,
+#         "context_dim" : 16,
+#         "num_flow_steps" : 9,
+
+#         "base_transform_kwargs" : {
+#         "num_transform_blocks": 5, # DNN layers per coupling
+#         "activation": "relu",
+#         "batch_norm": True,
+#         "num_bins": 16,
+#         "hidden_dim": 128,
+#         "block_size": 10,
+#         "mask_type" : "block-binary"
+#         },
+
+#         "transform_type" : "block-permutation" 
+#     },
+# }

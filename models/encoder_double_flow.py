@@ -3,7 +3,6 @@ import numpy as np
 import torch.nn.functional as F
 from torch import optim
 from torch import nn
-from torchinfo import summary
 
 from basic_nflow import create_NDE_model
 
@@ -152,8 +151,7 @@ class FakeDoubleFlow(nn.Module):
         encorder_params = sum(p.numel() for p in self.encoder.parameters() if p.requires_grad)
         latent_NDE_params = sum(p.numel() for p in self.latent_NDE_model.parameters() if p.requires_grad)
         reco_NDE_params = sum(p.numel() for p in self.reco_NDE_model.parameters() if p.requires_grad)
-        dummy_bs = 2048
-        print("Encoder params: ", summary(self.encoder, input_size=(1, 1, self.input_dim)))
+        print("Encoder params: ", self.encoder)
         print("Latent NDE params: ", self.latent_NDE_model)
         print("Reco NDE params: ", self.reco_NDE_model)
         print("Total params: ", encorder_params + latent_NDE_params + reco_NDE_params)
@@ -210,7 +208,7 @@ class FakeDoubleFlow(nn.Module):
         return opt
 
     # we pass y as conditioning variable
-    def forward(self, x, y, N, opt, step, writer=None):
+    def forward(self, x, y, N, opt, step, writer=None, val=False):
         opt.zero_grad()
         batch_size = x.size(0)
         num_points = x.size(1)
@@ -272,12 +270,19 @@ class FakeDoubleFlow(nn.Module):
         recon_nats = recon / float(x.size(1) * x.size(2))
         prior_nats = prior / float(self.zdim)
 
-        if writer is not None:
+        if writer is not None and val is False:
             writer.add_scalar('train/entropy', entropy_log, step)
             writer.add_scalar('train/prior', prior, step)
             writer.add_scalar('train/prior(nats)', prior_nats, step)
             writer.add_scalar('train/recon', recon, step)
             writer.add_scalar('train/recon(nats)', recon_nats, step)
+
+        if writer is not None and val is True:
+            writer.add_scalar('val/entropy', entropy_log, step)
+            writer.add_scalar('val/prior', prior, step)
+            writer.add_scalar('val/prior(nats)', prior_nats, step)
+            writer.add_scalar('val/recon', recon, step)
+            writer.add_scalar('val/recon(nats)', recon_nats, step)
 
         return {
             'entropy': entropy_log.cpu().detach().item()

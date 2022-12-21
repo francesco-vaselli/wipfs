@@ -42,7 +42,7 @@ class FakesDataset(Dataset):
         Dataset (Pytorch Dataset): Pytorch Dataset class
     """
 
-    def __init__(self, h5_paths, limit, x_dim, y_dim):
+    def __init__(self, h5_paths, start=0, limit=-1, x_dim, y_dim):
 
         # we must fix a convention for parametrizing slices
 
@@ -50,9 +50,9 @@ class FakesDataset(Dataset):
         self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
         self._archives = None
 
-        y = self.archives[0]["data"][:limit, x_dim : (x_dim + y_dim)]
-        x = self.archives[0]["data"][:limit, 0:x_dim]
-        N = self.archives[0]["data"][:limit, (y_dim + x_dim) : (y_dim + x_dim + 1)]
+        y = self.archives[0]["data"][start:limit, x_dim : (x_dim + y_dim)]
+        x = self.archives[0]["data"][start:limit, 0:x_dim]
+        N = self.archives[0]["data"][start:limit, (y_dim + x_dim) : (y_dim + x_dim + 1)]
         self.x_train = torch.tensor(x, dtype=torch.float32).view(-1, 1, x_dim) # reshape needed for CONV1D 
         self.y_train = torch.tensor(y, dtype=torch.float32)  
         self.N_train = torch.tensor(N, dtype=torch.float32)  

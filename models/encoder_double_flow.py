@@ -219,6 +219,8 @@ class FakeDoubleFlow(nn.Module):
             z = z_mu + 0 * z_sigma
         else:
             z = self.reparameterize_gaussian(z_mu, z_sigma)
+            # add N of true fakes
+            z = torch.cat([z, N], dim=1)
 
         # Compute H[Q(z|X)]
         if self.use_deterministic_encoder:
@@ -241,8 +243,6 @@ class FakeDoubleFlow(nn.Module):
         # Compute the reconstruction likelihood P(X|z)
         z_new = z.view(*z.size())
         z_new = z_new + (log_pz * 0.0).mean()
-        # add N of true fakes
-        z_new = torch.cat([z_new, N], dim=0)
         """
         y, delta_log_py = self.point_cnf(x, z_new, torch.zeros(batch_size, num_points, 1).to(x))
         log_py = standard_normal_logprob(y).view(batch_size, -1).sum(1, keepdim=True)

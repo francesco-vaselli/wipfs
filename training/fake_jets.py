@@ -31,9 +31,9 @@ if __name__ == "__main__":
         'use_deterministic_encoder': False,
         'use_latent_flow': True,
         'latent_flow_param_dict': {
-            "input_dim" : 31,
+            "input_dim" : 16,
             "context_dim" : 6,
-            "num_flow_steps" : 8,
+            "num_flow_steps" : 6,
 
             "base_transform_kwargs" : {
             "num_transform_blocks": 5, # DNN layers per coupling
@@ -41,7 +41,7 @@ if __name__ == "__main__":
             "batch_norm": True,
             "num_bins": 128,
             "hidden_dim": 128,
-            "block_size": 10,
+            "block_size": 8,
             "mask_type" : "block-binary"
             },
 

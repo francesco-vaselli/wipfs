@@ -70,7 +70,7 @@ def add_args(parser):
     # training options
     parser.add_argument('--use_latent_flow', type=bool, default=True,
                         help='Whether to use the latent flow to model the prior.')
-    parser.add_argument('--use_deterministic_encoder', action='store_true',
+    parser.add_argument('--use_deterministic_encoder', default=False, action='store_true',
                         help='Whether to use a deterministic encoder.')
     parser.add_argument('--zdim', type=int, default=15,
                         help='Dimension of the shape code')
@@ -134,12 +134,12 @@ def add_args(parser):
     # logging and saving frequency
     parser.add_argument('--log_name', type=str, default='saves_fakes', help="Name for the log dir")
     parser.add_argument('--viz_freq', type=int, default=10)
-    parser.add_argument('--val_freq', type=int, default=10)
+    parser.add_argument('--val_freq', type=int, default=5)
     parser.add_argument('--log_freq', type=int, default=10)
     parser.add_argument('--save_freq', type=int, default=10)
 
     # validation options
-    parser.add_argument('--no_validation', action='store_true',
+    parser.add_argument('--no_validation', default=False, action='store_true',
                         help='Whether to disable validation altogether.')
     parser.add_argument('--save_val_results', action='store_true',
                         help='Whether to save the validation results.')

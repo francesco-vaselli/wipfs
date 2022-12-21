@@ -176,7 +176,7 @@ def add_args(parser):
                              'multi node data parallel training')
     parser.add_argument('--rank', default=0, type=int,
                         help='node rank for distributed training')
-    parser.add_argument('--gpu', default=None, type=int,
+    parser.add_argument('--gpu', default=0, type=int,
                         help='GPU id to use. None means using all available GPUs.')
 
     # Evaluation options

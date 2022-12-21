@@ -68,7 +68,7 @@ class Encoder(nn.Module):
 
 
 class SimplerEncoder(nn.Module):
-    def __init__(self, zdim, input_dim=3, use_deterministic_encoder=False):
+    def __init__(self, zdim, input_dim=30, use_deterministic_encoder=False):
         super(SimplerEncoder, self).__init__()
         self.use_deterministic_encoder = use_deterministic_encoder
         self.zdim = zdim

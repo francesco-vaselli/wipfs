@@ -44,8 +44,8 @@ def add_args(parser):
             "transform_type" : "block-permutation" 
         }
     # model architecture options
-    parser.add_argument('--input_dim', type=int, default=3,
-                        help='Number of input dimensions (3 for 3D point clouds)')
+    parser.add_argument('--input_dim', type=int, default=30,
+                        help='Number of input dimensions (30 as we flatten all fakes)')
     parser.add_argument('--dims', type=str, default='256')
     parser.add_argument('--latent_dims', type=str, default='256')
     parser.add_argument("--num_blocks", type=int, default=1,

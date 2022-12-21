@@ -247,7 +247,7 @@ class FakeDoubleFlow(nn.Module):
         delta_log_py = delta_log_py.view(batch_size, num_points, 1).sum(1)
         log_px = log_py - delta_log_py
         """
-        log_px = self.reco_NDE_model.log_prob(x, context=z_new)
+        log_px = self.reco_NDE_model.log_prob(x.view(-1, self.input_dim), context=z_new)
 
         # Loss
         entropy_loss = -entropy.mean() * self.entropy_weight

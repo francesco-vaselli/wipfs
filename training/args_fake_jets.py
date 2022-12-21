@@ -169,11 +169,11 @@ def add_args(parser):
                         help='url used to set up distributed training')
     parser.add_argument('--dist_backend', default='nccl', type=str,
                         help='distributed backend')
-    parser.add_argument('--distributed', action='store_false',
+    parser.add_argument('--distributed', type=bool, default=False,
                         help='Use multi-processing distributed training to launch '
                              'N processes per node, which has N GPUs. This is the '
                              'fastest way to use PyTorch for either single node or '
-                             'multi node data parallel training')
+                             'multi node data parallel training') # action='store_false',
     parser.add_argument('--rank', default=0, type=int,
                         help='node rank for distributed training')
     parser.add_argument('--gpu', default=0, type=int,

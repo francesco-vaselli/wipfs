@@ -186,7 +186,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
             if step % args.log_freq == 0:
                 duration = time.time() - start_time
                 start_time = time.time()
-                print("TRAIN: [Rank %d] Epoch %d Batch [%2d/%2d] Time [%3.2fs] Entropy %2.5f LatentNats %2.5f PointNats %2.5f"
+                print("TRAIN: [Rank %d] Epoch %d Batch [%2d/%2d] Time [%3.2fs] Entropy %2.5f LatentFlowLoss %2.5f RecoFlowLoss %2.5f"
                       % (args.rank, epoch, bidx, len(train_loader), duration, entropy_avg_meter.avg,
                          latent_nats_avg_meter.avg, point_nats_avg_meter.avg))
 
@@ -194,7 +194,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
         if (epoch + 1) % args.exp_decay_freq == 0:
             scheduler.step()
             if writer is not None:
-                writer.add_scalar('lr/optimizer', scheduler.get_lr()[0], epoch)
+                writer.add_scalar('lr/optimizer', scheduler.get_last_lr(), epoch)
 
         if not args.no_validation and (epoch + 1) % args.val_freq == 0:
             # evaluate on the validation set
@@ -213,7 +213,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
                 if step % args.log_freq == 0:
                     duration = time.time() - start_time
                     start_time = time.time()
-                    print("TEST: [Rank %d] Epoch %d Batch [%2d/%2d] Time [%3.2fs] Entropy %2.5f LatentNats %2.5f PointNats %2.5f"
+                    print("TEST: [Rank %d] Epoch %d Batch [%2d/%2d] Time [%3.2fs] Entropy %2.5f LatentFlowLoss %2.5f RecoFlowLoss %2.5f"
                         % (args.rank, epoch, bidx, len(test_loader), duration, entropy_avg_meter.avg,
                             latent_nats_avg_meter.avg, point_nats_avg_meter.avg))
             

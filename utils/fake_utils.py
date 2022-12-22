@@ -170,7 +170,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
             
             if names[i] == 'N_true_int':
                 ax1.hist(generated_sample, bins=100,  histtype='step', lw=1,
-                    range=[rangeR.min(), rangeR.max()], label=f'FlashSim, {np.mean(generated_sample):.2f)}')
+                    range=[rangeR.min(), rangeR.max()], label=f'FlashSim, {np.mean(generated_sample):.2f}')
             else:
                 ax1.hist(generated_sample, bins=100,  histtype='step', lw=1,
                     range=[rangeR.min(), rangeR.max()], label=f'FlashSim')

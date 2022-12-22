@@ -248,7 +248,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
         ax2.hist2d(PU_n_true_int, N_true_fakes_latent, 
         bins=[np.arange(left_of_first_bin, right_of_last_bin+d, d), 
             np.arange(left_of_first_bin2, right_of_last_bin2+d2, d2)], 
-            range=[[0, 100], [0, 11], cmap='Reds', label='FlashSim Latent')
+            range=[[0, 100], [0, 11]], cmap='Reds', label='FlashSim Latent')
         ax2.set_xlabel('PU_n_true_int')
         ax2.set_ylabel('N_true_fakes_latent')
         fig.suptitle("Comparison of N_true_fakes_full vs PU_n_true_int", fontsize=16)

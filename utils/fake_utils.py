@@ -104,14 +104,14 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
     if args.use_latent_flow:
         with torch.no_grad():
 
-            pts = []
-            etas = []
-            phis = []
-            rpts = []
-            retas = []
-            rphis = []
-            N_true_int = []
-            N_true_fakes = []
+            pts = [[] for _ in range(2)]
+            etas = [[] for _ in range(2)]
+            phis = [[] for _ in range(2)]
+            rpts = [[] for _ in range(2)]
+            retas = [[] for _ in range(2)]
+            rphis = [[] for _ in range(2)]
+            N_true_int = [[] for _ in range(2)]
+            N_true_fakes = [[] for _ in range(2)]
             delta_phi_full = []
             delta_phi_flash = []
             for bidx, data in enumerate(test_loader):

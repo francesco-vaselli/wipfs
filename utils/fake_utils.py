@@ -5,6 +5,7 @@ import torch.distributed as dist
 from math import log, pi
 import sys
 import os
+import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.join("..", "utils"))
 from dataset import FakesDataset
@@ -103,35 +104,35 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
     if args.use_latent_flow:
         with torch.no_grad():
 
-        pts = []
-        etas = []
-        phis = []
-        rpts = []
-        retas = []
-        rphis = []
-        N_true_int = []
-        N_true_fakes = []
-        delta_phi_full = []
-        delta_phi_flash = []
-        for bidx, data in enumerate(test_loader):
-            x, y, N = data[0], data[1], data[2]
-            inputs_y = y.cuda(args.gpu, non_blocking=True)
+            pts = []
+            etas = []
+            phis = []
+            rpts = []
+            retas = []
+            rphis = []
+            N_true_int = []
+            N_true_fakes = []
+            delta_phi_full = []
+            delta_phi_flash = []
+            for bidx, data in enumerate(test_loader):
+                x, y, N = data[0], data[1], data[2]
+                inputs_y = y.cuda(args.gpu, non_blocking=True)
 
-            z_sampled, x_sampled = model.sample(inputs_y, num_points=1)
+                z_sampled, x_sampled = model.sample(inputs_y, num_points=1)
 
-            z_sampled = z_sampled.cpu().detach().numpy()
-            x_sampled = x_sampled.cpu().detach().numpy()
-            inputs_y = inputs_y.cpu().detach().numpy()
+                z_sampled = z_sampled.cpu().detach().numpy()
+                x_sampled = x_sampled.cpu().detach().numpy()
+                inputs_y = inputs_y.cpu().detach().numpy()
 
-            pts = np.concatenate((pts, x[:, :10]), axis=0)
-            etas = np.concatenate((etas, x[:, 10:20]), axis=0)
-            phis = np.concatenate((phis, x[:, 20:30]), axis=0)
-            rpts = np.concatenate((rpts, x_sampled[:, :10]), axis=0)
-            retas = np.concatenate((retas, x_sampled[:, 10:20]), axis=0)
-            rphis = np.concatenate((rphis, x_sampled[:, 20:30]), axis=0)
+                pts = np.concatenate((pts, x[:, :10]), axis=0)
+                etas = np.concatenate((etas, x[:, 10:20]), axis=0)
+                phis = np.concatenate((phis, x[:, 20:30]), axis=0)
+                rpts = np.concatenate((rpts, x_sampled[:, :10]), axis=0)
+                retas = np.concatenate((retas, x_sampled[:, 10:20]), axis=0)
+                rphis = np.concatenate((rphis, x_sampled[:, 20:30]), axis=0)
 
-            N_true_int = np.concatenate((N_true_int, inputs_y[:, 2]), axis=0)
-            N_true_fakes = np.concatenate((N_true_fakes, np.count_nonzero(x_sampled[:, :10]>0)), axis=0)
+                N_true_int = np.concatenate((N_true_int, inputs_y[:, 2]), axis=0)
+                N_true_fakes = np.concatenate((N_true_fakes, np.count_nonzero(x_sampled[:, :10]>0)), axis=0)
 
             # delta_phi_full = np.concatenate((delta_phi_full, np.abs(x[:, 20:30] - inputs_y[:, 0])), axis=0)
 

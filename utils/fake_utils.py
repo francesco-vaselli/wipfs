@@ -153,12 +153,13 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
         retas = np.reshape(retas, (-1, 10))
         rphis = np.reshape(rphis, (-1, 10))
         PU_n_true_int = np.reshape(PU_n_true_int, (-1, 1)).flatten()
-        N_true_fakes_latent = np.reshape(N_true_fakes_latent, (-1, 1)).flatten()
+        N_true_fakes_latent = np.rint(np.reshape(N_true_fakes_latent, (-1, 1)).flatten())
         N_true_fakes_reco = np.reshape(N_true_fakes_reco, (-1, 1)).flatten()
         N_true_fakes_full = np.reshape(N_true_fakes_full, (-1, 1)).flatten()
         full_sim = [pts, etas, phis]
         flash_sim = [rpts, retas, rphis]
         names = ['pt', 'eta', 'phi']
+        print(N_true_fakes_latent)
 
         for i in range(0, len(full_sim)):
             test_values = full_sim[i].flatten()

@@ -125,7 +125,9 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                 z_sampled = z_sampled.cpu().detach().numpy()
                 x_sampled = x_sampled.cpu().detach().numpy()
                 inputs_y = inputs_y.cpu().detach().numpy()
+                x = x.cpu().detach().numpy()
 
+                print(x.shape, x_sampled.shape)
                 pts = np.concatenate((pts, x[:, :10]), axis=0)
                 etas = np.concatenate((etas, x[:, 10:20]), axis=0)
                 phis = np.concatenate((phis, x[:, 20:30]), axis=0)

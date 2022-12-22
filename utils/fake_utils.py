@@ -167,7 +167,12 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
             _, rangeR, _ = ax1.hist(test_values, histtype='step', label='FullSim', lw=1, bins=100)
             generated_sample = np.where(generated_sample < rangeR.min(), rangeR.min(), generated_sample)
             generated_sample = np.where(generated_sample > rangeR.max(), rangeR.max(), generated_sample)
-            ax1.hist(generated_sample, bins=100,  histtype='step', lw=1,
+            
+            if names[i] == 'N_true_int':
+                ax1.hist(generated_sample, bins=100,  histtype='step', lw=1,
+                    range=[rangeR.min(), rangeR.max()], label=f'FlashSim, {np.mean(generated_sample):.2f)}')
+            else:
+                ax1.hist(generated_sample, bins=100,  histtype='step', lw=1,
                     range=[rangeR.min(), rangeR.max()], label=f'FlashSim')
             fig.suptitle(f"Comparison of {names[i]}", fontsize=16)
             ax1.legend(frameon=False, loc='upper right')

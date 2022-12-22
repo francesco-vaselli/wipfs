@@ -137,6 +137,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                 rphis.append(x_sampled[:, 20:30])
                 N_true_int.append(inputs_y[:, 2])
                 N_true_fakes.append(np.count_nonzero(x_sampled[:, :10]>0))
+                print(N_true_fakes.shape, N_true_fakes)
                 print('done 10k')
 
             # delta_phi_full = np.concatenate((delta_phi_full, np.abs(x[:, 20:30] - inputs_y[:, 0])), axis=0)

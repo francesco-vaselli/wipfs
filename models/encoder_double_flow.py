@@ -217,8 +217,10 @@ class FakeDoubleFlow(nn.Module):
             z = z_mu + 0 * z_sigma
         else:
             z = self.reparameterize_gaussian(z_mu, z_sigma)
+            print(z.size())
             # add N of true fakes
             z = torch.cat([z, N], dim=1)
+            print(z.size())
 
         # Compute H[Q(z|X)]
         if self.use_deterministic_encoder:
@@ -322,8 +324,8 @@ class FakeDoubleFlow(nn.Module):
         # print(y.size())
         z = self.latent_NDE_model.sample(1, context=y)
         # Sample points conditioned on the shape code
-        print(z.size())
-        x = self.reco_NDE_model.sample(num_points, context=z)
+        # print(z.size())
+        x = self.reco_NDE_model.sample(num_points, context=z.view(-1, 16))
         return z, x
 
     def reconstruct(self, x, num_points=None, truncate_std=None):

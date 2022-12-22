@@ -116,7 +116,6 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
             delta_phi_flash = []
             for bidx, data in enumerate(test_loader):
                 x, y, N = data[0], data[1], data[2]
-                x.view(-1, 30)
                 # print('x', x.shape, 'y', y.shape, 'N', N.shape)
                 inputs_y = y.cuda(args.gpu, non_blocking=True)
                 # print('inputs_y', inputs_y.shape)
@@ -127,6 +126,8 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                 inputs_y = inputs_y.cpu().detach().numpy()
                 x = x.cpu().detach().numpy()
 
+                x = x.reshape(-1, 30)
+                x_sampled = x_sampled.reshape(-1, 30)
                 print(x.shape, x_sampled.shape)
                 pts = np.concatenate((pts, x[:, :10]), axis=0)
                 etas = np.concatenate((etas, x[:, 10:20]), axis=0)

@@ -255,12 +255,14 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
         bins=[np.arange(left_of_first_bin, right_of_last_bin+d, d), 
             np.arange(left_of_first_bin2, right_of_last_bin2+d2, d2)], 
             range=[[0, 100], [0, 11]], cmap='Reds', label='FlashSim Latent')
+        ax2.set_ylim(0, 11)
         ax2.set_xlabel('PU_n_true_int')
         ax2.set_ylabel('N_true_fakes_latent')
         ax3.hist2d(PU_n_true_int, N_true_fakes_reco,
         bins=[np.arange(left_of_first_bin, right_of_last_bin+d, d),
             np.arange(left_of_first_bin3, right_of_last_bin3+d3, d3)],
             range=[[0, 100], [0, 11]], cmap='Greens', label='FlashSim Reco')
+        ax3.set_ylim(0, 11)
         ax3.set_xlabel('PU_n_true_int')
         ax3.set_ylabel('N_true_fakes_reco')
         fig.suptitle("Comparison of N_true_fakes_full vs N_true_fakes_latent vs N_true_fakes_reco", fontsize=16)

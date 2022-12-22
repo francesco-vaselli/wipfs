@@ -139,7 +139,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                 rphis.append(x_sampled[:, 20:30])
                 N_true_int.append(inputs_y[:, 2])
                 N_true_fakes_latent.append(z_sampled[:, 15])
-                N_true_fakes.append(np.sum(x_sampled[:, :10]>0))
+                N_true_fakes.append(np.sum(x_sampled[:, :10]>0, axis=1))
                 
                 print('done 10k')
 

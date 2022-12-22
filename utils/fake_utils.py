@@ -179,3 +179,32 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
             # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
             plt.savefig(f"./figures/comparison_{names[i]}.png")
             plt.close()
+
+            if names[i] == 'pt':
+                test_values_pt = full_sim[i]
+                generated_sample_pt = flash_sim[i]
+
+                for i in range(0, 3):
+                    test_values = test_values_pt[:, i].flatten()
+                    generated_sample = generated_sample_pt[:, i].flatten()
+                    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
+
+                    _, rangeR, _ = ax1.hist(test_values[:, 0], histtype='step', label='FullSim', lw=1, bins=100)
+                    generated_sample = np.where(generated_sample < rangeR.min(), rangeR.min(), generated_sample)
+                    generated_sample = np.where(generated_sample > rangeR.max(), rangeR.max(), generated_sample)
+                    ax1.hist(generated_sample, bins=100,  histtype='step', lw=1,
+                            range=[rangeR.min(), rangeR.max()], label=f'FlashSim')
+                    fig.suptitle(f"Comparison of Jet{names[i]}, {i}", fontsize=16)
+                    ax1.legend(frameon=False, loc='upper right')
+
+                    ax1.spines['right'].set_visible(False)
+                    ax1.spines['top'].set_visible(False)
+                    ax2.spines['right'].set_visible(False)
+                    ax2.spines['top'].set_visible(False)
+                    ax2.set_yscale("log")
+                    ax2.hist(test_values, histtype='step', lw=1, bins=100)
+                    ax2.hist(generated_sample, bins=100,  histtype='step', lw=1,
+                            range=[rangeR.min(), rangeR.max()])
+                    #ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
+                    # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
+                    plt.savefig(f"./figures/comparison_Jet{names[i]}.png")

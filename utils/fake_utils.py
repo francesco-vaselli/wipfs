@@ -110,9 +110,10 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
             rpts = []
             retas = []
             rphis = []
-            N_true_int = []
-            N_true_fakes = []
+            PU_n_true_int = []
+            N_true_fakes_reco = []
             N_true_fakes_latent = []
+            N_true_fakes_full = []
             delta_phi_full = []
             delta_phi_flash = []
             for bidx, data in enumerate(test_loader):
@@ -137,27 +138,27 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                 rpts.append(x_sampled[:, :10])
                 retas.append(x_sampled[:, 10:20])
                 rphis.append(x_sampled[:, 20:30])
-                N_true_int.append(inputs_y[:, 2])
+                PU_n_true_int.append(inputs_y[:, 2])
                 N_true_fakes_latent.append(z_sampled[:, 15])
-                N_true_fakes.append(np.sum(x_sampled[:, :10]>0, axis=1))
+                N_true_fakes_reco.append(np.sum(x_sampled[:, :10]>0, axis=1))
+                N_true_fakes_full.append(np.sum(x[:, :10]>0, axis=1))
                 
                 print('done 10k')
 
             # delta_phi_full = np.concatenate((delta_phi_full, np.abs(x[:, 20:30] - inputs_y[:, 0])), axis=0)
-        print(N_true_fakes)
         pts = np.reshape(pts, (-1, 10))
         etas = np.reshape(etas, (-1, 10))
         phis = np.reshape(phis, (-1, 10))
         rpts = np.reshape(rpts, (-1, 10))
         retas = np.reshape(retas, (-1, 10))
         rphis = np.reshape(rphis, (-1, 10))
-        N_true_int = np.reshape(N_true_int, (-1, 1))
-        N_true_fakes_latent = np.reshape(N_true_fakes_latent, (-1, 1))
-        N_true_fakes = np.reshape(N_true_fakes, (-1, 1))
-        print(N_true_fakes.shape, N_true_fakes)
-        full_sim = [pts, etas, phis, N_true_int]
-        flash_sim = [rpts, retas, rphis, N_true_fakes_latent]
-        names = ['pt', 'eta', 'phi', 'N_true_int']
+        PU_n_true_int = np.reshape(PU_n_true_int, (-1, 1)).flatten()
+        N_true_fakes_latent = np.reshape(N_true_fakes_latent, (-1, 1)).flatten()
+        N_true_fakes_reco = np.reshape(N_true_fakes_reco, (-1, 1)).flatten()
+        N_true_fakes_full = np.reshape(N_true_fakes_full, (-1, 1)).flatten()
+        full_sim = [pts, etas, phis]
+        flash_sim = [rpts, retas, rphis]
+        names = ['pt', 'eta', 'phi']
 
         for i in range(0, len(full_sim)):
             test_values = full_sim[i].flatten()
@@ -218,3 +219,18 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                     #ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
                     # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
                     plt.savefig(f"./figures/comparison_Jet_pt{j}.png")
+
+        # a plt hist2d of N_true_fakes_full vs PU_n_true_int
+        # with another hist2 of N_true_fakes_latent vs PU_n_true_int
+        # same style as before (lw etc) and labels
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
+        ax1.hist2d(PU_n_true_int, N_true_fakes_full, bins=100, cmap='Blues', label='FullSim')
+        ax1.set_xlabel('PU_n_true_int')
+        ax1.set_ylabel('N_true_fakes_full')
+        ax2.hist2d(PU_n_true_int, N_true_fakes_latent, bins=100, cmap='Reds', label='FlashSim')
+        ax2.set_xlabel('PU_n_true_int')
+        ax2.set_ylabel('N_true_fakes_latent')
+        fig.suptitle("Comparison of N_true_fakes_full vs PU_n_true_int", fontsize=16)
+        ax1.legend(frameon=False, loc='upper right')
+        plt.savefig(f"./figures/comparison_N_true_fakes_full_vs_PU_n_true_int.png")
+        plt.close()

@@ -204,7 +204,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                     generated_sample = np.where(generated_sample > rangeR.max(), rangeR.max(), generated_sample)
                     ax1.hist(generated_sample, bins=100,  histtype='step', lw=1,
                             range=[rangeR.min(), rangeR.max()], label=f'FlashSim')
-                    fig.suptitle(f"Comparison of Jet_pt{i}", fontsize=16)
+                    fig.suptitle(f"Comparison of Jet_pt{j}", fontsize=16)
                     ax1.legend(frameon=False, loc='upper right')
 
                     ax1.spines['right'].set_visible(False)

@@ -129,6 +129,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
 
                 x = x.reshape(-1, 30)
                 x_sampled = x_sampled.reshape(-1, 30)
+                z_sampled = z_sampled.reshape(-1, 16)
                 print(x.shape, x_sampled.shape)
                 pts.append(x[:, :10])
                 etas.append(x[:, 10:20])

@@ -189,9 +189,9 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                 test_values_pt = full_sim[i]
                 generated_sample_pt = flash_sim[i]
 
-                for i in range(0, 3):
-                    test_values = test_values_pt[:, i].flatten()
-                    generated_sample = generated_sample_pt[:, i].flatten()
+                for j in range(0, 3):
+                    test_values = test_values_pt[:, j].flatten()
+                    generated_sample = generated_sample_pt[:, j].flatten()
                     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
 
                     _, rangeR, _ = ax1.hist(test_values, histtype='step', label='FullSim', lw=1, bins=100)
@@ -199,7 +199,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                     generated_sample = np.where(generated_sample > rangeR.max(), rangeR.max(), generated_sample)
                     ax1.hist(generated_sample, bins=100,  histtype='step', lw=1,
                             range=[rangeR.min(), rangeR.max()], label=f'FlashSim')
-                    fig.suptitle(f"Comparison of Jet{names[i]}, {i}", fontsize=16)
+                    fig.suptitle(f"Comparison of Jet_pt{i}", fontsize=16)
                     ax1.legend(frameon=False, loc='upper right')
 
                     ax1.spines['right'].set_visible(False)
@@ -212,4 +212,4 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                             range=[rangeR.min(), rangeR.max()])
                     #ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
                     # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
-                    plt.savefig(f"./figures/comparison_Jet{names[i]}.png")
+                    plt.savefig(f"./figures/comparison_Jet_pt{j}.png")

@@ -112,6 +112,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
             rphis = []
             N_true_int = []
             N_true_fakes = []
+            N_true_fakes_latent = []
             delta_phi_full = []
             delta_phi_flash = []
             for bidx, data in enumerate(test_loader):
@@ -136,6 +137,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                 retas.append(x_sampled[:, 10:20])
                 rphis.append(x_sampled[:, 20:30])
                 N_true_int.append(inputs_y[:, 2])
+                N_true_fakes_latent.append(z_sampled[:, 15])
                 N_true_fakes.append(np.count_nonzero(x_sampled[:, :10]>0))
                 
                 print('done 10k')
@@ -149,10 +151,11 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
         retas = np.reshape(retas, (-1, 10))
         rphis = np.reshape(rphis, (-1, 10))
         N_true_int = np.reshape(N_true_int, (-1, 1))
+        N_true_fakes_latent = np.reshape(N_true_fakes_latent, (-1, 1))
         N_true_fakes = np.reshape(N_true_fakes, (-1, 1))
         print(N_true_fakes.shape, N_true_fakes)
         full_sim = [pts, etas, phis, N_true_int]
-        flash_sim = [rpts, retas, rphis, N_true_fakes]
+        flash_sim = [rpts, retas, rphis, N_true_fakes_latent]
         names = ['pt', 'eta', 'phi', 'N_true_int']
 
         for i in range(0, len(full_sim)):
@@ -190,7 +193,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                     generated_sample = generated_sample_pt[:, i].flatten()
                     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
 
-                    _, rangeR, _ = ax1.hist(test_values[:, 0], histtype='step', label='FullSim', lw=1, bins=100)
+                    _, rangeR, _ = ax1.hist(test_values, histtype='step', label='FullSim', lw=1, bins=100)
                     generated_sample = np.where(generated_sample < rangeR.min(), rangeR.min(), generated_sample)
                     generated_sample = np.where(generated_sample > rangeR.max(), rangeR.max(), generated_sample)
                     ax1.hist(generated_sample, bins=100,  histtype='step', lw=1,

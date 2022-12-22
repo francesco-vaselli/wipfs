@@ -104,14 +104,14 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
     if args.use_latent_flow:
         with torch.no_grad():
 
-            pts = [[] for _ in range(2)]
-            etas = [[] for _ in range(2)]
-            phis = [[] for _ in range(2)]
-            rpts = [[] for _ in range(2)]
-            retas = [[] for _ in range(2)]
-            rphis = [[] for _ in range(2)]
-            N_true_int = [[] for _ in range(2)]
-            N_true_fakes = [[] for _ in range(2)]
+            pts = []
+            etas = []
+            phis = []
+            rpts = []
+            retas = []
+            rphis = []
+            N_true_int = []
+            N_true_fakes = []
             delta_phi_full = []
             delta_phi_flash = []
             for bidx, data in enumerate(test_loader):
@@ -129,19 +129,26 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                 x = x.reshape(-1, 30)
                 x_sampled = x_sampled.reshape(-1, 30)
                 print(x.shape, x_sampled.shape)
-                pts = np.concatenate((pts, x[:, :10]), axis=0)
-                etas = np.concatenate((etas, x[:, 10:20]), axis=0)
-                phis = np.concatenate((phis, x[:, 20:30]), axis=0)
-                rpts = np.concatenate((rpts, x_sampled[:, :10]), axis=0)
-                retas = np.concatenate((retas, x_sampled[:, 10:20]), axis=0)
-                rphis = np.concatenate((rphis, x_sampled[:, 20:30]), axis=0)
-
-                N_true_int = np.concatenate((N_true_int, inputs_y[:, 2]), axis=0)
-                N_true_fakes = np.concatenate((N_true_fakes, np.count_nonzero(x_sampled[:, :10]>0)), axis=0)
+                pts.append(x[:, :10])
+                etas.append(x[:, 10:20])
+                phis.append(x[:, 20:30])
+                rpts.append(x_sampled[:, :10])
+                retas.append(x_sampled[:, 10:20])
+                rphis.append(x_sampled[:, 20:30])
+                N_true_int.append(inputs_y[:, 2])
+                N_true_fakes.append(np.count_nonzero(x_sampled[:, :10]>0))
                 print('done 10k')
 
             # delta_phi_full = np.concatenate((delta_phi_full, np.abs(x[:, 20:30] - inputs_y[:, 0])), axis=0)
 
+        pts = np.reshape(pts, (-1, 10))
+        etas = np.reshape(etas, (-1, 10))
+        phis = np.reshape(phis, (-1, 10))
+        rpts = np.reshape(rpts, (-1, 10))
+        retas = np.reshape(retas, (-1, 10))
+        rphis = np.reshape(rphis, (-1, 10))
+        N_true_int = np.reshape(N_true_int, (-1, 1))
+        N_true_fakes = np.reshape(N_true_fakes, (-1, 1))
         full_sim = [pts, etas, phis, N_true_int]
         flash_sim = [rpts, retas, rphis, N_true_fakes]
         names = ['pt', 'eta', 'phi', 'N_true_int']

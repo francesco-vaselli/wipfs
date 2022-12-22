@@ -141,7 +141,7 @@ def add_args(parser):
     # validation options
     parser.add_argument('--no_validation', default=False, action='store_true',
                         help='Whether to disable validation altogether.')
-    parser.add_argument('--save_val_results', action='store_true',
+    parser.add_argument('--save_val_results', default=True, action='store_true',
                         help='Whether to save the validation results.')
     parser.add_argument('--eval_classification', action='store_true',
                         help='Whether to evaluate classification accuracy on MN40 and MN10.')

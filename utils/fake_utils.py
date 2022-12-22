@@ -99,36 +99,68 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
     else:
         save_dir = None
 
-    # # classification
-    # if args.eval_classification and clf_loaders is not None:
-    #     for clf_expr, loaders in clf_loaders.items():
-    #         with torch.no_grad():
-    #             clf_val_res = validate_classification(loaders, model, args)
-
-    #         for k, v in clf_val_res.items():
-    #             if writer is not None and v is not None:
-    #                 writer.add_scalar('val_%s/%s' % (clf_expr, k), v, epoch)
-
     # samples
     if args.use_latent_flow:
         with torch.no_grad():
-            val_sample_res = validate_sample(
-                test_loader, model, args, max_samples=args.max_validate_shapes,
-                save_dir=save_dir)
 
-        for k, v in val_sample_res.items():
-            if not isinstance(v, float):
-                v = v.cpu().detach().item()
-            if writer is not None and v is not None:
-                writer.add_scalar('val_sample/%s' % k, v, epoch)
+        pts = []
+        etas = []
+        phis = []
+        rpts = []
+        retas = []
+        rphis = []
+        N_true_int = []
+        N_true_fakes = []
+        delta_phi_full = []
+        delta_phi_flash = []
+        for bidx, data in enumerate(test_loader):
+            x, y, N = data[0], data[1], data[2]
+            inputs_y = y.cuda(args.gpu, non_blocking=True)
 
-    # reconstructions
-    with torch.no_grad():
-        val_res = validate_conditioned(
-            test_loader, model, args, max_samples=args.max_validate_shapes,
-            save_dir=save_dir)
-    for k, v in val_res.items():
-        if not isinstance(v, float):
-            v = v.cpu().detach().item()
-        if writer is not None and v is not None:
-            writer.add_scalar('val_conditioned/%s' % k, v, epoch)
+            z_sampled, x_sampled = model.sample(inputs_y, num_points=1)
+
+            z_sampled = z_sampled.cpu().detach().numpy()
+            x_sampled = x_sampled.cpu().detach().numpy()
+            inputs_y = inputs_y.cpu().detach().numpy()
+
+            pts = np.concatenate((pts, x[:, :10]), axis=0)
+            etas = np.concatenate((etas, x[:, 10:20]), axis=0)
+            phis = np.concatenate((phis, x[:, 20:30]), axis=0)
+            rpts = np.concatenate((rpts, x_sampled[:, :10]), axis=0)
+            retas = np.concatenate((retas, x_sampled[:, 10:20]), axis=0)
+            rphis = np.concatenate((rphis, x_sampled[:, 20:30]), axis=0)
+
+            N_true_int = np.concatenate((N_true_int, inputs_y[:, 2]), axis=0)
+            N_true_fakes = np.concatenate((N_true_fakes, np.count_nonzero(x_sampled[:, :10]>0)), axis=0)
+
+            # delta_phi_full = np.concatenate((delta_phi_full, np.abs(x[:, 20:30] - inputs_y[:, 0])), axis=0)
+
+        full_sim = [pts, etas, phis, N_true_int]
+        flash_sim = [rpts, retas, rphis, N_true_fakes]
+        names = ['pt', 'eta', 'phi', 'N_true_int']
+
+        for i in range(0, len(full_sim)):
+            test_values = full_sim[i]
+            generated_sample = flash_sim[i]
+            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
+
+            _, rangeR, _ = ax1.hist(test_values, histtype='step', label='FullSim', lw=1, bins=100)
+            generated_sample = np.where(generated_sample < rangeR.min(), rangeR.min(), generated_sample)
+            generated_sample = np.where(generated_sample > rangeR.max(), rangeR.max(), generated_sample)
+            ax1.hist(generated_sample, bins=100,  histtype='step', lw=1,
+                    range=[rangeR.min(), rangeR.max()], label=f'FlashSim')
+            fig.suptitle(f"Comparison of {names[i]}", fontsize=16)
+            ax1.legend(frameon=False, loc='upper right')
+
+            ax1.spines['right'].set_visible(False)
+            ax1.spines['top'].set_visible(False)
+            ax2.spines['right'].set_visible(False)
+            ax2.spines['top'].set_visible(False)
+            ax2.set_yscale("log")
+            ax2.hist(test_values, histtype='step', lw=1, bins=100)
+            ax2.hist(generated_sample, bins=100,  histtype='step', lw=1,
+                    range=[rangeR.min(), rangeR.max()])
+            #ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
+            # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
+            plt.savefig(f"./figures/comparison_{names[i]}.png")
+            plt.close()

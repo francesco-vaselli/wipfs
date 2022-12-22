@@ -154,8 +154,8 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
         names = ['pt', 'eta', 'phi', 'N_true_int']
 
         for i in range(0, len(full_sim)):
-            test_values = full_sim[i]
-            generated_sample = flash_sim[i]
+            test_values = full_sim[i].flatten()
+            generated_sample = flash_sim[i].flatten()
             fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
 
             _, rangeR, _ = ax1.hist(test_values, histtype='step', label='FullSim', lw=1, bins=100)

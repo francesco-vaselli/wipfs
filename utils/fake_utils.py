@@ -154,7 +154,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
         rphis = np.reshape(rphis, (-1, 10))
         PU_n_true_int = np.reshape(PU_n_true_int, (-1, 1)).flatten()
         N_true_fakes_latent = np.rint(np.reshape(N_true_fakes_latent, (-1, 1)).flatten())
-        N_true_fakes_reco = np.reshape(N_true_fakes_reco, (-1, 1)).flatten()
+        N_true_fakes_reco = np.rint(np.reshape(N_true_fakes_reco, (-1, 1)).flatten())
         N_true_fakes_full = np.reshape(N_true_fakes_full, (-1, 1)).flatten()
         full_sim = [pts, etas, phis]
         flash_sim = [rpts, retas, rphis]
@@ -223,6 +223,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
 
         # a plt hist2d of N_true_fakes_full vs PU_n_true_int
         # with another hist2 of N_true_fakes_latent vs PU_n_true_int
+        # and another hist2 of N_true_fakes_reco vs PU_n_true_int
         # same style as before (lw etc) and labels
 
         d = np.diff(np.unique(PU_n_true_int)).min()
@@ -239,7 +240,12 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
         left_of_first_bin2 = N_true_fakes_latent.min() - float(d2)/2
         right_of_last_bin2 = N_true_fakes_latent.max() + float(d2)/2
 
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
+        # same for N_true_fakes_reco
+        d3 = np.diff(np.unique(N_true_fakes_reco)).min()
+        left_of_first_bin3 = N_true_fakes_reco.min() - float(d3)/2
+        right_of_last_bin3 = N_true_fakes_reco.max() + float(d3)/2
+
+        fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(9, 4.5), tight_layout=False)
         ax1.hist2d(PU_n_true_int, N_true_fakes_full, 
             bins=[np.arange(left_of_first_bin, right_of_last_bin+d, d), 
             np.arange(left_of_first_bin1, right_of_last_bin1+d1, d1)], cmap='Blues', label='FullSim')
@@ -251,7 +257,13 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
             range=[[0, 100], [0, 11]], cmap='Reds', label='FlashSim Latent')
         ax2.set_xlabel('PU_n_true_int')
         ax2.set_ylabel('N_true_fakes_latent')
-        fig.suptitle("Comparison of N_true_fakes_full vs PU_n_true_int", fontsize=16)
+        ax3.hist2d(PU_n_true_int, N_true_fakes_reco,
+        bins=[np.arange(left_of_first_bin, right_of_last_bin+d, d),
+            np.arange(left_of_first_bin3, right_of_last_bin3+d3, d3)],
+            range=[[0, 100], [0, 11]], cmap='Greens', label='FlashSim Reco')
+        ax3.set_xlabel('PU_n_true_int')
+        ax3.set_ylabel('N_true_fakes_reco')
+        fig.suptitle("Comparison of N_true_fakes_full vs N_true_fakes_latent vs N_true_fakes_reco", fontsize=16)
         ax1.legend(frameon=False, loc='upper right')
-        plt.savefig(f"./figures/comparison_N_true_fakes_full_vs_PU_n_true_int.png")
+        plt.savefig(f"./figures/comparison_N_true_fakes.png")
         plt.close()

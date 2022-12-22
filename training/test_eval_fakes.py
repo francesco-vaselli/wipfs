@@ -32,7 +32,7 @@ if __name__=='__main__':
     
     tr_dataset, te_dataset = get_datasets(args)
     test_loader = torch.utils.data.DataLoader(
-        dataset=te_dataset, batch_size=args.batch_size, shuffle=False,
+        dataset=te_dataset, batch_size=10000, shuffle=False,
         num_workers=0, pin_memory=True, drop_last=False,
         worker_init_fn=init_np_seed)
 

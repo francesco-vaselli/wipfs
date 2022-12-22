@@ -118,7 +118,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                 x, y, N = data[0], data[1], data[2]
                 inputs_y = y.cuda(args.gpu, non_blocking=True)
 
-                z_sampled, x_sampled = model.sample(inputs_y, batch_size=None, num_points=1)
+                z_sampled, x_sampled = model.sample(inputs_y.view(-1, 16), batch_size=None, num_points=1)
 
                 z_sampled = z_sampled.cpu().detach().numpy()
                 x_sampled = x_sampled.cpu().detach().numpy()

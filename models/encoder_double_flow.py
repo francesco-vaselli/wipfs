@@ -319,10 +319,10 @@ class FakeDoubleFlow(nn.Module):
             self.use_latent_flow
         ), "Sampling requires `self.use_latent_flow` to be True."
         # Generate the shape code from the prior
-        print(y.size())
+        # print(y.size())
         z = self.latent_NDE_model.sample(1, context=y)
         # Sample points conditioned on the shape code
-        print(z.size())
+        # print(z.size())
         x = self.reco_NDE_model.sample(num_points, context=z)
         return z, x
 

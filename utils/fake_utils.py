@@ -116,6 +116,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
             delta_phi_flash = []
             for bidx, data in enumerate(test_loader):
                 x, y, N = data[0], data[1], data[2]
+                print('x', x.shape, 'y', y.shape, 'N', N.shape)
                 inputs_y = y.cuda(args.gpu, non_blocking=True)
 
                 z_sampled, x_sampled = model.sample(inputs_y.view(-1, 16), batch_size=None, num_points=1)

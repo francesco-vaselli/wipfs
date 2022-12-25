@@ -217,10 +217,10 @@ class FakeDoubleFlow(nn.Module):
             z = z_mu + 0 * z_sigma
         else:
             z = self.reparameterize_gaussian(z_mu, z_sigma)
-            print(z.size())
+            # print(z.size())
             # add N of true fakes
             z = torch.cat([z, N], dim=1)
-            print(z.size())
+            # print(z.size())
 
         # Compute H[Q(z|X)]
         if self.use_deterministic_encoder:

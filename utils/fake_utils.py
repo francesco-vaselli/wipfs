@@ -94,7 +94,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
 
     # Make epoch wise save directory
     if writer is not None and args.save_val_results:
-        save_dir = os.path.join(save_dir, 'validation@epoch-%d' % epoch)
+        save_dir = os.path.join(save_dir, './figures/validation@epoch-%d' % epoch)
         if not os.path.isdir(save_dir):
             os.makedirs(save_dir)
     else:

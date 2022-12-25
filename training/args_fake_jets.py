@@ -17,7 +17,7 @@ def add_args(parser):
             "num_transform_blocks": 5, # DNN layers per coupling
             "activation": "relu",
             "batch_norm": True,
-            "num_bins": 16,
+            "num_bins": 32,
             "hidden_dim": 128,
             "block_size": 8,
             "mask_type" : "block-binary"
@@ -35,7 +35,7 @@ def add_args(parser):
             "num_transform_blocks": 5, # DNN layers per coupling
             "activation": "relu",
             "batch_norm": True,
-            "num_bins": 16,
+            "num_bins": 32,
             "hidden_dim": 128,
             "block_size": 10,
             "mask_type" : "block-binary"
@@ -134,7 +134,7 @@ def add_args(parser):
     # logging and saving frequency
     parser.add_argument('--log_name', type=str, default='saves_fakes', help="Name for the log dir")
     parser.add_argument('--viz_freq', type=int, default=10)
-    parser.add_argument('--val_freq', type=int, default=5)
+    parser.add_argument('--val_freq', type=int, default=10)
     parser.add_argument('--log_freq', type=int, default=10)
     parser.add_argument('--save_freq', type=int, default=10)
 

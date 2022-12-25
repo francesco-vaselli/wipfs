@@ -94,7 +94,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
 
     # Make epoch wise save directory
     if writer is not None and args.save_val_results:
-        save_dir = os.path.join(save_dir, 'epoch-%d' % epoch)
+        save_dir = os.path.join(save_dir, 'validation@epoch-%d' % epoch)
         if not os.path.isdir(save_dir):
             os.makedirs(save_dir)
     else:
@@ -114,8 +114,8 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
             N_true_fakes_reco = []
             N_true_fakes_latent = []
             N_true_fakes_full = []
-            delta_phi_full = []
-            delta_phi_flash = []
+            # delta_phi_full = []
+            # delta_phi_flash = []
             for bidx, data in enumerate(test_loader):
                 x, y, N = data[0], data[1], data[2]
                 # print('x', x.shape, 'y', y.shape, 'N', N.shape)
@@ -176,7 +176,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
             else:
                 ax1.hist(generated_sample, bins=100,  histtype='step', lw=1,
                     range=[rangeR.min(), rangeR.max()], label=f'FlashSim')
-            fig.suptitle(f"Comparison of {names[i]}", fontsize=16)
+            fig.suptitle(f"Comparison of {names[i]} @ epoch {epoch}", fontsize=16)
             ax1.legend(frameon=False, loc='upper right')
 
             ax1.spines['right'].set_visible(False)
@@ -189,7 +189,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                     range=[rangeR.min(), rangeR.max()])
             #ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
             # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
-            plt.savefig(f"./figures/comparison_{names[i]}.png")
+            plt.savefig(os.path.join(save_dir, f"comparison_{names[i]}.png"))
             plt.close()
 
             if names[i] == 'pt':
@@ -206,7 +206,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                     generated_sample = np.where(generated_sample > rangeR.max(), rangeR.max(), generated_sample)
                     ax1.hist(generated_sample, bins=100,  histtype='step', lw=1,
                             range=[rangeR.min(), rangeR.max()], label=f'FlashSim')
-                    fig.suptitle(f"Comparison of Jet_pt{j}", fontsize=16)
+                    fig.suptitle(f"Comparison of Jet_pt{j} @ epoch {epoch}", fontsize=16)
                     ax1.legend(frameon=False, loc='upper right')
 
                     ax1.spines['right'].set_visible(False)
@@ -219,7 +219,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                             range=[rangeR.min(), rangeR.max()])
                     #ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
                     # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
-                    plt.savefig(f"./figures/comparison_Jet_pt{j}.png")
+                    plt.savefig(os.path.join(save_dir, f"comparison_Jet_pt{j}.png"))
 
         # a plt hist2d of N_true_fakes_full vs PU_n_true_int
         # with another hist2 of N_true_fakes_latent vs PU_n_true_int
@@ -267,5 +267,5 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
         ax3.set_ylabel('N_true_fakes_reco')
         fig.suptitle("Comparison of N_true_fakes_full vs N_true_fakes_latent vs N_true_fakes_reco", fontsize=16)
         ax1.legend(frameon=False, loc='upper right')
-        plt.savefig(f"./figures/comparison_N_true_fakes.png")
+        plt.savefig(os.path.join(save_dir, f"comparison_N_true_fakes.png"))
         plt.close()

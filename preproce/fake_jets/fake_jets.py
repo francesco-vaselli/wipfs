@@ -39,8 +39,8 @@ if __name__ == '__main__':
 
     # fill missing fakes with nonphysical values
     dfft['FJet_pt'] = [i if i != 0 else np.random.normal(-10, 1) for i in dfft['FJet_pt'].values]
-    dfft['FJet_eta'] = [i if i != 0 else np.random.normal(-20, 1) for i in dfft['FJet_eta'].values]
-    dfft['FJet_phi'] = [i if i != 0 else np.random.normal(-20, 1) for i in dfft['FJet_phi'].values]
+    dfft['FJet_eta'] = [i if i != 0 else np.random.normal(-10, 1) for i in dfft['FJet_eta'].values]
+    dfft['FJet_phi'] = [i if i != 0 else np.random.normal(-10, 1) for i in dfft['FJet_phi'].values]
 
     # get all fake in one event on the same row
     # NOTE: we now have all pts, then all etas, then all phis

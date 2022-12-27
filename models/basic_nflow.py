@@ -184,7 +184,7 @@ def create_transform(
     param_dim,
     context_dim,
     base_transform_kwargs,
-    transform_type="block-permutation",
+    transform_type,
 ):
     """Build a sequence of NSF transforms, which maps parameters x into the
     base distribution u (noise). Transforms are conditioned on strain data y.

@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.join("..", "models"))
 from dataset import FakesDataset
 from basic_nflow import create_NDE_model
 from encoder_double_flow import FakeDoubleFlow
-from fake_utils import AverageValueMeter, save, resume, init_np_seed, reduce_tensor, set_random_seed, get_datasets
+from fake_utils import AverageValueMeter, save, resume, init_np_seed, reduce_tensor, set_random_seed, get_datasets, validate
 from args_fake_jets import get_args
 
 faulthandler.enable()
@@ -220,7 +220,6 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
 
 
         if not args.no_validation and (epoch + 1) % args.val_freq == 0:
-            from utils import validate
             validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None)
 
         # # save visualizations WE DO NOT VISUALIZE

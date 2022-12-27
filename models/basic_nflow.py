@@ -207,9 +207,9 @@ def create_transform(
     if transform_type == "block-permutation":
         block_size = base_transform_kwargs["block_size"]
         selected_transform = create_block_transform(param_dim, block_size)
-    elif transform_type == "random-permutation":
+    if transform_type == "random-permutation":
         selected_transform == create_random_transform(param_dim)
-    elif transform_type == "no-permutation":
+    if transform_type == "no-permutation":
         selected_transform = create_identity_transform(param_dim)
     else:
         raise ValueError

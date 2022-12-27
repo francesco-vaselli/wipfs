@@ -23,7 +23,16 @@ sys.path.insert(0, os.path.join("..", "models"))
 from dataset import FakesDataset
 from basic_nflow import create_NDE_model
 from encoder_double_flow import FakeDoubleFlow
-from fake_utils import AverageValueMeter, save, resume, init_np_seed, reduce_tensor, set_random_seed, get_datasets, validate
+from fake_utils import (
+    AverageValueMeter,
+    save,
+    resume,
+    init_np_seed,
+    reduce_tensor,
+    set_random_seed,
+    get_datasets,
+    validate,
+)
 from args_fake_jets import get_args
 
 faulthandler.enable()
@@ -41,8 +50,12 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
             args.rank = int(os.environ["RANK"])
         if args.distributed:
             args.rank = args.rank * ngpus_per_node + gpu
-        dist.init_process_group(backend=args.dist_backend, init_method=args.dist_url,
-                                world_size=args.world_size, rank=args.rank)
+        dist.init_process_group(
+            backend=args.dist_backend,
+            init_method=args.dist_url,
+            world_size=args.world_size,
+            rank=args.rank,
+        )
 
     if args.log_name is not None:
         log_dir = "runs/%s" % args.log_name
@@ -62,9 +75,14 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
     model = FakeDoubleFlow(args)
     if args.distributed:  # Multiple processes, single GPU per process
         if args.gpu is not None:
+
             def _transform_(m):
                 return nn.parallel.DistributedDataParallel(
-                    m, device_ids=[args.gpu], output_device=args.gpu, check_reduction=True)
+                    m,
+                    device_ids=[args.gpu],
+                    output_device=args.gpu,
+                    check_reduction=True,
+                )
 
             torch.cuda.set_device(args.gpu)
             model.cuda(args.gpu)
@@ -72,7 +90,9 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
             args.batch_size = int(args.batch_size / ngpus_per_node)
             args.workers = 0
         else:
-            assert 0, "DistributedDataParallel constructor should always set the single device scope"
+            assert (
+                0
+            ), "DistributedDataParallel constructor should always set the single device scope"
     elif args.gpu is not None:  # Single process, single GPU per process
         torch.cuda.set_device(args.gpu)
         model = model.cuda(args.gpu)
@@ -85,16 +105,28 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
     # resume checkpoints
     start_epoch = 0
     optimizer = model.make_optimizer(args)
-    if args.resume_checkpoint is None and os.path.exists(os.path.join(save_dir, 'checkpoint-latest.pt')):
-        args.resume_checkpoint = os.path.join(save_dir, 'checkpoint-latest.pt')  # use the latest checkpoint
+    if args.resume_checkpoint is None and os.path.exists(
+        os.path.join(save_dir, "checkpoint-latest.pt")
+    ):
+        args.resume_checkpoint = os.path.join(
+            save_dir, "checkpoint-latest.pt"
+        )  # use the latest checkpoint
     if args.resume_checkpoint is not None:
         if args.resume_optimizer:
             model, optimizer, start_epoch = resume(
-                args.resume_checkpoint, model, optimizer, strict=(not args.resume_non_strict))
+                args.resume_checkpoint,
+                model,
+                optimizer,
+                strict=(not args.resume_non_strict),
+            )
         else:
             model, _, start_epoch = resume(
-                args.resume_checkpoint, model, optimizer=None, strict=(not args.resume_non_strict))
-        print('Resumed from: ' + args.resume_checkpoint)
+                args.resume_checkpoint,
+                model,
+                optimizer=None,
+                strict=(not args.resume_non_strict),
+            )
+        print("Resumed from: " + args.resume_checkpoint)
 
     # initialize datasets and loaders
     tr_dataset, te_dataset = get_datasets(args)
@@ -104,13 +136,24 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
         train_sampler = None
 
     train_loader = torch.utils.data.DataLoader(
-        dataset=tr_dataset, batch_size=args.batch_size, shuffle=(train_sampler is None),
-        num_workers=0, pin_memory=True, sampler=train_sampler, drop_last=True,
-        worker_init_fn=init_np_seed)
+        dataset=tr_dataset,
+        batch_size=args.batch_size,
+        shuffle=(train_sampler is None),
+        num_workers=0,
+        pin_memory=True,
+        sampler=train_sampler,
+        drop_last=True,
+        worker_init_fn=init_np_seed,
+    )
     test_loader = torch.utils.data.DataLoader(
-        dataset=te_dataset, batch_size=args.batch_size, shuffle=False,
-        num_workers=0, pin_memory=True, drop_last=False,
-        worker_init_fn=init_np_seed)
+        dataset=te_dataset,
+        batch_size=args.batch_size,
+        shuffle=False,
+        num_workers=0,
+        pin_memory=True,
+        drop_last=False,
+        worker_init_fn=init_np_seed,
+    )
 
     # save dataset statistics
     # if not args.distributed or (args.rank % ngpus_per_node == 0):
@@ -140,14 +183,18 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
     #     clf_loaders = None
 
     # initialize the learning rate scheduler
-    if args.scheduler == 'exponential':
+    if args.scheduler == "exponential":
         scheduler = optim.lr_scheduler.ExponentialLR(optimizer, args.exp_decay)
-    elif args.scheduler == 'step':
-        scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=args.epochs // 2, gamma=0.1)
-    elif args.scheduler == 'linear':
+    elif args.scheduler == "step":
+        scheduler = optim.lr_scheduler.StepLR(
+            optimizer, step_size=args.epochs // 2, gamma=0.1
+        )
+    elif args.scheduler == "linear":
+
         def lambda_rule(ep):
             lr_l = 1.0 - max(0, ep - 0.5 * args.epochs) / float(0.5 * args.epochs)
             return lr_l
+
         scheduler = optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda_rule)
     else:
         assert 0, "args.schedulers should be either 'exponential' or 'linear'"
@@ -165,8 +212,6 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
         if args.distributed:
             train_sampler.set_epoch(epoch)
 
-        
-
         # train for one epoch
         for bidx, data in enumerate(train_loader):
             x, y, N = data[0], data[1], data[2]
@@ -179,22 +224,36 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
             inputs_y = y.cuda(args.gpu, non_blocking=True)
             inputs_N = N.cuda(args.gpu, non_blocking=True)
             out = model(inputs_x, inputs_y, inputs_N, optimizer, step, writer)
-            entropy, prior_nats, recon_nats = out['entropy'], out['prior_nats'], out['recon_nats']
+            entropy, prior_nats, recon_nats = (
+                out["entropy"],
+                out["prior_nats"],
+                out["recon_nats"],
+            )
             entropy_avg_meter.update(entropy)
             point_nats_avg_meter.update(recon_nats)
             latent_nats_avg_meter.update(prior_nats)
             if step % args.log_freq == 0:
                 duration = time.time() - start_time
                 start_time = time.time()
-                print("TRAIN: [Rank %d] Epoch %d Batch [%2d/%2d] Time [%3.2fs] Entropy %2.5f LatentFlowLoss %2.5f RecoFlowLoss %2.5f"
-                      % (args.rank, epoch, bidx, len(train_loader), duration, entropy_avg_meter.avg,
-                         latent_nats_avg_meter.avg, point_nats_avg_meter.avg))
+                print(
+                    "TRAIN: [Rank %d] Epoch %d Batch [%2d/%2d] Time [%3.2fs] Entropy %2.5f LatentFlowLoss %2.5f RecoFlowLoss %2.5f"
+                    % (
+                        args.rank,
+                        epoch,
+                        bidx,
+                        len(train_loader),
+                        duration,
+                        entropy_avg_meter.avg,
+                        latent_nats_avg_meter.avg,
+                        point_nats_avg_meter.avg,
+                    )
+                )
 
         # adjust the learning rate
         if (epoch + 1) % args.exp_decay_freq == 0:
             scheduler.step()
             if writer is not None:
-                writer.add_scalar('lr/optimizer', scheduler.get_last_lr(), epoch)
+                writer.add_scalar("lr/optimizer", scheduler.get_last_lr(), epoch)
 
         if not args.no_validation and (epoch + 1) % args.val_freq == 0:
             # evaluate on the validation set
@@ -205,22 +264,38 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
                 inputs_x = x.cuda(args.gpu, non_blocking=True)
                 inputs_y = y.cuda(args.gpu, non_blocking=True)
                 inputs_N = N.cuda(args.gpu, non_blocking=True)
-                out = model(inputs_x, inputs_y, inputs_N, optimizer, step, writer, val=True)
-                entropy, prior_nats, recon_nats = out['entropy'], out['prior_nats'], out['recon_nats']
+                out = model(
+                    inputs_x, inputs_y, inputs_N, optimizer, step, writer, val=True
+                )
+                entropy, prior_nats, recon_nats = (
+                    out["entropy"],
+                    out["prior_nats"],
+                    out["recon_nats"],
+                )
                 entropy_avg_meter.update(entropy)
                 point_nats_avg_meter.update(recon_nats)
                 latent_nats_avg_meter.update(prior_nats)
                 if step % args.log_freq == 0:
                     duration = time.time() - start_time
                     start_time = time.time()
-                    print("TEST: [Rank %d] Epoch %d Batch [%2d/%2d] Time [%3.2fs] Entropy %2.5f LatentFlowLoss %2.5f RecoFlowLoss %2.5f"
-                        % (args.rank, epoch, bidx, len(test_loader), duration, entropy_avg_meter.avg,
-                            latent_nats_avg_meter.avg, point_nats_avg_meter.avg))
-            
-
+                    print(
+                        "TEST: [Rank %d] Epoch %d Batch [%2d/%2d] Time [%3.2fs] Entropy %2.5f LatentFlowLoss %2.5f RecoFlowLoss %2.5f"
+                        % (
+                            args.rank,
+                            epoch,
+                            bidx,
+                            len(test_loader),
+                            duration,
+                            entropy_avg_meter.avg,
+                            latent_nats_avg_meter.avg,
+                            point_nats_avg_meter.avg,
+                        )
+                    )
 
         if not args.no_validation and (epoch + 1) % args.val_freq == 0:
-            validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None)
+            validate(
+                test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
+            )
 
         # # save visualizations WE DO NOT VISUALIZE
         # if (epoch + 1) % args.viz_freq == 0:
@@ -257,10 +332,18 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
         # save checkpoints
         if not args.distributed or (args.rank % ngpus_per_node == 0):
             if (epoch + 1) % args.save_freq == 0:
-                save(model, optimizer, epoch + 1,
-                     os.path.join(save_dir, 'checkpoint-%d.pt' % epoch))
-                save(model, optimizer, epoch + 1,
-                     os.path.join(save_dir, 'checkpoint-latest.pt'))
+                save(
+                    model,
+                    optimizer,
+                    epoch + 1,
+                    os.path.join(save_dir, "checkpoint-%d.pt" % epoch),
+                )
+                save(
+                    model,
+                    optimizer,
+                    epoch + 1,
+                    os.path.join(save_dir, "checkpoint-latest.pt"),
+                )
 
 
 def main():
@@ -269,19 +352,21 @@ def main():
     save_dir = os.path.join("checkpoints", args.log_name)
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-        os.makedirs(os.path.join(save_dir, 'images'))
+        os.makedirs(os.path.join(save_dir, "images"))
 
-    with open(os.path.join(save_dir, 'command.sh'), 'w') as f:
-        f.write('python -X faulthandler ' + ' '.join(sys.argv))
-        f.write('\n')
+    with open(os.path.join(save_dir, "command.sh"), "w") as f:
+        f.write("python -X faulthandler " + " ".join(sys.argv))
+        f.write("\n")
 
     if args.seed is None:
         args.seed = random.randint(0, 1000000)
     set_random_seed(args.seed)
 
     if args.gpu is not None:
-        warnings.warn('You have chosen a specific GPU. This will completely '
-                      'disable data parallelism.')
+        warnings.warn(
+            "You have chosen a specific GPU. This will completely "
+            "disable data parallelism."
+        )
 
     if args.dist_url == "env://" and args.world_size == -1:
         args.world_size = int(os.environ["WORLD_SIZE"])
@@ -295,12 +380,14 @@ def main():
     ngpus_per_node = torch.cuda.device_count()
     if args.distributed:
         args.world_size = ngpus_per_node * args.world_size
-        mp.spawn(main_worker, nprocs=ngpus_per_node, args=(save_dir, ngpus_per_node, args))
+        mp.spawn(
+            main_worker, nprocs=ngpus_per_node, args=(save_dir, ngpus_per_node, args)
+        )
     else:
         main_worker(args.gpu, save_dir, ngpus_per_node, args)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
 
     # get settings
@@ -317,5 +404,5 @@ if __name__ == '__main__':
     # train_loader = DataLoader(
     #         train_ds, batch_size=BATCH_SIZE, shuffle=True, pin_memory=True, num_workers=9
     #     )
-    # control printout    
+    # control printout
     # print(next(iter(train_loader))[0].size(), next(iter(train_loader))[1].size(), next(iter(train_loader))[2].size())

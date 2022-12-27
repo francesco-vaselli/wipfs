@@ -14,16 +14,16 @@ def add_args(parser):
             "num_flow_steps" : 6,
 
             "base_transform_kwargs" : {
-            "num_transform_blocks": 5, # DNN layers per coupling
+            "num_transform_blocks": 6, # DNN layers per coupling
             "activation": "relu",
             "batch_norm": True,
             "num_bins": 32,
             "hidden_dim": 128,
             "block_size": 8,
-            "mask_type" : "block-binary"
+            "mask_type" : "alternating-binary"
             },
 
-            "transform_type" : "block-permutation" 
+            "transform_type" : "random-permutation" 
         }
 
     reco_flow_param_dict = {
@@ -32,16 +32,16 @@ def add_args(parser):
             "num_flow_steps" : 9,
 
             "base_transform_kwargs" : {
-            "num_transform_blocks": 5, # DNN layers per coupling
+            "num_transform_blocks": 6, # DNN layers per coupling
             "activation": "relu",
             "batch_norm": True,
             "num_bins": 32,
             "hidden_dim": 128,
-            "block_size": 10,
-            "mask_type" : "block-binary"
+            "block_size": 15,
+            "mask_type" : "alternating-binary"
             },
 
-            "transform_type" : "block-permutation" 
+            "transform_type" : "random-permutation" 
         }
     # model architecture options
     parser.add_argument('--input_dim', type=int, default=30,

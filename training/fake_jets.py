@@ -147,7 +147,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
     )
     test_loader = torch.utils.data.DataLoader(
         dataset=te_dataset,
-        batch_size=args.batch_size,
+        batch_size=10000, # manually set batch size to avoid diff shapes
         shuffle=False,
         num_workers=0,
         pin_memory=True,

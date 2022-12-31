@@ -145,7 +145,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                 
                 print('done 10k')
 
-        print(pts.shape)
+        print(np.shape(pts))
             # delta_phi_full = np.concatenate((delta_phi_full, np.abs(x[:, 20:30] - inputs_y[:, 0])), axis=0)
         pts = np.reshape(pts, (-1, 10))
         etas = np.reshape(etas, (-1, 10))

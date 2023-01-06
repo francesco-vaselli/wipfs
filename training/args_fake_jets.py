@@ -78,7 +78,7 @@ def add_args(parser):
                         help='Optimizer to use', choices=['adam', 'adamax', 'sgd'])
     parser.add_argument('--batch_size', type=int, default=2048,
                         help='Batch size (of datasets) for training')
-    parser.add_argument('--lr', type=float, default=1e-3,
+    parser.add_argument('--lr', type=float, default=1e-4,
                         help='Learning rate for the Adam optimizer.')
     parser.add_argument('--beta1', type=float, default=0.9,
                         help='Beta1 for Adam.')

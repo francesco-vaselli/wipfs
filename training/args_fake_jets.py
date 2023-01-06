@@ -18,7 +18,7 @@ def add_args(parser):
             "activation": "relu",
             "batch_norm": True,
             "num_bins": 32,
-            "hidden_dim": 128,
+            "hidden_dim": 256,
             "block_size": 8,
             "mask_type" : "alternating-binary"
             },
@@ -36,7 +36,7 @@ def add_args(parser):
             "activation": "relu",
             "batch_norm": True,
             "num_bins": 32,
-            "hidden_dim": 128,
+            "hidden_dim": 256,
             "block_size": 15,
             "mask_type" : "alternating-binary"
             },

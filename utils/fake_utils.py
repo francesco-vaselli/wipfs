@@ -84,7 +84,7 @@ def init_np_seed(worker_id):
 def get_datasets(args):
     
     tr_dataset = FakesDataset(["./datasets/fake_jets.hdf5"], x_dim=30, y_dim=6, limit=1000000)
-    te_dataset = FakesDataset(["./datasets/fake_jets.hdf5"], x_dim=30, y_dim=6, start=1000000, limit=1200000)
+    te_dataset = FakesDataset(["./datasets/fake_jets.hdf5"], x_dim=30, y_dim=6, start=1000000, limit=1100000)
 
     return tr_dataset, te_dataset
 

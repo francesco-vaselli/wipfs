@@ -1,5 +1,7 @@
 // Open a NanoAOD file and extract Gen-level condtioning AND reco targets for
 // trainings Working fine with ROOT 6.22
+#include <iostream>
+using namespace std;
 
 
 auto DeltaPhiMEFJ(ROOT::VecOps::RVec<float> &PhiJ) {
@@ -317,7 +319,7 @@ auto second_muon_dphi(ROOT::VecOps::RVec<float> &etaj,
   return dphis;
 }
 
-void gen_jet_graph(string input_file, string output_file) {
+void gen_jet_graph(const char* input_file, const char* output_file) {
 
   /* The main function. Uses ROOT::RDataFrame to select only jets NOT matching
      to a GenJet, then extracts all the conditioning variables of the event and
@@ -330,7 +332,7 @@ void gen_jet_graph(string input_file, string output_file) {
   // BECAUSE OF MT ORIGINAL ORDERING OF FILE IS NOT PRESERVED
   ROOT::EnableImplicitMT(); // disabling if you want to use range
   TFile *f =
-      TFile::Open(&input_file);
+      TFile::Open(input_file);
                   /*"root://cmsxrootd.fnal.gov///store/mc/RunIIAutumn18NanoAODv6/"
                   "TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8/NANOAODSIM/"
                   "Nano25Oct2019_102X_upgrade2018_realistic_v20_ext1-v1/250000/"
@@ -384,7 +386,7 @@ void gen_jet_graph(string input_file, string output_file) {
                                 "FJet_deta"};
 
   // finally process columns and save to .root file
-  d_matched.Snapshot("FJets", &output_file, col_to_save);
+  d_matched.Snapshot("FJets", output_file, col_to_save);
   /*
   gStyle->SetOptStat(0);
   auto h = d_matched.Histo1D({"FJet_dphi", "FJet_dphi", 100, 0, 3.14},

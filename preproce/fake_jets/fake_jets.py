@@ -54,7 +54,7 @@ if __name__ == '__main__':
     )
     print(df)
 
-    file = h5py.File(f"~/wipfs/training/datasets/fake_jets{file_num}.hdf5", "w")
+    file = h5py.File(f"../../training/datasets/fake_jets{file_num}.hdf5", "w")
 
     dset = file.create_dataset("data", data=df.values, dtype="f4")
 

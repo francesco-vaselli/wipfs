@@ -8,7 +8,7 @@ import os
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.join("..", "utils"))
-from dataset import FakesDataset
+from dataset import FakesDataset, H5FakesDataset
 
 
 class AverageValueMeter(object):
@@ -35,19 +35,19 @@ class AverageValueMeter(object):
 
 def save(model, optimizer, epoch, path):
     d = {
-        'epoch': epoch,
-        'model': model.state_dict(),
-        'optimizer': optimizer.state_dict()
+        "epoch": epoch,
+        "model": model.state_dict(),
+        "optimizer": optimizer.state_dict(),
     }
     torch.save(d, path)
 
 
 def resume(path, model, optimizer=None, strict=True):
     ckpt = torch.load(path)
-    model.load_state_dict(ckpt['model'], strict=strict)
-    start_epoch = ckpt['epoch']
+    model.load_state_dict(ckpt["model"], strict=strict)
+    start_epoch = ckpt["epoch"]
     if optimizer is not None:
-        optimizer.load_state_dict(ckpt['optimizer'])
+        optimizer.load_state_dict(ckpt["optimizer"])
     return model, optimizer, start_epoch
 
 
@@ -82,9 +82,21 @@ def init_np_seed(worker_id):
 
 
 def get_datasets(args):
-    
-    tr_dataset = FakesDataset(["./datasets/fake_jets.hdf5"], x_dim=30, y_dim=6, limit=1000000)
-    te_dataset = FakesDataset(["./datasets/fake_jets.hdf5"], x_dim=30, y_dim=6, start=1000000, limit=1100000)
+
+    tr_dataset = H5FakesDataset(
+        [
+            "./datasets/fake_jets1.hdf5",
+            "./datasets/fake_jets2.hdf5",
+            "./datasets/fake_jets3.hdf5",
+            "./datasets/fake_jets4.hdf5",
+        ],
+        x_dim=30,
+        y_dim=6,
+        limit=5000000,
+    )
+    te_dataset = FakesDataset(
+        ["./datasets/fake_jets5.hdf5"], x_dim=30, y_dim=6, start=0, limit=100000
+    )
 
     return tr_dataset, te_dataset
 
@@ -94,7 +106,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
 
     # Make epoch wise save directory
     if writer is not None and args.save_val_results:
-        save_dir = os.path.join(save_dir, './figures/validation@epoch-%d' % epoch)
+        save_dir = os.path.join(save_dir, "./figures/validation@epoch-%d" % epoch)
         if not os.path.isdir(save_dir):
             os.makedirs(save_dir)
     else:
@@ -121,7 +133,9 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                 # print('x', x.shape, 'y', y.shape, 'N', N.shape)
                 inputs_y = y.cuda(args.gpu, non_blocking=True)
                 # print('inputs_y', inputs_y.shape)
-                z_sampled, x_sampled = model.sample(y=inputs_y, batch_size=None, num_points=1)
+                z_sampled, x_sampled = model.sample(
+                    y=inputs_y, batch_size=None, num_points=1
+                )
 
                 z_sampled = z_sampled.cpu().detach().numpy()
                 x_sampled = x_sampled.cpu().detach().numpy()
@@ -140,13 +154,13 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                 rphis.append(x_sampled[:, 20:30])
                 PU_n_true_int.append(inputs_y[:, 2])
                 N_true_fakes_latent.append(z_sampled[:, 15])
-                N_true_fakes_reco.append(np.sum(x_sampled[:, :10]>0, axis=1))
-                N_true_fakes_full.append(np.sum(x[:, :10]>0, axis=1))
-                
-                print('done 10k')
+                N_true_fakes_reco.append(np.sum(x_sampled[:, :10] > 0, axis=1))
+                N_true_fakes_full.append(np.sum(x[:, :10] > 0, axis=1))
+
+                print("done 10k")
 
         print(np.shape(pts))
-            # delta_phi_full = np.concatenate((delta_phi_full, np.abs(x[:, 20:30] - inputs_y[:, 0])), axis=0)
+        # delta_phi_full = np.concatenate((delta_phi_full, np.abs(x[:, 20:30] - inputs_y[:, 0])), axis=0)
         pts = np.reshape(pts, (-1, 10))
         etas = np.reshape(etas, (-1, 10))
         phis = np.reshape(phis, (-1, 10))
@@ -154,12 +168,14 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
         retas = np.reshape(retas, (-1, 10))
         rphis = np.reshape(rphis, (-1, 10))
         PU_n_true_int = np.reshape(PU_n_true_int, (-1, 1)).flatten()
-        N_true_fakes_latent = np.rint(np.reshape(N_true_fakes_latent, (-1, 1)).flatten())
+        N_true_fakes_latent = np.rint(
+            np.reshape(N_true_fakes_latent, (-1, 1)).flatten()
+        )
         N_true_fakes_reco = np.rint(np.reshape(N_true_fakes_reco, (-1, 1)).flatten())
         N_true_fakes_full = np.reshape(N_true_fakes_full, (-1, 1)).flatten()
         full_sim = [pts, etas, phis]
         flash_sim = [rpts, retas, rphis]
-        names = ['pt', 'eta', 'phi']
+        names = ["pt", "eta", "phi"]
         print(N_true_fakes_latent)
 
         for i in range(0, len(full_sim)):
@@ -167,58 +183,102 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
             generated_sample = flash_sim[i].flatten()
             fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
 
-            _, rangeR, _ = ax1.hist(test_values, histtype='step', label='FullSim', lw=1, bins=100)
-            generated_sample = np.where(generated_sample < rangeR.min(), rangeR.min(), generated_sample)
-            generated_sample = np.where(generated_sample > rangeR.max(), rangeR.max(), generated_sample)
-            
-            if names[i] == 'N_true_int':
-                ax1.hist(generated_sample, bins=100,  histtype='step', lw=1,
-                    range=[rangeR.min(), rangeR.max()], label=f'FlashSim, {np.mean(generated_sample):.2f}')
-            else:
-                ax1.hist(generated_sample, bins=100,  histtype='step', lw=1,
-                    range=[rangeR.min(), rangeR.max()], label=f'FlashSim')
-            fig.suptitle(f"Comparison of {names[i]} @ epoch {epoch}", fontsize=16)
-            ax1.legend(frameon=False, loc='upper right')
+            _, rangeR, _ = ax1.hist(
+                test_values, histtype="step", label="FullSim", lw=1, bins=100
+            )
+            generated_sample = np.where(
+                generated_sample < rangeR.min(), rangeR.min(), generated_sample
+            )
+            generated_sample = np.where(
+                generated_sample > rangeR.max(), rangeR.max(), generated_sample
+            )
 
-            ax1.spines['right'].set_visible(False)
-            ax1.spines['top'].set_visible(False)
-            ax2.spines['right'].set_visible(False)
-            ax2.spines['top'].set_visible(False)
+            if names[i] == "N_true_int":
+                ax1.hist(
+                    generated_sample,
+                    bins=100,
+                    histtype="step",
+                    lw=1,
+                    range=[rangeR.min(), rangeR.max()],
+                    label=f"FlashSim, {np.mean(generated_sample):.2f}",
+                )
+            else:
+                ax1.hist(
+                    generated_sample,
+                    bins=100,
+                    histtype="step",
+                    lw=1,
+                    range=[rangeR.min(), rangeR.max()],
+                    label=f"FlashSim",
+                )
+            fig.suptitle(f"Comparison of {names[i]} @ epoch {epoch}", fontsize=16)
+            ax1.legend(frameon=False, loc="upper right")
+
+            ax1.spines["right"].set_visible(False)
+            ax1.spines["top"].set_visible(False)
+            ax2.spines["right"].set_visible(False)
+            ax2.spines["top"].set_visible(False)
             ax2.set_yscale("log")
-            ax2.hist(test_values, histtype='step', lw=1, bins=100)
-            ax2.hist(generated_sample, bins=100,  histtype='step', lw=1,
-                    range=[rangeR.min(), rangeR.max()])
-            #ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
+            ax2.hist(test_values, histtype="step", lw=1, bins=100)
+            ax2.hist(
+                generated_sample,
+                bins=100,
+                histtype="step",
+                lw=1,
+                range=[rangeR.min(), rangeR.max()],
+            )
+            # ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
             # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
             plt.savefig(os.path.join(save_dir, f"comparison_{names[i]}.png"))
             plt.close()
 
-            if names[i] == 'pt':
+            if names[i] == "pt":
                 test_values_pt = full_sim[i]
                 generated_sample_pt = flash_sim[i]
 
                 for j in range(0, 3):
                     test_values = test_values_pt[:, j].flatten()
                     generated_sample = generated_sample_pt[:, j].flatten()
-                    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
+                    fig, (ax1, ax2) = plt.subplots(
+                        1, 2, figsize=(9, 4.5), tight_layout=False
+                    )
 
-                    _, rangeR, _ = ax1.hist(test_values, histtype='step', label='FullSim', lw=1, bins=100)
-                    generated_sample = np.where(generated_sample < rangeR.min(), rangeR.min(), generated_sample)
-                    generated_sample = np.where(generated_sample > rangeR.max(), rangeR.max(), generated_sample)
-                    ax1.hist(generated_sample, bins=100,  histtype='step', lw=1,
-                            range=[rangeR.min(), rangeR.max()], label=f'FlashSim')
-                    fig.suptitle(f"Comparison of Jet_pt{j} @ epoch {epoch}", fontsize=16)
-                    ax1.legend(frameon=False, loc='upper right')
+                    _, rangeR, _ = ax1.hist(
+                        test_values, histtype="step", label="FullSim", lw=1, bins=100
+                    )
+                    generated_sample = np.where(
+                        generated_sample < rangeR.min(), rangeR.min(), generated_sample
+                    )
+                    generated_sample = np.where(
+                        generated_sample > rangeR.max(), rangeR.max(), generated_sample
+                    )
+                    ax1.hist(
+                        generated_sample,
+                        bins=100,
+                        histtype="step",
+                        lw=1,
+                        range=[rangeR.min(), rangeR.max()],
+                        label=f"FlashSim",
+                    )
+                    fig.suptitle(
+                        f"Comparison of Jet_pt{j} @ epoch {epoch}", fontsize=16
+                    )
+                    ax1.legend(frameon=False, loc="upper right")
 
-                    ax1.spines['right'].set_visible(False)
-                    ax1.spines['top'].set_visible(False)
-                    ax2.spines['right'].set_visible(False)
-                    ax2.spines['top'].set_visible(False)
+                    ax1.spines["right"].set_visible(False)
+                    ax1.spines["top"].set_visible(False)
+                    ax2.spines["right"].set_visible(False)
+                    ax2.spines["top"].set_visible(False)
                     ax2.set_yscale("log")
-                    ax2.hist(test_values, histtype='step', lw=1, bins=100)
-                    ax2.hist(generated_sample, bins=100,  histtype='step', lw=1,
-                            range=[rangeR.min(), rangeR.max()])
-                    #ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
+                    ax2.hist(test_values, histtype="step", lw=1, bins=100)
+                    ax2.hist(
+                        generated_sample,
+                        bins=100,
+                        histtype="step",
+                        lw=1,
+                        range=[rangeR.min(), rangeR.max()],
+                    )
+                    # ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
                     # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
                     plt.savefig(os.path.join(save_dir, f"comparison_Jet_pt{j}.png"))
 
@@ -228,45 +288,69 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
         # same style as before (lw etc) and labels
 
         d = np.diff(np.unique(PU_n_true_int)).min()
-        left_of_first_bin = PU_n_true_int.min() - float(d)/2
-        right_of_last_bin = PU_n_true_int.max() + float(d)/2
+        left_of_first_bin = PU_n_true_int.min() - float(d) / 2
+        right_of_last_bin = PU_n_true_int.max() + float(d) / 2
 
         # same for N_true_fakes_full
         d1 = np.diff(np.unique(N_true_fakes_full)).min()
-        left_of_first_bin1 = N_true_fakes_full.min() - float(d1)/2
-        right_of_last_bin1 = N_true_fakes_full.max() + float(d1)/2
+        left_of_first_bin1 = N_true_fakes_full.min() - float(d1) / 2
+        right_of_last_bin1 = N_true_fakes_full.max() + float(d1) / 2
 
         # same for N_true_fakes_latent
         d2 = np.diff(np.unique(N_true_fakes_latent)).min()
-        left_of_first_bin2 = N_true_fakes_latent.min() - float(d2)/2
-        right_of_last_bin2 = N_true_fakes_latent.max() + float(d2)/2
+        left_of_first_bin2 = N_true_fakes_latent.min() - float(d2) / 2
+        right_of_last_bin2 = N_true_fakes_latent.max() + float(d2) / 2
 
         # same for N_true_fakes_reco
         d3 = np.diff(np.unique(N_true_fakes_reco)).min()
-        left_of_first_bin3 = N_true_fakes_reco.min() - float(d3)/2
-        right_of_last_bin3 = N_true_fakes_reco.max() + float(d3)/2
+        left_of_first_bin3 = N_true_fakes_reco.min() - float(d3) / 2
+        right_of_last_bin3 = N_true_fakes_reco.max() + float(d3) / 2
 
         fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(9, 4.5), tight_layout=False)
-        ax1.hist2d(PU_n_true_int, N_true_fakes_full, 
-            bins=[np.arange(left_of_first_bin, right_of_last_bin+d, d), 
-            np.arange(left_of_first_bin1, right_of_last_bin1+d1, d1)], cmap='Blues', label='FullSim')
-        ax1.set_xlabel('PU_n_true_int')
-        ax1.set_ylabel('N_true_fakes_full')
-        ax2.hist2d(PU_n_true_int, N_true_fakes_latent, 
-        bins=[np.arange(left_of_first_bin, right_of_last_bin+d, d), 
-            np.arange(left_of_first_bin2, right_of_last_bin2+d2, d2)], 
-            range=[[0, 100], [0, 11]], cmap='Reds', label='FlashSim Latent')
+        ax1.hist2d(
+            PU_n_true_int,
+            N_true_fakes_full,
+            bins=[
+                np.arange(left_of_first_bin, right_of_last_bin + d, d),
+                np.arange(left_of_first_bin1, right_of_last_bin1 + d1, d1),
+            ],
+            cmap="Blues",
+            label="FullSim",
+        )
+        ax1.set_xlabel("PU_n_true_int")
+        ax1.set_ylabel("N_true_fakes_full")
+        ax2.hist2d(
+            PU_n_true_int,
+            N_true_fakes_latent,
+            bins=[
+                np.arange(left_of_first_bin, right_of_last_bin + d, d),
+                np.arange(left_of_first_bin2, right_of_last_bin2 + d2, d2),
+            ],
+            range=[[0, 100], [0, 11]],
+            cmap="Reds",
+            label="FlashSim Latent",
+        )
         ax2.set_ylim([0, 11])
-        ax2.set_xlabel('PU_n_true_int')
-        ax2.set_ylabel('N_true_fakes_latent')
-        ax3.hist2d(PU_n_true_int, N_true_fakes_reco,
-        bins=[np.arange(left_of_first_bin, right_of_last_bin+d, d),
-            np.arange(left_of_first_bin3, right_of_last_bin3+d3, d3)],
-            range=[[0, 100], [0, 11]], cmap='Greens', label='FlashSim Reco')
+        ax2.set_xlabel("PU_n_true_int")
+        ax2.set_ylabel("N_true_fakes_latent")
+        ax3.hist2d(
+            PU_n_true_int,
+            N_true_fakes_reco,
+            bins=[
+                np.arange(left_of_first_bin, right_of_last_bin + d, d),
+                np.arange(left_of_first_bin3, right_of_last_bin3 + d3, d3),
+            ],
+            range=[[0, 100], [0, 11]],
+            cmap="Greens",
+            label="FlashSim Reco",
+        )
         ax3.set_ylim([0, 11])
-        ax3.set_xlabel('PU_n_true_int')
-        ax3.set_ylabel('N_true_fakes_reco')
-        fig.suptitle("Comparison of N_true_fakes_full vs N_true_fakes_latent vs N_true_fakes_reco", fontsize=16)
-        ax1.legend(frameon=False, loc='upper right')
+        ax3.set_xlabel("PU_n_true_int")
+        ax3.set_ylabel("N_true_fakes_reco")
+        fig.suptitle(
+            "Comparison of N_true_fakes_full vs N_true_fakes_latent vs N_true_fakes_reco",
+            fontsize=16,
+        )
+        ax1.legend(frameon=False, loc="upper right")
         plt.savefig(os.path.join(save_dir, f"comparison_N_true_fakes.png"))
         plt.close()

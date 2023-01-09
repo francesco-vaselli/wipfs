@@ -89,13 +89,14 @@ def get_datasets(args):
             "./datasets/fake_jets2.hdf5",
             "./datasets/fake_jets3.hdf5",
             "./datasets/fake_jets4.hdf5",
+            "./datasets/fake_jets5.hdf5",
         ],
         x_dim=30,
         y_dim=6,
         limit=5000000,
     )
     te_dataset = FakesDataset(
-        ["./datasets/fake_jets5.hdf5"], x_dim=30, y_dim=6, start=0, limit=100000
+        ["./datasets/fake_jets6.hdf5"], x_dim=30, y_dim=6, start=0, limit=100000
     )
 
     return tr_dataset, te_dataset

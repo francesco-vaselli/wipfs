@@ -150,3 +150,53 @@ class H5Dataset(Dataset):
             return self.limit
         else:
             return self.strides[-1]
+
+
+class H5FakesDataset(Dataset):
+    def __init__(self, h5_paths, x_dim, y_dim, limit=-1):
+        """Initialize the class, set indexes across datasets and define lazy loading
+        Args:
+            h5_paths (strings): paths to the various hdf5 files to include in the final Dataset
+            limit (int, optional): optionally limit dataset length to specified values, if negative
+                returns the full length as inferred from files. Defaults to -1.
+        """
+        max_events = int(5e9)
+        self.limit = max_events if limit == -1 else int(limit)
+        self.h5_paths = h5_paths
+        self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
+
+        self.strides = []
+        for archive in self.archives:
+            with archive as f:
+                self.strides.append(len(f["data"]))
+
+        self.len_in_files = self.strides[1:]
+        self.strides = np.cumsum(self.strides)
+        self._archives = None
+
+    @property
+    def archives(self):
+        if self._archives is None:  # lazy loading here!
+            self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
+        return self._archives
+
+    def __getitem__(self, index, x_dim, y_dim):
+        file_idx = np.searchsorted(self.strides, index, side="right")
+        idx_in_file = index - self.strides[max(0, file_idx - 1)]
+        y = self.archives[file_idx]["data"][idx_in_file, x_dim :(x_dim + y_dim)]
+        x = self.archives[file_idx]["data"][idx_in_file, 0 : x_dim]
+        N = self.archives[file_idx]["data"][idx_in_file, (y_dim + x_dim) : (y_dim + x_dim + 1)]]
+        x = torch.tensor(x, dtype=torch.float32).view(-1, 1, x_dim) # reshape needed for CONV1D 
+        y = torch.tensor(y, dtype=torch.float32)  
+        N = torch.tensor(N, dtype=torch.float32)  
+        # x = x.float()
+        # y = y.float()
+
+        return x, y, N
+
+    def __len__(self):
+        # return self.strides[-1] #this will process all files
+        if self.limit <= self.strides[-1]:
+            return self.limit
+        else:
+            return self.strides[-1]

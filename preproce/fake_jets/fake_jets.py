@@ -3,14 +3,15 @@ import numpy as np
 import uproot
 import awkward as ak
 import h5py
+import sys
 
 STOP = None
 
 
 if __name__ == '__main__':
 
-    tree = uproot.open(f"~/wipfs/extract/fake_jets/FJets.root:FJets", num_workers=20)
-    # define pandas df for fast manipulation
+    file_num = sys.argv[1]
+    tree = uproot.open(f"~/wipfs/extract/fake_jets/extracted_files/FJets{file_num}.root:FJets", num_workers=20)
     # define pandas df for fast manipulation
     dfgl = tree.arrays(
         [
@@ -53,7 +54,7 @@ if __name__ == '__main__':
     )
     print(df)
 
-    file = h5py.File(f"fake_jets.hdf5", "w")
+    file = h5py.File(f"~/wipfs/training/datasets/fake_jets{file_num}.hdf5", "w")
 
     dset = file.create_dataset("data", data=df.values, dtype="f4")
 

@@ -11,6 +11,7 @@ STOP = None
 if __name__ == '__main__':
 
     file_num = sys.argv[1]
+    save_file = h5py.File(f"../../training/datasets/fake_jets{file_num}.hdf5", "w")
     tree = uproot.open(f"~/wipfs/extract/fake_jets/extracted_files/FJets{file_num}.root:FJets", num_workers=20)
     # define pandas df for fast manipulation
     dfgl = tree.arrays(
@@ -54,8 +55,6 @@ if __name__ == '__main__':
     )
     print(df)
 
-    file = h5py.File(f"../../training/datasets/fake_jets{file_num}.hdf5", "w")
+    dset = save_file.create_dataset("data", data=df.values, dtype="f4")
 
-    dset = file.create_dataset("data", data=df.values, dtype="f4")
-
-    file.close()
+    save_file.close()

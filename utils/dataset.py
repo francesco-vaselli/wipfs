@@ -185,7 +185,7 @@ class H5FakesDataset(Dataset):
         idx_in_file = index - self.strides[max(0, file_idx - 1)]
         y = self.archives[file_idx]["data"][idx_in_file, x_dim :(x_dim + y_dim)]
         x = self.archives[file_idx]["data"][idx_in_file, 0 : x_dim]
-        N = self.archives[file_idx]["data"][idx_in_file, (y_dim + x_dim) : (y_dim + x_dim + 1)]]
+        N = self.archives[file_idx]["data"][idx_in_file, (y_dim + x_dim) : (y_dim + x_dim + 1)]
         x = torch.tensor(x, dtype=torch.float32).view(-1, 1, x_dim) # reshape needed for CONV1D 
         y = torch.tensor(y, dtype=torch.float32)  
         N = torch.tensor(N, dtype=torch.float32)  

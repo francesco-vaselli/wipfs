@@ -175,19 +175,22 @@ class H5FakesDataset(Dataset):
         self.strides = np.cumsum(self.strides)
         self._archives = None
 
+        self.x_dim = x_dim
+        self.y_dim = y_dim
+
     @property
     def archives(self):
         if self._archives is None:  # lazy loading here!
             self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
         return self._archives
 
-    def __getitem__(self, index, x_dim, y_dim):
+    def __getitem__(self, index):
         file_idx = np.searchsorted(self.strides, index, side="right")
         idx_in_file = index - self.strides[max(0, file_idx - 1)]
-        y = self.archives[file_idx]["data"][idx_in_file, x_dim :(x_dim + y_dim)]
-        x = self.archives[file_idx]["data"][idx_in_file, 0 : x_dim]
-        N = self.archives[file_idx]["data"][idx_in_file, (y_dim + x_dim) : (y_dim + x_dim + 1)]
-        x = torch.tensor(x, dtype=torch.float32).view(-1, 1, x_dim) # reshape needed for CONV1D 
+        y = self.archives[file_idx]["data"][idx_in_file, self.x_dim :(self.x_dim + self.y_dim)]
+        x = self.archives[file_idx]["data"][idx_in_file, 0 : self.x_dim]
+        N = self.archives[file_idx]["data"][idx_in_file, (self.y_dim + self.x_dim) : (self.y_dim + self.x_dim + 1)]
+        x = torch.tensor(x, dtype=torch.float32).view(-1, 1, self.x_dim) # reshape needed for CONV1D 
         y = torch.tensor(y, dtype=torch.float32)  
         N = torch.tensor(N, dtype=torch.float32)  
         # x = x.float()

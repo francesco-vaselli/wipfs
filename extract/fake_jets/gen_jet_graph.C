@@ -1,7 +1,5 @@
 // Open a NanoAOD file and extract Gen-level condtioning AND reco targets for
 // trainings Working fine with ROOT 6.22
-#include <iostream>
-using namespace std;
 
 
 auto DeltaPhiMEFJ(ROOT::VecOps::RVec<float> &PhiJ) {
@@ -319,7 +317,7 @@ auto second_muon_dphi(ROOT::VecOps::RVec<float> &etaj,
   return dphis;
 }
 
-void gen_jet_graph(const char input_file, const char output_file) {
+void gen_jet_graph(string input_file, string output_file) {
 
   /* The main function. Uses ROOT::RDataFrame to select only jets NOT matching
      to a GenJet, then extracts all the conditioning variables of the event and

@@ -120,9 +120,11 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
             pts = []
             etas = []
             phis = []
+            dphis = []
             rpts = []
             retas = []
             rphis = []
+            rdphis = []
             PU_n_true_int = []
             N_true_fakes_reco = []
             N_true_fakes_latent = []
@@ -150,9 +152,11 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                 pts.append(x[:, :10])
                 etas.append(x[:, 10:20])
                 phis.append(x[:, 20:30])
+                dphis.append(np.angle(x[:, 20] - x[:, 21:30]))
                 rpts.append(x_sampled[:, :10])
                 retas.append(x_sampled[:, 10:20])
                 rphis.append(x_sampled[:, 20:30])
+                rdphis.append(np.angle(x_sampled[:, 20] - x_sampled[:, 21:30]))
                 PU_n_true_int.append(inputs_y[:, 2])
                 N_true_fakes_latent.append(z_sampled[:, 15])
                 N_true_fakes_reco.append(np.sum(x_sampled[:, :10] > 0, axis=1))
@@ -165,18 +169,20 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
         pts = np.reshape(pts, (-1, 10))
         etas = np.reshape(etas, (-1, 10))
         phis = np.reshape(phis, (-1, 10))
+        dphis = np.reshape(dphis, (-1, 9))
         rpts = np.reshape(rpts, (-1, 10))
         retas = np.reshape(retas, (-1, 10))
         rphis = np.reshape(rphis, (-1, 10))
+        rdphis = np.reshape(rdphis, (-1, 9))
         PU_n_true_int = np.reshape(PU_n_true_int, (-1, 1)).flatten()
         N_true_fakes_latent = np.rint(
             np.reshape(N_true_fakes_latent, (-1, 1)).flatten()
         )
         N_true_fakes_reco = np.rint(np.reshape(N_true_fakes_reco, (-1, 1)).flatten())
         N_true_fakes_full = np.reshape(N_true_fakes_full, (-1, 1)).flatten()
-        full_sim = [pts, etas, phis]
-        flash_sim = [rpts, retas, rphis]
-        names = ["pt", "eta", "phi"]
+        full_sim = [pts, etas, phis, dphis]
+        flash_sim = [rpts, retas, rphis, rdphis]
+        names = ["pt", "eta", "phi", "delta_phi"]
         print(N_true_fakes_latent)
 
         for i in range(0, len(full_sim)):

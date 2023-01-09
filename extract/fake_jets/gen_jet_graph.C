@@ -319,7 +319,7 @@ auto second_muon_dphi(ROOT::VecOps::RVec<float> &etaj,
   return dphis;
 }
 
-void gen_jet_graph(int argc, char** argv) {
+void gen_jet_graph(string input_file, string output_file) {
 
   /* The main function. Uses ROOT::RDataFrame to select only jets NOT matching
      to a GenJet, then extracts all the conditioning variables of the event and

@@ -190,7 +190,7 @@ class H5FakesDataset(Dataset):
         y = self.archives[file_idx]["data"][idx_in_file, self.x_dim :(self.x_dim + self.y_dim)]
         x = self.archives[file_idx]["data"][idx_in_file, 0 : self.x_dim]
         N = self.archives[file_idx]["data"][idx_in_file, (self.y_dim + self.x_dim) : (self.y_dim + self.x_dim + 1)]
-        x = torch.tensor(x, dtype=torch.float32).view(-1, 1, self.x_dim) # reshape needed for CONV1D 
+        x = torch.tensor(x, dtype=torch.float32).view(-1, self.x_dim) # differently from FakesDataset now we are getting the single item to be batched
         y = torch.tensor(y, dtype=torch.float32)  
         N = torch.tensor(N, dtype=torch.float32)  
         # x = x.float()

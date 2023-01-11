@@ -209,11 +209,19 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
     point_nats_avg_meter = AverageValueMeter()
     if args.distributed:
         print("[Rank %d] World size : %d" % (args.rank, dist.get_world_size()))
-
+    if args.freeze_latent_flow:
+        print("Freezing latent flow")
+        model.latent_NDE_model.weight.requires_grad = False
+        model.latent_NDE_model.bias.requires_grad = False
     print("Start epoch: %d End epoch: %d" % (start_epoch, args.epochs))
     for epoch in range(start_epoch, args.epochs):
         if args.distributed:
             train_sampler.set_epoch(epoch)
+
+        if epoch == args.epochs_to_freeze_latent and args.freeze_latent_flow:
+            print("Unfreezing latent flow")
+            model.latent_NDE_model.weight.requires_grad = True
+            model.latent_NDE_model.bias.requires_grad = True
 
         # train for one epoch
         for bidx, data in enumerate(train_loader):

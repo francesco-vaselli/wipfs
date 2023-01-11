@@ -231,7 +231,7 @@ class FakeDoubleFlow(nn.Module):
             entropy = self.gaussian_entropy(z_sigma)
 
         # Compute the prior probability P(z)
-        if self.use_latent_flow and epoch > self.epochs_to_freeze_latent:
+        if self.use_latent_flow and epoch >= self.epochs_to_freeze_latent:
             """
             w, delta_log_pw = self.latent_cnf(z, None, torch.zeros(batch_size, 1).to(z))
             log_pw = standard_normal_logprob(w).view(batch_size, -1).sum(1, keepdim=True)

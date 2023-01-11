@@ -13,10 +13,10 @@ if __name__=='__main__':
             "../../training/datasets/fake_jets5.hdf5"
         ]
 
-    data = np.array(h5_files[0]["data"][:,:])
+    data = np.array(h5py.File(h5_files[0], "r")["data"][:,:])
     df = pd.DataFrame(data=data)
     for h5_file in h5_files[1:]:
-        data = np.array(h5_file["data"][:,:])
+        data = np.array(h5py.File(h5_file, "r")["data"][:,:])
         df = pd.concat([df, pd.DataFrame(data=data)], axis=0)
 
     print(df)

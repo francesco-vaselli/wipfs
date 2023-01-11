@@ -41,4 +41,4 @@ if __name__=='__main__':
     model, _, _ = resume('checkpoints/val_test/val_weights.pt', model, strict=False)
 
     writer = SummaryWriter('checkpoints/val_test')
-    validate(test_loader, model, epoch=500, writer=writer, save_dir='./checkpoints/val_test', args=args, clf_loaders=None)
+    validate(test_loader, model, epoch='val_test', writer=writer, save_dir='./checkpoints/val_test', args=args, clf_loaders=None)

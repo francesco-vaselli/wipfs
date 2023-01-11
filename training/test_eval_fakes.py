@@ -38,7 +38,7 @@ if __name__=='__main__':
 
     model = FakeDoubleFlow(args)
     model = model.cuda()
-    model, _, _ = resume('checkpoints/saves_fakes/checkpoint-499.pt', model, strict=False)
+    model, _, _ = resume('checkpoints/val_test/val_weights.pt', model, strict=False)
 
-    writer = SummaryWriter('checkpoints/saves_fakes')
-    validate(test_loader, model, epoch=500, writer=writer, save_dir='.', args=args, clf_loaders=None)
+    writer = SummaryWriter('checkpoints/val_test')
+    validate(test_loader, model, epoch=500, writer=writer, save_dir='./checkpoints/val_test', args=args, clf_loaders=None)

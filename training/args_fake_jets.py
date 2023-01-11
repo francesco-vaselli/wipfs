@@ -70,6 +70,8 @@ def add_args(parser):
     # training options
     parser.add_argument('--use_latent_flow', type=bool, default=True,
                         help='Whether to use the latent flow to model the prior.')
+    parser.add_argument('--epochs_to_freeze_latent', type=int, default=50,
+                        help='Number of epochs to freeze the latent flow.')
     parser.add_argument('--use_deterministic_encoder', default=False, action='store_true',
                         help='Whether to use a deterministic encoder.')
     parser.add_argument('--zdim', type=int, default=15,

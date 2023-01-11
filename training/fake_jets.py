@@ -223,7 +223,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
             inputs_x = x.cuda(args.gpu, non_blocking=True)
             inputs_y = y.cuda(args.gpu, non_blocking=True)
             inputs_N = N.cuda(args.gpu, non_blocking=True)
-            out = model(inputs_x, inputs_y, inputs_N, optimizer, step, writer)
+            out = model(inputs_x, inputs_y, inputs_N, optimizer, step, epoch, writer)
             entropy, prior_nats, recon_nats = (
                 out["entropy"],
                 out["prior_nats"],
@@ -265,7 +265,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
                 inputs_y = y.cuda(args.gpu, non_blocking=True)
                 inputs_N = N.cuda(args.gpu, non_blocking=True)
                 out = model(
-                    inputs_x, inputs_y, inputs_N, optimizer, step, writer, val=True
+                    inputs_x, inputs_y, inputs_N, optimizer, step, epoch, writer, val=True
                 )
                 entropy, prior_nats, recon_nats = (
                     out["entropy"],

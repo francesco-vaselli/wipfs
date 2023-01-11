@@ -146,6 +146,7 @@ class FakeDoubleFlow(nn.Module):
         )
         self.latent_NDE_model = create_NDE_model(**self.latent_flow_param_dict)
         self.reco_NDE_model = create_NDE_model(**self.reco_flow_param_dict)
+        self.epochs_to_freeze_latent = args.epochs_to_freeze_latent
 
         # params printout
         encorder_params = sum(p.numel() for p in self.encoder.parameters() if p.requires_grad)
@@ -208,7 +209,7 @@ class FakeDoubleFlow(nn.Module):
         return opt
 
     # we pass y as conditioning variable
-    def forward(self, x, y, N, opt, step, writer=None, val=False):
+    def forward(self, x, y, N, opt, step, epoch, writer=None, val=False):
         opt.zero_grad()
         batch_size = x.size(0)
         num_points = x.size(1)
@@ -230,7 +231,7 @@ class FakeDoubleFlow(nn.Module):
             entropy = self.gaussian_entropy(z_sigma)
 
         # Compute the prior probability P(z)
-        if self.use_latent_flow:
+        if self.use_latent_flow and epoch > self.epochs_to_freeze_latent:
             """
             w, delta_log_pw = self.latent_cnf(z, None, torch.zeros(batch_size, 1).to(z))
             log_pw = standard_normal_logprob(w).view(batch_size, -1).sum(1, keepdim=True)
@@ -258,7 +259,13 @@ class FakeDoubleFlow(nn.Module):
         entropy_loss = -entropy.mean() * self.entropy_weight
         recon_loss = -log_px.mean() * self.recon_weight
         prior_loss = -log_pz.mean() * self.prior_weight
-        loss = entropy_loss + prior_loss + recon_loss
+
+        # freeze the training of the latent flow in the first epochs
+        if epoch < self.epochs_to_freeze_latent:
+            loss = entropy_loss + recon_loss
+        else:
+            loss = entropy_loss + prior_loss + recon_loss
+
         loss.backward()
         opt.step()
         

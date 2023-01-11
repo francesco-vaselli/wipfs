@@ -83,18 +83,25 @@ def init_np_seed(worker_id):
 
 def get_datasets(args):
 
-    tr_dataset = H5FakesDataset(
-        [
-            "./datasets/fake_jets1.hdf5",
-            "./datasets/fake_jets2.hdf5",
-            "./datasets/fake_jets3.hdf5",
-            "./datasets/fake_jets4.hdf5",
-            "./datasets/fake_jets5.hdf5",
-        ],
+    tr_dataset = FakesDataset(
+        ["./datasets/train_dataset_fake_jets.hdf5"],
         x_dim=30,
         y_dim=6,
+        start=0,
         limit=5000000,
     )
+    # H5FakesDataset(
+    #     [
+    #         "./datasets/fake_jets1.hdf5",
+    #         "./datasets/fake_jets2.hdf5",
+    #         "./datasets/fake_jets3.hdf5",
+    #         "./datasets/fake_jets4.hdf5",
+    #         "./datasets/fake_jets5.hdf5",
+    #     ],
+    #     x_dim=30,
+    #     y_dim=6,
+    #     limit=5000000,
+    # )
     te_dataset = FakesDataset(
         ["./datasets/fake_jets6.hdf5"], x_dim=30, y_dim=6, start=0, limit=100000
     )
@@ -103,7 +110,7 @@ def get_datasets(args):
 
 
 def delta_phi1v9(pts, phis):
-    filtered_phi = np.where(pts>0, phis, np.inf)
+    filtered_phi = np.where(pts > 0, phis, np.inf)
     dphi = np.expand_dims(filtered_phi[:, 0], axis=-1) - filtered_phi[:, 1:10]
     dphi.flatten()
     dphi = dphi[np.isfinite(dphi)]
@@ -116,13 +123,12 @@ def delta_phi1v9(pts, phis):
 
 
 def delta_pt(pts):
-    filtered_pt = np.where(pts>0, pts, np.inf)
+    filtered_pt = np.where(pts > 0, pts, np.inf)
     dpt = filtered_pt[:, 0] - filtered_pt[:, 1]
     dpt.flatten()
     dpt = dpt[np.isfinite(dpt)]
 
     return dpt
-    
 
 
 def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None):

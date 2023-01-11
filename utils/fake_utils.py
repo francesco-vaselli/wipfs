@@ -331,71 +331,83 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
         # with another hist2 of N_true_fakes_latent vs PU_n_true_int
         # and another hist2 of N_true_fakes_reco vs PU_n_true_int
         # same style as before (lw etc) and labels
+        gen_unique = np.unique(PU_n_true_int)
+        full_unique = np.unique(N_true_fakes_full)
+        latent_unique = np.unique(N_true_fakes_latent)
+        reco_unique = np.unique(N_true_fakes_reco)
+        if (
+            gen_unique.size > 0
+            and full_unique.size > 0
+            and latent_unique.size > 0
+            and reco_unique.size > 0
+        ):
 
-        d = np.diff(np.unique(PU_n_true_int)).min()
-        left_of_first_bin = PU_n_true_int.min() - float(d) / 2
-        right_of_last_bin = PU_n_true_int.max() + float(d) / 2
+            d = np.diff(gen_unique).min()
+            left_of_first_bin = PU_n_true_int.min() - float(d) / 2
+            right_of_last_bin = PU_n_true_int.max() + float(d) / 2
 
-        # same for N_true_fakes_full
-        d1 = np.diff(np.unique(N_true_fakes_full)).min()
-        left_of_first_bin1 = N_true_fakes_full.min() - float(d1) / 2
-        right_of_last_bin1 = N_true_fakes_full.max() + float(d1) / 2
+            # same for N_true_fakes_full
+            d1 = np.diff(full_unique).min()
+            left_of_first_bin1 = N_true_fakes_full.min() - float(d1) / 2
+            right_of_last_bin1 = N_true_fakes_full.max() + float(d1) / 2
 
-        # same for N_true_fakes_latent
-        d2 = np.diff(np.unique(N_true_fakes_latent)).min()
-        left_of_first_bin2 = N_true_fakes_latent.min() - float(d2) / 2
-        right_of_last_bin2 = N_true_fakes_latent.max() + float(d2) / 2
+            # same for N_true_fakes_latent
+            d2 = np.diff(latent_unique).min()
+            left_of_first_bin2 = N_true_fakes_latent.min() - float(d2) / 2
+            right_of_last_bin2 = N_true_fakes_latent.max() + float(d2) / 2
 
-        # same for N_true_fakes_reco
-        d3 = np.diff(np.unique(N_true_fakes_reco)).min()
-        left_of_first_bin3 = N_true_fakes_reco.min() - float(d3) / 2
-        right_of_last_bin3 = N_true_fakes_reco.max() + float(d3) / 2
+            # same for N_true_fakes_reco
+            d3 = np.diff(reco_unique).min()
+            left_of_first_bin3 = N_true_fakes_reco.min() - float(d3) / 2
+            right_of_last_bin3 = N_true_fakes_reco.max() + float(d3) / 2
 
-        fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(9, 4.5), tight_layout=False)
-        ax1.hist2d(
-            PU_n_true_int,
-            N_true_fakes_full,
-            bins=[
-                np.arange(left_of_first_bin, right_of_last_bin + d, d),
-                np.arange(left_of_first_bin1, right_of_last_bin1 + d1, d1),
-            ],
-            cmap="Blues",
-            label="FullSim",
-        )
-        ax1.set_xlabel("PU_n_true_int")
-        ax1.set_ylabel("N_true_fakes_full")
-        ax2.hist2d(
-            PU_n_true_int,
-            N_true_fakes_latent,
-            bins=[
-                np.arange(left_of_first_bin, right_of_last_bin + d, d),
-                np.arange(left_of_first_bin2, right_of_last_bin2 + d2, d2),
-            ],
-            range=[[0, 100], [0, 11]],
-            cmap="Reds",
-            label="FlashSim Latent",
-        )
-        ax2.set_ylim([0, 11])
-        ax2.set_xlabel("PU_n_true_int")
-        ax2.set_ylabel("N_true_fakes_latent")
-        ax3.hist2d(
-            PU_n_true_int,
-            N_true_fakes_reco,
-            bins=[
-                np.arange(left_of_first_bin, right_of_last_bin + d, d),
-                np.arange(left_of_first_bin3, right_of_last_bin3 + d3, d3),
-            ],
-            range=[[0, 100], [0, 11]],
-            cmap="Greens",
-            label="FlashSim Reco",
-        )
-        ax3.set_ylim([0, 11])
-        ax3.set_xlabel("PU_n_true_int")
-        ax3.set_ylabel("N_true_fakes_reco")
-        fig.suptitle(
-            "Comparison of N_true_fakes_full vs N_true_fakes_latent vs N_true_fakes_reco",
-            fontsize=16,
-        )
-        ax1.legend(frameon=False, loc="upper right")
-        plt.savefig(os.path.join(save_dir, f"comparison_N_true_fakes.png"))
-        plt.close()
+            fig, (ax1, ax2, ax3) = plt.subplots(
+                1, 3, figsize=(9, 4.5), tight_layout=False
+            )
+            ax1.hist2d(
+                PU_n_true_int,
+                N_true_fakes_full,
+                bins=[
+                    np.arange(left_of_first_bin, right_of_last_bin + d, d),
+                    np.arange(left_of_first_bin1, right_of_last_bin1 + d1, d1),
+                ],
+                cmap="Blues",
+                label="FullSim",
+            )
+            ax1.set_xlabel("PU_n_true_int")
+            ax1.set_ylabel("N_true_fakes_full")
+            ax2.hist2d(
+                PU_n_true_int,
+                N_true_fakes_latent,
+                bins=[
+                    np.arange(left_of_first_bin, right_of_last_bin + d, d),
+                    np.arange(left_of_first_bin2, right_of_last_bin2 + d2, d2),
+                ],
+                range=[[0, 100], [0, 11]],
+                cmap="Reds",
+                label="FlashSim Latent",
+            )
+            ax2.set_ylim([0, 11])
+            ax2.set_xlabel("PU_n_true_int")
+            ax2.set_ylabel("N_true_fakes_latent")
+            ax3.hist2d(
+                PU_n_true_int,
+                N_true_fakes_reco,
+                bins=[
+                    np.arange(left_of_first_bin, right_of_last_bin + d, d),
+                    np.arange(left_of_first_bin3, right_of_last_bin3 + d3, d3),
+                ],
+                range=[[0, 100], [0, 11]],
+                cmap="Greens",
+                label="FlashSim Reco",
+            )
+            ax3.set_ylim([0, 11])
+            ax3.set_xlabel("PU_n_true_int")
+            ax3.set_ylabel("N_true_fakes_reco")
+            fig.suptitle(
+                "Comparison of N_true_fakes_full vs N_true_fakes_latent vs N_true_fakes_reco",
+                fontsize=16,
+            )
+            ax1.legend(frameon=False, loc="upper right")
+            plt.savefig(os.path.join(save_dir, f"comparison_N_true_fakes.png"))
+            plt.close()

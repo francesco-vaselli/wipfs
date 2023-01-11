@@ -211,8 +211,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
         print("[Rank %d] World size : %d" % (args.rank, dist.get_world_size()))
     if args.freeze_latent_flow:
         print("Freezing latent flow")
-        model.latent_NDE_model.weight.requires_grad = False
-        model.latent_NDE_model.bias.requires_grad = False
+        model.latent_NDE_model.requires_grad_(False)
     print("Start epoch: %d End epoch: %d" % (start_epoch, args.epochs))
     for epoch in range(start_epoch, args.epochs):
         if args.distributed:
@@ -220,8 +219,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
 
         if epoch == args.epochs_to_freeze_latent and args.freeze_latent_flow:
             print("Unfreezing latent flow")
-            model.latent_NDE_model.weight.requires_grad = True
-            model.latent_NDE_model.bias.requires_grad = True
+            model.latent_NDE_model.requires_grad_(True)
 
         # train for one epoch
         for bidx, data in enumerate(train_loader):

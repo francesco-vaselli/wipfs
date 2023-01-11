@@ -13,9 +13,11 @@ if __name__=='__main__':
             "../../training/datasets/fake_jets5.hdf5"
         ]
 
-    df = pd.read_hdf(h5_files[0], key='data')
+    data = np.array(h5_files[0]["data"][:,:])
+    df = pd.DataFrame(data=data)
     for h5_file in h5_files[1:]:
-        df = pd.concat([df, pd.read(h5_file, key='data')], ignore_index=True)
+        data = np.array(h5_file["data"][:,:])
+        df = pd.concat([df, pd.DataFrame(data=data)], axis=0)
 
     print(df)
 
@@ -23,4 +25,10 @@ if __name__=='__main__':
 
     print(df.iloc[:, 32])
 
-    df.to_hdf('../../training/datasets/train_dataset_fake_jets.hdf5', key='data', mode='w')
+    save_file = h5py.File(f"../../training/datasets/train_dataset_fake_jets.hdf5", "w")
+
+    dset = save_file.create_dataset("data", data=df.values, dtype="f4")
+
+    save_file.close()
+
+    # df.to_hdf('../../training/datasets/train_dataset_fake_jets.hdf5', key='data', mode='w')

@@ -331,10 +331,10 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
         # with another hist2 of N_true_fakes_latent vs PU_n_true_int
         # and another hist2 of N_true_fakes_reco vs PU_n_true_int
         # same style as before (lw etc) and labels
-        gen_unique = np.unique(PU_n_true_int)
-        full_unique = np.unique(N_true_fakes_full)
-        latent_unique = np.unique(N_true_fakes_latent)
-        reco_unique = np.unique(N_true_fakes_reco)
+        gen_unique = np.diff(np.unique(PU_n_true_int))
+        full_unique = np.diff(np.unique(N_true_fakes_full))
+        latent_unique = np.diff(np.unique(N_true_fakes_latent))
+        reco_unique = np.diff(np.unique(N_true_fakes_reco))
         if (
             gen_unique.size > 0
             and full_unique.size > 0
@@ -342,22 +342,22 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
             and reco_unique.size > 0
         ):
 
-            d = np.diff(gen_unique).min()
+            d = gen_unique.min()
             left_of_first_bin = PU_n_true_int.min() - float(d) / 2
             right_of_last_bin = PU_n_true_int.max() + float(d) / 2
 
             # same for N_true_fakes_full
-            d1 = np.diff(full_unique).min()
+            d1 = full_unique.min()
             left_of_first_bin1 = N_true_fakes_full.min() - float(d1) / 2
             right_of_last_bin1 = N_true_fakes_full.max() + float(d1) / 2
 
             # same for N_true_fakes_latent
-            d2 = np.diff(latent_unique).min()
+            d2 = latent_unique.min()
             left_of_first_bin2 = N_true_fakes_latent.min() - float(d2) / 2
             right_of_last_bin2 = N_true_fakes_latent.max() + float(d2) / 2
 
             # same for N_true_fakes_reco
-            d3 = np.diff(reco_unique).min()
+            d3 = reco_unique.min()
             left_of_first_bin3 = N_true_fakes_reco.min() - float(d3) / 2
             right_of_last_bin3 = N_true_fakes_reco.max() + float(d3) / 2
 

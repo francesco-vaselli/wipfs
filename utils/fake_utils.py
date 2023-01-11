@@ -102,6 +102,29 @@ def get_datasets(args):
     return tr_dataset, te_dataset
 
 
+def delta_phi1v9(pts, phis):
+    filtered_phi = np.where(pts>0, phis, np.inf)
+    dphi = np.expand_dims(filtered_phi[:, 0], axis=-1) - filtered_phi[:, 1:10]
+    dphi.flatten()
+    dphi = dphi[np.isfinite(dphi)]
+
+    # constraints the angles in the -pi,pi range
+    dphi = np.where(dphi > np.pi, dphi - 2 * np.pi, dphi)
+    dphi = np.where(dphi < -np.pi, dphi + 2 * np.pi, dphi)
+
+    return dphi
+
+
+def delta_pt(pts):
+    filtered_pt = np.where(pts>0, pts, np.inf)
+    dpt = filtered_pt[:, 0] - filtered_pt[:, 1]
+    dpt.flatten()
+    dpt = dpt[np.isfinite(dpt)]
+
+    return dpt
+    
+
+
 def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None):
     model.eval()
 
@@ -120,11 +143,11 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
             pts = []
             etas = []
             phis = []
-            dphis = []
+            # dphis = []
             rpts = []
             retas = []
             rphis = []
-            rdphis = []
+            # rdphis = []
             PU_n_true_int = []
             N_true_fakes_reco = []
             N_true_fakes_latent = []
@@ -152,11 +175,13 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                 pts.append(x[:, :10])
                 etas.append(x[:, 10:20])
                 phis.append(x[:, 20:30])
-                dphis.append(np.expand_dims(x[:, 20], axis=-1) - x[:, 21:30])
+                # dphis.append(np.expand_dims(x[:, 20], axis=-1) - x[:, 21:30])
+                # dphis.append(delta_phi1v9(x[:, :10], x[:, 20:30]))
                 rpts.append(x_sampled[:, :10])
                 retas.append(x_sampled[:, 10:20])
                 rphis.append(x_sampled[:, 20:30])
-                rdphis.append(np.expand_dims(x_sampled[:, 20], axis=-1) - x_sampled[:, 21:30])
+                # rdphis.append(np.expand_dims(x_sampled[:, 20], axis=-1) - x_sampled[:, 21:30])
+                # rdphis.append(delta_phi1v9(x_sampled[:, :10], x_sampled[:, 20:30]))
                 PU_n_true_int.append(inputs_y[:, 2])
                 N_true_fakes_latent.append(z_sampled[:, 15])
                 N_true_fakes_reco.append(np.sum(x_sampled[:, :10] > 0, axis=1))
@@ -169,26 +194,27 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
         pts = np.reshape(pts, (-1, 10))
         etas = np.reshape(etas, (-1, 10))
         phis = np.reshape(phis, (-1, 10))
-        dphis = np.reshape(dphis, (-1, 9))
+        dphis = delta_phi1v9(pts, phis)
+        delta_pt_full = delta_pt(pts)
+        # np.reshape(dphis, (-1, 9))
         # constraints the angles in the -pi,pi range
-        dphis = np.where(dphis < np.pi, dphis, dphis - 2*np.pi)
-        dphis = np.where(dphis > -np.pi, dphis, dphis + 2*np.pi)
+        # dphis = np.where(dphis < np.pi, dphis, dphis - 2*np.pi)
+        # dphis = np.where(dphis > -np.pi, dphis, dphis + 2*np.pi)
         rpts = np.reshape(rpts, (-1, 10))
         retas = np.reshape(retas, (-1, 10))
         rphis = np.reshape(rphis, (-1, 10))
-        rdphis = np.reshape(rdphis, (-1, 9))
-        # constraints the angles in the -pi,pi range
-        rdphis = np.where(rdphis < np.pi, rdphis, rdphis - 2*np.pi)
-        rdphis = np.where(rdphis > -np.pi, rdphis, rdphis + 2*np.pi)
+        rdphis = delta_phi1v9(rpts, rphis)
+        delta_pt_flash = delta_pt(rpts)
+
         PU_n_true_int = np.reshape(PU_n_true_int, (-1, 1)).flatten()
         N_true_fakes_latent = np.rint(
             np.reshape(N_true_fakes_latent, (-1, 1)).flatten()
         )
         N_true_fakes_reco = np.rint(np.reshape(N_true_fakes_reco, (-1, 1)).flatten())
         N_true_fakes_full = np.reshape(N_true_fakes_full, (-1, 1)).flatten()
-        full_sim = [pts, etas, phis, dphis]
-        flash_sim = [rpts, retas, rphis, rdphis]
-        names = ["pt", "eta", "phi", "delta_phi"]
+        full_sim = [pts, etas, phis, dphis, delta_pt_full]
+        flash_sim = [rpts, retas, rphis, rdphis, delta_pt_flash]
+        names = ["pt", "eta", "phi", "delta_phi", "delta_pt"]
         print(N_true_fakes_latent)
 
         for i in range(0, len(full_sim)):

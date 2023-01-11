@@ -11,7 +11,7 @@ def add_args(parser):
     latent_flow_param_dict = {
             "input_dim" : 16,
             "context_dim" : 6,
-            "num_flow_steps" : 6,
+            "num_flow_steps" : 6, # increasing this could improve conditioning
 
             "base_transform_kwargs" : {
             "num_transform_blocks": 6, # DNN layers per coupling

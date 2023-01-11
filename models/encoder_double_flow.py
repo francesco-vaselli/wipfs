@@ -215,6 +215,7 @@ class FakeDoubleFlow(nn.Module):
         z_mu, z_sigma = self.encoder(x)
         if self.use_deterministic_encoder:
             z = z_mu + 0 * z_sigma
+            print("!!USING DETERMINISTIC ENCODER!!")
         else:
             z = self.reparameterize_gaussian(z_mu, z_sigma)
             # print(z.size())

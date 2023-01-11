@@ -21,7 +21,7 @@ if __name__=='__main__':
 
     print(df)
 
-    df = df.sort_values(by=['32'])
+    df = df.sort_values(by=df.columns[32])
 
     print(df.iloc[:, 32])
 

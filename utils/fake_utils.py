@@ -219,7 +219,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
             np.reshape(N_true_fakes_latent, (-1, 1)).flatten()
         )
         N_true_fakes_reco = np.rint(np.reshape(N_true_fakes_reco, (-1, 1)).flatten())
-        N_true_fakes_full = np.reshape(N_true_fakes_full, (-1, 1)).flatten()
+        N_true_fakes_full = np.rint(np.reshape(N_true_fakes_full, (-1, 1)).flatten())
         print(N_true_fakes_full, N_true_fakes_full.shape)
         full_sim = [pts, etas, phis, dphis, delta_pt_full]
         flash_sim = [rpts, retas, rphis, rdphis, delta_pt_flash]
@@ -370,10 +370,10 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
             ax1.hist2d(
                 PU_n_true_int,
                 N_true_fakes_full,
-                # bins=[
-                #     np.arange(left_of_first_bin, right_of_last_bin + d, d),
-                #     np.arange(left_of_first_bin1, right_of_last_bin1 + d1, d1),
-                # ],
+                bins=[
+                    np.arange(left_of_first_bin, right_of_last_bin + d, d),
+                    np.arange(left_of_first_bin1, right_of_last_bin1 + d1, d1),
+                ],
                 cmap="Blues",
                 label="FullSim",
             )

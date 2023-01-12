@@ -146,6 +146,7 @@ class FakeDoubleFlow(nn.Module):
         )
         self.latent_NDE_model = create_NDE_model(**self.latent_flow_param_dict)
         self.reco_NDE_model = create_NDE_model(**self.reco_flow_param_dict)
+        self.freeze_latent_flow = args.freeze_latent_flow
         self.epochs_to_freeze_latent = args.epochs_to_freeze_latent
         self.freeze_encoder = args.freeze_encoder
         self.epochs_to_freeze_encoder = args.epochs_to_freeze_encoder

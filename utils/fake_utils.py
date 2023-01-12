@@ -220,6 +220,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
         )
         N_true_fakes_reco = np.rint(np.reshape(N_true_fakes_reco, (-1, 1)).flatten())
         N_true_fakes_full = np.reshape(N_true_fakes_full, (-1, 1)).flatten()
+        print(N_true_fakes_full)
         full_sim = [pts, etas, phis, dphis, delta_pt_full]
         flash_sim = [rpts, retas, rphis, rdphis, delta_pt_flash]
         names = ["pt", "eta", "phi", "delta_phi", "delta_pt"]

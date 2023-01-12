@@ -11,7 +11,7 @@ def add_args(parser):
     latent_flow_param_dict = {
             "input_dim" : 16,
             "context_dim" : 6,
-            "num_flow_steps" : 6, # increasing this could improve conditioning
+            "num_flow_steps" : 9, # increasing this could improve conditioning
 
             "base_transform_kwargs" : {
             "num_transform_blocks": 6, # DNN layers per coupling
@@ -70,7 +70,7 @@ def add_args(parser):
     # training options
     parser.add_argument('--use_latent_flow', type=bool, default=True,
                         help='Whether to use the latent flow to model the prior.')
-    parser.add_argument('--freeze_latent_flow', type=bool, default=True,
+    parser.add_argument('--freeze_latent_flow', type=bool, default=False,
                         help='Whether to freeze the latent flow.')
     parser.add_argument('--epochs_to_freeze_latent', type=int, default=20,
                         help='Number of epochs to freeze the latent flow.')

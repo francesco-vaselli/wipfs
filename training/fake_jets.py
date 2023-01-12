@@ -265,12 +265,12 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
                         len(train_loader),
                         duration,
                         # avoid buggy printout?
-                        # entropy_avg_meter.avg,
-                        # latent_nats_avg_meter.avg,
-                        # point_nats_avg_meter.avg,
-                        entropy,
-                        prior_nats,
-                        recon_nats
+                        entropy_avg_meter.avg,
+                        latent_nats_avg_meter.avg,
+                        point_nats_avg_meter.avg,
+                        # entropy,
+                        # prior_nats,
+                        # recon_nats
                     )
                 )
 
@@ -311,12 +311,12 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
                             bidx,
                             len(test_loader),
                             duration,
-                            # entropy_avg_meter.avg,
-                            # latent_nats_avg_meter.avg,
-                            # point_nats_avg_meter.avg,
-                            entropy,
-                            prior_nats,
-                            recon_nats
+                            entropy_avg_meter.avg,
+                            latent_nats_avg_meter.avg,
+                            point_nats_avg_meter.avg,
+                            # entropy,
+                            # prior_nats,
+                            # recon_nats
                         )
                     )
 

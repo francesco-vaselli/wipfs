@@ -370,10 +370,10 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
             ax1.hist2d(
                 PU_n_true_int,
                 N_true_fakes_full,
-                bins=[
-                    np.arange(left_of_first_bin, right_of_last_bin + d, d),
-                    np.arange(left_of_first_bin1, right_of_last_bin1 + d1, d1),
-                ],
+                # bins=[
+                #     np.arange(left_of_first_bin, right_of_last_bin + d, d),
+                #     np.arange(left_of_first_bin1, right_of_last_bin1 + d1, d1),
+                # ],
                 cmap="Blues",
                 label="FullSim",
             )

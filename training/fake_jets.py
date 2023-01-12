@@ -221,6 +221,18 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
             print("Unfreezing latent flow")
             model.latent_NDE_model.requires_grad_(True)
 
+        if (args.freeze_encoder
+            and args.epochs_to_freeze_latent
+            <= epoch
+            < args.epochs_to_freeze_encoder + args.epochs_to_freeze_latent):
+            print("Freezing encoder")
+            model.encoder.requires_grad_(False)
+
+        if (args.freeze_encoder
+            and epoch >= args.epochs_to_freeze_encoder + args.epochs_to_freeze_latent):
+            print("Unfreezing encoder")
+            model.encoder.requires_grad_(True)
+
         # train for one epoch
         for bidx, data in enumerate(train_loader):
             x, y, N = data[0], data[1], data[2]
@@ -252,9 +264,13 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
                         bidx,
                         len(train_loader),
                         duration,
-                        entropy_avg_meter.avg,
-                        latent_nats_avg_meter.avg,
-                        point_nats_avg_meter.avg,
+                        # avoid buggy printout?
+                        # entropy_avg_meter.avg,
+                        # latent_nats_avg_meter.avg,
+                        # point_nats_avg_meter.avg,
+                        entropy,
+                        prior_nats,
+                        recon_nats
                     )
                 )
 
@@ -295,9 +311,12 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
                             bidx,
                             len(test_loader),
                             duration,
-                            entropy_avg_meter.avg,
-                            latent_nats_avg_meter.avg,
-                            point_nats_avg_meter.avg,
+                            # entropy_avg_meter.avg,
+                            # latent_nats_avg_meter.avg,
+                            # point_nats_avg_meter.avg,
+                            entropy,
+                            prior_nats,
+                            recon_nats
                         )
                     )
 

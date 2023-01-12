@@ -101,10 +101,10 @@ class SimplerEncoder(nn.Module):
             self.fc_bn2_v = nn.BatchNorm1d(64)
 
     def forward(self, x):
-        x = x.transpose(1, 2) # changed transpose
+        x = x.transpose(1, 2)  # changed transpose
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
-        x = (self.bn3(self.conv3(x)))
+        x = self.bn3(self.conv3(x))
         x = torch.max(x, 2, keepdim=True)[0]
         x = x.view(-1, 256)
 
@@ -147,11 +147,19 @@ class FakeDoubleFlow(nn.Module):
         self.latent_NDE_model = create_NDE_model(**self.latent_flow_param_dict)
         self.reco_NDE_model = create_NDE_model(**self.reco_flow_param_dict)
         self.epochs_to_freeze_latent = args.epochs_to_freeze_latent
+        self.freeze_encoder = args.freeze_encoder
+        self.epochs_to_freeze_encoder = args.epoch_to_freeze_encoder
 
         # params printout
-        encorder_params = sum(p.numel() for p in self.encoder.parameters() if p.requires_grad)
-        latent_NDE_params = sum(p.numel() for p in self.latent_NDE_model.parameters() if p.requires_grad)
-        reco_NDE_params = sum(p.numel() for p in self.reco_NDE_model.parameters() if p.requires_grad)
+        encorder_params = sum(
+            p.numel() for p in self.encoder.parameters() if p.requires_grad
+        )
+        latent_NDE_params = sum(
+            p.numel() for p in self.latent_NDE_model.parameters() if p.requires_grad
+        )
+        reco_NDE_params = sum(
+            p.numel() for p in self.reco_NDE_model.parameters() if p.requires_grad
+        )
         # print("Encoder params: ", self.encoder)
         # print("Latent NDE params: ", self.latent_NDE_model)
         # print("Reco NDE params: ", self.reco_NDE_model)
@@ -194,9 +202,7 @@ class FakeDoubleFlow(nn.Module):
                     weight_decay=args.weight_decay,
                 )
             elif args.optimizer == "sgd":
-                optimizer = torch.optim.SGD(
-                    params, lr=args.lr, momentum=args.momentum
-                )
+                optimizer = torch.optim.SGD(params, lr=args.lr, momentum=args.momentum)
             else:
                 assert 0, "args.optimizer should be either 'adam' or 'sgd'"
             return optimizer
@@ -225,13 +231,20 @@ class FakeDoubleFlow(nn.Module):
             # print(z.size())
 
         # Compute H[Q(z|X)]
-        if self.use_deterministic_encoder:
+        if self.use_deterministic_encoder or (
+            self.freeze_encoder
+            and self.epochs_to_freeze_latent
+            <= epoch
+            < self.epochs_to_freeze_encoder + self.epochs_to_freeze_latent
+        ):
             entropy = torch.zeros(batch_size).to(z)
         else:
             entropy = self.gaussian_entropy(z_sigma)
 
         # Compute the prior probability P(z)
-        if self.use_latent_flow and epoch >= self.epochs_to_freeze_latent:
+        if epoch < self.epochs_to_freeze_latent and self.freeze_latent_flow:
+            log_pz = torch.zeros(batch_size, 1).to(z)
+        elif self.use_latent_flow:
             """
             w, delta_log_pw = self.latent_cnf(z, None, torch.zeros(batch_size, 1).to(z))
             log_pw = standard_normal_logprob(w).view(batch_size, -1).sum(1, keepdim=True)
@@ -260,15 +273,20 @@ class FakeDoubleFlow(nn.Module):
         recon_loss = -log_px.mean() * self.recon_weight
         prior_loss = -log_pz.mean() * self.prior_weight
 
-        # freeze the training of the latent flow in the first epochs
-        if epoch < self.epochs_to_freeze_latent:
+        # freeze the training of the latent flow in the first epochs, then the encoder
+        if epoch < self.epochs_to_freeze_latent and self.freeze_latent_flow:
             loss = entropy_loss + recon_loss
+        if (self.freeze_encoder
+            and self.epochs_to_freeze_latent
+            <= epoch
+            < self.epochs_to_freeze_encoder + self.epochs_to_freeze_latent):
+            loss = prior_loss + recon_loss
         else:
             loss = entropy_loss + prior_loss + recon_loss
 
         loss.backward()
         opt.step()
-        
+
         # LOGGING (after the training)
         if self.distributed:
             entropy_log = reduce_tensor(entropy.mean())
@@ -283,26 +301,26 @@ class FakeDoubleFlow(nn.Module):
         prior_nats = prior / float(self.zdim)
 
         if writer is not None and val is False:
-            writer.add_scalar('train/entropy', entropy_log, step)
-            writer.add_scalar('train/prior', prior, step)
-            writer.add_scalar('train/prior(nats)', prior_nats, step)
-            writer.add_scalar('train/recon', recon, step)
-            writer.add_scalar('train/recon(nats)', recon_nats, step)
+            writer.add_scalar("train/entropy", entropy_log, step)
+            writer.add_scalar("train/prior", prior, step)
+            writer.add_scalar("train/prior(nats)", prior_nats, step)
+            writer.add_scalar("train/recon", recon, step)
+            writer.add_scalar("train/recon(nats)", recon_nats, step)
 
         if writer is not None and val is True:
-            writer.add_scalar('val/entropy', entropy_log, step)
-            writer.add_scalar('val/prior', prior, step)
-            writer.add_scalar('val/prior(nats)', prior_nats, step)
-            writer.add_scalar('val/recon', recon, step)
-            writer.add_scalar('val/recon(nats)', recon_nats, step)
+            writer.add_scalar("val/entropy", entropy_log, step)
+            writer.add_scalar("val/prior", prior, step)
+            writer.add_scalar("val/prior(nats)", prior_nats, step)
+            writer.add_scalar("val/recon", recon, step)
+            writer.add_scalar("val/recon(nats)", recon_nats, step)
 
         return {
-            'entropy': entropy_log.cpu().detach().item()
-            if not isinstance(entropy_log, float) else entropy_log,
-            'prior_nats': prior_nats,
-            'recon_nats': recon_nats,
+            "entropy": entropy_log.cpu().detach().item()
+            if not isinstance(entropy_log, float)
+            else entropy_log,
+            "prior_nats": prior_nats,
+            "recon_nats": recon_nats,
         }
-        
 
     def encode(self, x):
         z_mu, z_sigma = self.encoder(x)
@@ -341,6 +359,3 @@ class FakeDoubleFlow(nn.Module):
         z = self.encode(x)
         _, x = self.decode(z, num_points, truncate_std)
         return x
-
-
-

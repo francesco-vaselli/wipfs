@@ -76,6 +76,10 @@ def add_args(parser):
                         help='Number of epochs to freeze the latent flow.')
     parser.add_argument('--use_deterministic_encoder', default=False, action='store_true',
                         help='Whether to use a deterministic encoder.')
+    parser.add_argument('--freeze_encoder', type=bool, default=False,
+                        help='Whether to freeze the encoder.')
+    parser.add_argument('--epochs_to_freeze_encoder', type=int, default=100,
+                        help='Number of epochs to freeze the encoder.')
     parser.add_argument('--zdim', type=int, default=15,
                         help='Dimension of the shape code')
     parser.add_argument('--optimizer', type=str, default='adam',

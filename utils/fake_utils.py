@@ -173,6 +173,7 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                 x_sampled = x_sampled.cpu().detach().numpy()
                 inputs_y = inputs_y.cpu().detach().numpy()
                 x = x.cpu().detach().numpy()
+                N = N.cpu().detach().numpy()
 
                 x = x.reshape(-1, 30)
                 x_sampled = x_sampled.reshape(-1, 30)
@@ -191,7 +192,8 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                 PU_n_true_int.append(inputs_y[:, 2])
                 N_true_fakes_latent.append(z_sampled[:, 15])
                 N_true_fakes_reco.append(np.sum(x_sampled[:, :10] > 0, axis=1))
-                N_true_fakes_full.append(np.sum(x[:, :10] > 0, axis=1))
+                # N_true_fakes_full.append(np.sum(x[:, :10] > 0, axis=1))
+                N_true_fakes_full.append(N)
 
                 print("done 10k")
 

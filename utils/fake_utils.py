@@ -215,15 +215,18 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
         delta_pt_flash = delta_pt(rpts)
 
         PU_n_true_int = np.reshape(PU_n_true_int, (-1, 1)).flatten()
+        N_reco = np.reshape(N_true_fakes_reco, (-1, 1)).flatten()
+        N_latent = np.reshape(N_true_fakes_latent, (-1, 1)).flatten()
+        N_full = np.reshape(N_true_fakes_full, (-1, 1)).flatten()
         N_true_fakes_latent = np.rint(
             np.reshape(N_true_fakes_latent, (-1, 1)).flatten()
         )
         N_true_fakes_reco = np.rint(np.reshape(N_true_fakes_reco, (-1, 1)).flatten())
         N_true_fakes_full = np.rint(np.reshape(N_true_fakes_full, (-1, 1)).flatten())
         print(N_true_fakes_full, N_true_fakes_full.shape)
-        full_sim = [pts, etas, phis, dphis, delta_pt_full]
-        flash_sim = [rpts, retas, rphis, rdphis, delta_pt_flash]
-        names = ["pt", "eta", "phi", "delta_phi", "delta_pt"]
+        full_sim = [pts, etas, phis, dphis, delta_pt_full, N_full, N_full]
+        flash_sim = [rpts, retas, rphis, rdphis, delta_pt_flash, N_reco, N_latent]
+        names = ["pt", "eta", "phi", "delta_phi", "delta_pt", "N_reco", "N_latent"]
         print(N_true_fakes_latent)
 
         for i in range(0, len(full_sim)):

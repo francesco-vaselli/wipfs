@@ -39,6 +39,12 @@ if __name__ == '__main__':
     # fill missing fakes with 0s. seems to be cutting excess fakes per event
     dfft = dfft.reindex(pd.MultiIndex.from_product([np.arange(len(dfgl)), np.arange(10)]), fill_value=0) 
 
+    # if you want to get the values before filling with negative numbers
+    # useful for later preprocessing
+    # pts = np.reshape(dfft1['FJet_pt'], (-1, 10))
+    # etas = np.reshape(dfft1['FJet_eta'], (-1, 10))
+    # phis = np.reshape(dfft1['FJet_phi'], (-1, 10))
+
     # fill missing fakes with nonphysical values
     dfft['FJet_pt'] = [i if i != 0 else np.random.normal(-10, 1) for i in dfft['FJet_pt'].values]
     dfft['FJet_eta'] = [i if i != 0 else np.random.normal(-10, 1) for i in dfft['FJet_eta'].values]

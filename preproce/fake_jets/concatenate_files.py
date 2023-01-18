@@ -30,7 +30,7 @@ if __name__=='__main__':
     print(df.iloc[:, 32])
 
     # revert N fakes to int and scale
-    df.iloc[:36] = np.rint(df.iloc[:36].values)/10
+    df.iloc[:35] = np.rint(df.iloc[:35].values)/10
 
     # print(df.iloc[:, 36])
 
@@ -46,7 +46,7 @@ if __name__=='__main__':
     df["sum_px"] = px
     df["sum_py"] = py
 
-    print(df.iloc[:, [36, 37, 38, 39]])
+    print(df.iloc[:, [35, 36, 37, 38]])
 
     save_file = h5py.File(f"../../training/datasets/train_dataset_fake_jets.hdf5", "w")
 

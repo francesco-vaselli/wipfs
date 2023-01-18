@@ -31,14 +31,18 @@ if __name__=='__main__':
     print(df.iloc[:, 32])
 
     # revert N fakes to int and scale
-    df.iloc[:35] = np.rint(df.iloc[:35].values)/10
+    df.iloc[:36] = np.rint(df.iloc[:36].values)/10
 
     # print(df.iloc[:, 36])
 
     # get sum of modpt, px and py
     pts = df.iloc[:, :10].values
+    # correct for negative values
+    pts = np.where(pts < 0, 0, pts)
     # etas = np.reshape(dfft1['FJet_eta'], (-1, 10))
     phis = df.iloc[:, 20:30].values
+    # this is not needed as the 0 module avoids taking into account the unphysical phis
+    # phis = np.where(phis < -2*np.pi, 0, phis)
 
     mod_pt = mod_sum_pt(pts)
     px, py = sum_px_py(pts, phis)
@@ -47,7 +51,7 @@ if __name__=='__main__':
     df["sum_px"] = px
     df["sum_py"] = py
 
-    print(df.iloc[:, [35, 36, 37, 38]])
+    print(df.iloc[:, [36, 37, 38, 39]])
 
     save_file = h5py.File(f"../../training/datasets/train_dataset_fake_jets_only_flows.hdf5", "w")
 

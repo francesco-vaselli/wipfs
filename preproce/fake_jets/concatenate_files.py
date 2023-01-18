@@ -24,12 +24,11 @@ if __name__=='__main__':
         data = np.array(h5py.File(h5_file, "r")["data"][:,:])
         df = pd.concat([df, pd.DataFrame(data=data)], axis=0)
 
-    print(df)
 
     df = df.sort_values(by=df.columns[32])
 
     print(df.iloc[:, 32])
-
+    print(df)
     # revert N fakes to int and scale
     df.iloc[:36] = np.rint(df.iloc[:36].values)/10
 

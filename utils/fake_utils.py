@@ -159,6 +159,26 @@ def vec_sum_pt(pts, phis):
     return spt, angle
 
 
+def sum_px_py(pts, phis):
+    """sum of pts components
+
+    Args:
+        pts (np.array): pts array shape [n events, 10 fake jets], 0 for empty jets
+        phis (np.array): phis array shape [n events, 10 fake jets], 0 for empty jets
+
+    Returns:
+        px: vector sum of pts on x [n events]
+        py: vector sum of pts on y [n events]
+    """
+    px = np.sum(pts * np.cos(phis), axis=1)
+    py = np.sum(pts * np.sin(phis), axis=1)
+
+    px.flatten()
+    py.flatten()
+
+    return px, py
+
+
 def delta_pt(pts):
     filtered_pt = np.where(pts > 0, pts, np.inf)
     dpt = filtered_pt[:, 0] - filtered_pt[:, 1]

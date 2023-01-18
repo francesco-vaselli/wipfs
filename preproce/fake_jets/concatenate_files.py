@@ -1,6 +1,10 @@
 import h5py
 import pandas as pd
 import numpy as np
+import sys
+sys.path.insert(0, os.path.join("..", "utils"))
+
+from fake_utils import mod_sum_pt, sum_px_py
 
 
 if __name__=='__main__':
@@ -24,6 +28,25 @@ if __name__=='__main__':
     df = df.sort_values(by=df.columns[32])
 
     print(df.iloc[:, 32])
+
+    # revert N fakes to int and scale
+    df.iloc[:36] = np.rint(df.iloc[:36].values)/10
+
+    # print(df.iloc[:, 36])
+
+    # get sum of modpt, px and py
+    pts = df.iloc[:, :10].values
+    # etas = np.reshape(dfft1['FJet_eta'], (-1, 10))
+    phis = df.iloc[:, 20:30].values
+
+    mod_pt = mod_sum_pt(pts)
+    px, py = sum_px_py(pts, phis)
+
+    df["mod_sum_pt"] = mod_pt
+    df["sum_px"] = px
+    df["sum_py"] = py
+
+    print(df.iloc[:, [36, 37, 38, 39]])
 
     save_file = h5py.File(f"../../training/datasets/train_dataset_fake_jets.hdf5", "w")
 

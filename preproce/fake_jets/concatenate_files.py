@@ -1,4 +1,5 @@
 import h5py
+import os
 import pandas as pd
 import numpy as np
 import sys
@@ -48,7 +49,7 @@ if __name__=='__main__':
 
     print(df.iloc[:, [35, 36, 37, 38]])
 
-    save_file = h5py.File(f"../../training/datasets/train_dataset_fake_jets.hdf5", "w")
+    save_file = h5py.File(f"../../training/datasets/train_dataset_fake_jets_only_flows.hdf5", "w")
 
     dset = save_file.create_dataset("data", data=df.values, dtype="f4")
 

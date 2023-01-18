@@ -2,7 +2,7 @@ import h5py
 import pandas as pd
 import numpy as np
 import sys
-sys.path.insert(0, os.path.join("..", "utils"))
+sys.path.insert(0, os.path.join("../..", "utils"))
 
 from fake_utils import mod_sum_pt, sum_px_py
 

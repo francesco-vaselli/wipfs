@@ -152,6 +152,7 @@ class RecoFlow(nn.Module):
             return optimizer
 
         opt = _get_opt_(list(self.reco_NDE_model.parameters()))
+        return opt
 
     def forward(self, x, z, opt, step, epoch, writer=None, val=False):
         opt.zero_grad()

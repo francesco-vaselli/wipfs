@@ -280,7 +280,7 @@ def validate_double_flow(test_loader, latent_model, reco_model, epoch, writer, s
 
                 x = x.reshape(-1, args.x_dim)
                 x_sampled = x_sampled.reshape(-1, args.x_dim)
-                z_sampled = z_sampled.reshape(-1, args.z_dim)
+                z_sampled = z_sampled.reshape(-1, args.zdim)
                 N_sampled = z_sampled[:, 0]
                 print(x.shape, x_sampled.shape)
                 pts.append(x[:, :10])

@@ -135,7 +135,7 @@ def get_new_datasets(args):
         ["./datasets/train_dataset_fake_jets_only_flows.hdf5"],
         x_dim=args.x_dim,
         y_dim=args.y_dim,
-        z_dim=args.z_dim,
+        z_dim=args.zdim,
         start=5000000,
         limit=5100000,
     )

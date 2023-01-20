@@ -151,6 +151,7 @@ def add_args(parser):
     parser.add_argument('--save_freq', type=int, default=10)
 
     # validation options
+    parser.add_argument('--validate_at_0', default=False, action='store_true')
     parser.add_argument('--no_validation', default=False, action='store_true',
                         help='Whether to disable validation altogether.')
     parser.add_argument('--save_val_results', default=True, action='store_true',

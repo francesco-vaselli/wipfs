@@ -31,7 +31,7 @@ from fake_utils import (
     reduce_tensor,
     set_random_seed,
     get_new_datasets,
-    validate,
+    validate_double_flow,
 )
 from args_fake_jets_only_flows import get_args
 
@@ -180,6 +180,12 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
     else:
         assert 0, "args.schedulers should be either 'exponential' or 'linear'"
 
+    # epoch 0 validation
+    if args.validate_at_0:
+        epoch = 0
+        validate_double_flow(
+                test_loader, latent_model, reco_model, epoch, writer, save_dir, args, clf_loaders=None
+            )
     # main training loop
     start_time = time.time()
     latent_nats_avg_meter = AverageValueMeter()
@@ -188,7 +194,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
         print("[Rank %d] World size : %d" % (args.rank, dist.get_world_size()))
     if args.freeze_latent_flow:
         print("Freezing latent flow")
-        for param in model.latent_NDE_model.parameters():
+        for param in latent_model.parameters():
             param.requires_grad = False
         # model.latent_NDE_model.requires_grad_(False)
     print("Start epoch: %d End epoch: %d" % (start_epoch, args.epochs))
@@ -198,7 +204,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
 
         if epoch == args.epochs_to_freeze_latent and args.freeze_latent_flow:
             print("Unfreezing latent flow")
-            for param in model.latent_NDE_model.parameters():
+            for param in latent_model.parameters():
                 param.requires_grad = True
             # model.latent_NDE_model.requires_grad_(True)
 

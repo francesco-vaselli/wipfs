@@ -33,7 +33,7 @@ from fake_utils import (
     get_new_datasets,
     validate,
 )
-from args_fake_jets import get_args
+from args_fake_jets_only_flows import get_args
 
 faulthandler.enable()
 
@@ -252,33 +252,27 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
             for bidx, data in enumerate(test_loader):
                 x, y, N = data[0], data[1], data[2]
                 step = bidx + len(test_loader) * epoch
-                model.eval()
+                latent_model.eval()
+                reco_model.eval()
                 inputs_x = x.cuda(args.gpu, non_blocking=True)
                 inputs_y = y.cuda(args.gpu, non_blocking=True)
-                inputs_N = N.cuda(args.gpu, non_blocking=True)
-                out = model(
-                    inputs_x, inputs_y, inputs_N, optimizer, step, epoch, writer, val=True
-                )
-                entropy, prior_nats, recon_nats = (
-                    out["entropy"],
-                    out["prior_nats"],
-                    out["recon_nats"],
-                )
-                entropy_avg_meter.update(entropy)
+                inputs_z = z.cuda(args.gpu, non_blocking=True)
+                prior_nats = latent_model(inputs_y, inputs_z, optimizer_latent, step, epoch, writer)
+                recon_nats = reco_model(inputs_x, inputs_z, optimizer_reco, step, epoch, writer)
+
                 point_nats_avg_meter.update(recon_nats)
                 latent_nats_avg_meter.update(prior_nats)
                 if step % args.log_freq == 0:
                     duration = time.time() - start_time
                     start_time = time.time()
                     print(
-                        "TEST: [Rank %d] Epoch %d Batch [%2d/%2d] Time [%3.2fs] Entropy %2.5f LatentFlowLoss %2.5f RecoFlowLoss %2.5f"
+                        "TEST: [Rank %d] Epoch %d Batch [%2d/%2d] Time [%3.2fs] LatentFlowLoss %2.5f RecoFlowLoss %2.5f"
                         % (
                             args.rank,
                             epoch,
                             bidx,
                             len(test_loader),
                             duration,
-                            entropy_avg_meter.avg,
                             latent_nats_avg_meter.avg,
                             point_nats_avg_meter.avg,
                             # entropy,
@@ -288,8 +282,8 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
                     )
 
         if not args.no_validation and (epoch + 1) % args.val_freq == 0:
-            validate(
-                test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
+            validate_double_flow(
+                test_loader, latent_model, reco_model, epoch, writer, save_dir, args, clf_loaders=None
             )
 
         # # save visualizations WE DO NOT VISUALIZE
@@ -328,16 +322,28 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
         if not args.distributed or (args.rank % ngpus_per_node == 0):
             if (epoch + 1) % args.save_freq == 0:
                 save(
-                    model,
-                    optimizer,
+                    latent_model,
+                    optimizer_latent,
                     epoch + 1,
-                    os.path.join(save_dir, "checkpoint-%d.pt" % epoch),
+                    os.path.join(save_dir, "latent_checkpoint-%d.pt" % epoch),
                 )
                 save(
-                    model,
-                    optimizer,
+                    latent_model,
+                    optimizer_latent,
                     epoch + 1,
-                    os.path.join(save_dir, "checkpoint-latest.pt"),
+                    os.path.join(save_dir, "latent_checkpoint-latest.pt"),
+                )
+                save(
+                    reco_model,
+                    optimizer_reco,
+                    epoch + 1,
+                    os.path.join(save_dir, "reco_checkpoint-%d.pt" % epoch),
+                )
+                save(
+                    reco_model,
+                    optimizer_reco,
+                    epoch + 1,
+                    os.path.join(save_dir, "reco_checkpoint-latest.pt"),
                 )
 
 

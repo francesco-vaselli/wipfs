@@ -91,26 +91,9 @@ class LatentFlow(nn.Module):
             "prior_nats": prior_nats,
         }
 
-    # TO BE WRITTEN IN THE UTILS
-    # def sample(
-    #     self,
-    #     y,
-    #     batch_size,
-    #     num_points,
-    #     truncate_std=None,
-    #     truncate_std_latent=None,
-    #     gpu=None,
-    # ):
-    #     assert (
-    #         self.use_latent_flow
-    #     ), "Sampling requires `self.use_latent_flow` to be True."
-    #     # Generate the shape code from the prior
-    #     # print(y.size())
-    #     z = self.latent_NDE_model.sample(num_points, context=y)
-    #     # Sample points conditioned on the shape code
-    #     # print(z.size())
-    #     x = self.reco_NDE_model.sample(num_points, context=z.view(-1, self.zdim))
-    #     return z, x
+    def sample(self, num_samples, y):
+        z = self.latent_NDE_model.sample(num_samples, context=y)
+        return z
 
 
 # Reco model
@@ -181,3 +164,7 @@ class RecoFlow(nn.Module):
         return {
             "posterior_nats": posterior_nats,
         }
+
+    def sample(self, num_samples, y):
+        x = self.reco_NDE_model.sample(num_samples, context=y)
+        return x

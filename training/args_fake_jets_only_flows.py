@@ -13,8 +13,8 @@ def add_args(parser):
 
     # nflows args
     latent_flow_param_dict = {
-            "input_dim" : 4,
-            "context_dim" : 6,
+            "input_dim" : Z_DIM,
+            "context_dim" : Y_DIM,
             "num_flow_steps" : 6, # increasing this could improve conditioning
 
             "base_transform_kwargs" : {
@@ -31,8 +31,8 @@ def add_args(parser):
         }
 
     reco_flow_param_dict = {
-            "input_dim" : 30,
-            "context_dim" : 16,
+            "input_dim" : X_DIM,
+            "context_dim" : Z_DIM,
             "num_flow_steps" : 9,
 
             "base_transform_kwargs" : {
@@ -86,7 +86,7 @@ def add_args(parser):
                         help='Whether to freeze the encoder.')
     parser.add_argument('--epochs_to_freeze_encoder', type=int, default=100,
                         help='Number of epochs to freeze the encoder.')
-    parser.add_argument('--zdim', type=int, default=4,
+    parser.add_argument('--zdim', type=int, default=Z_DIM,
                         help='Dimension of the shape code')
     parser.add_argument('--optimizer', type=str, default='adam',
                         help='Optimizer to use', choices=['adam', 'adamax', 'sgd'])

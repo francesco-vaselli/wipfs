@@ -87,9 +87,7 @@ class LatentFlow(nn.Module):
             writer.add_scalar("val/prior", prior, step)
             writer.add_scalar("val/prior(nats)", prior_nats, step)
 
-        return {
-            "prior_nats": prior_nats,
-        }
+        return prior_nats
 
     def sample(self, num_samples, y):
         z = self.latent_NDE_model.sample(num_samples, context=y)
@@ -161,9 +159,7 @@ class RecoFlow(nn.Module):
             writer.add_scalar("val/posterior", posterior, step)
             writer.add_scalar("val/posterior(nats)", posterior_nats, step)
 
-        return {
-            "posterior_nats": posterior_nats,
-        }
+        return posterior_nats
 
     def sample(self, num_samples, y):
         x = self.reco_NDE_model.sample(num_samples, context=y)

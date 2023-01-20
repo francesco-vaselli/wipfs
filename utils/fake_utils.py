@@ -227,7 +227,7 @@ def sample_double_flow(latent_model, reco_model, y, n_samples, args):
     z = latent_model.sample(n_samples, y)
 
     # Sample from the reconstruction flow
-    x = reco_model.sample(n_samples, z.view(-1, args.z_dim))
+    x = reco_model.sample(n_samples, z.view(-1, args.zdim))
 
     return z, x
 

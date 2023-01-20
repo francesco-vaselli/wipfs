@@ -151,7 +151,7 @@ class RecoFlow(nn.Module):
                 assert 0, "args.optimizer should be either 'adam' or 'sgd'"
             return optimizer
 
-        opt = _get_opt_(+list(self.reco_NDE_model.parameters()))
+        opt = _get_opt_(list(self.reco_NDE_model.parameters()))
 
     def forward(self, x, z, opt, step, epoch, writer=None, val=False):
         opt.zero_grad()

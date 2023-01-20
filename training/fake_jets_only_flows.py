@@ -81,6 +81,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
     start_epoch = 0
     optimizer_latent = latent_model.make_optimizer(args)
     optimizer_reco = reco_model.make_optimizer(args)
+    print(optimizer_reco)
     if args.resume_latent_checkpoint is None and os.path.exists(
         os.path.join(save_dir, "latent_checkpoint-latest.pt")
     ):

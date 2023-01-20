@@ -8,7 +8,7 @@ import os
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.join("..", "utils"))
-from dataset import FakesDataset, H5FakesDataset
+from dataset import FakesDataset, H5FakesDataset, NewFakesDataset
 
 
 class AverageValueMeter(object):
@@ -104,6 +104,40 @@ def get_datasets(args):
     # )
     te_dataset = FakesDataset(
         ["./datasets/fake_jets6.hdf5"], x_dim=30, y_dim=6, start=0, limit=100000
+    )
+
+    return tr_dataset, te_dataset
+
+
+def get_new_datasets(args):
+
+    tr_dataset = NewFakesDataset(
+        ["./datasets/train_dataset_fake_jets_only_flows.hdf5"],
+        x_dim=30,
+        y_dim=6,
+        z_dim=4
+        start=0,
+        limit=5000000,
+    )
+    # H5FakesDataset(
+    #     [
+    #         "./datasets/fake_jets1.hdf5",
+    #         "./datasets/fake_jets2.hdf5",
+    #         "./datasets/fake_jets3.hdf5",
+    #         "./datasets/fake_jets4.hdf5",
+    #         "./datasets/fake_jets5.hdf5",
+    #     ],
+    #     x_dim=30,
+    #     y_dim=6,
+    #     limit=5000000,
+    # )
+    te_dataset = NewFakesDataset(
+        ["./datasets/train_dataset_fake_jets_only_flows.hdf5"],
+        x_dim=30,
+        y_dim=6,
+        z_dim=4
+        start=5000000,
+        limit=5100000,
     )
 
     return tr_dataset, te_dataset

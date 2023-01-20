@@ -116,7 +116,7 @@ class LatentFlow(nn.Module):
 # Reco model
 class RecoFlow(nn.Module):
     def __init__(self, args):
-        super(FakeFlow, self).__init__()
+        super(RecoFlow, self).__init__()
         self.input_dim = args.input_dim
         self.zdim = args.zdim
 

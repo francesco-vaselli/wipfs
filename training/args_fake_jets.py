@@ -4,7 +4,6 @@ NONLINEARITIES = ["tanh", "relu", "softplus", "elu", "swish", "square", "identit
 SOLVERS = ["dopri5", "bdf", "rk4", "midpoint", 'adams', 'explicit_adams', 'fixed_adams']
 LAYERS = ["ignore", "concat", "concat_v2", "squash", "concatsquash", "scale", "concatscale"]
 
-
 def add_args(parser):
 
     # nflows args
@@ -44,7 +43,7 @@ def add_args(parser):
             "transform_type" : "random-permutation" 
         }
     # model architecture options
-    parser.add_argument('--input_dim', type=int, default=30,
+    parser.add_argument('--input_dim', type=int, default=X_DIM,
                         help='Number of input dimensions (30 as we flatten all fakes)')
     parser.add_argument('--dims', type=str, default='256')
     parser.add_argument('--latent_dims', type=str, default='256')

@@ -5,6 +5,9 @@ NONLINEARITIES = ["tanh", "relu", "softplus", "elu", "swish", "square", "identit
 SOLVERS = ["dopri5", "bdf", "rk4", "midpoint", 'adams', 'explicit_adams', 'fixed_adams']
 LAYERS = ["ignore", "concat", "concat_v2", "squash", "concatsquash", "scale", "concatscale"]
 
+X_DIM = 30
+Y_DIM = 6
+Z_DIM = 4   
 
 def add_args(parser):
 
@@ -45,6 +48,8 @@ def add_args(parser):
             "transform_type" : "random-permutation" 
         }
     # model architecture options
+    parser.add_argument('--x_dim', type=int, default=X_DIM)
+    parser.add_argument('--y_dim', type=int, default=Y_DIM)
     parser.add_argument('--input_dim', type=int, default=30,
                         help='Number of input dimensions (30 as we flatten all fakes)')
     parser.add_argument('--dims', type=str, default='256')

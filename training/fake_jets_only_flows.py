@@ -212,7 +212,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
         if (epoch == 0):
             # evaluate on the validation set
             for bidx, data in enumerate(test_loader):
-                x, y, N = data[0], data[1], data[2]
+                x, y, z = data[0], data[1], data[2]
                 step = bidx + len(test_loader) * epoch
                 latent_model.eval()
                 reco_model.eval()
@@ -288,10 +288,10 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
                 writer.add_scalar("lr/optimizer_latent", scheduler_latent.get_last_lr(), epoch)
                 writer.add_scalar("lr/optimizer_reco", scheduler_reco.get_last_lr(), epoch)
 
-        if (not args.no_validation and (epoch + 1) % args.val_freq == 0) or (epoch == 0):
+        if (not args.no_validation and (epoch + 1) % args.val_freq == 0):
             # evaluate on the validation set
             for bidx, data in enumerate(test_loader):
-                x, y, N = data[0], data[1], data[2]
+                x, y, z = data[0], data[1], data[2]
                 step = bidx + len(test_loader) * epoch
                 latent_model.eval()
                 reco_model.eval()

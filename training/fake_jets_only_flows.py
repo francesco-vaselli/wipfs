@@ -209,40 +209,6 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
                 param.requires_grad = True
             # model.latent_NDE_model.requires_grad_(True)
 
-        if (epoch == 0):
-            # evaluate on the validation set
-            for bidx, data in enumerate(test_loader):
-                x, y, z = data[0], data[1], data[2]
-                step = bidx + len(test_loader) * epoch
-                latent_model.eval()
-                reco_model.eval()
-                inputs_x = x.cuda(args.gpu, non_blocking=True)
-                inputs_y = y.cuda(args.gpu, non_blocking=True)
-                inputs_z = z.cuda(args.gpu, non_blocking=True)
-                print(inputs_y.shape, inputs_z.shape)
-                prior_nats = latent_model(inputs_y, inputs_z, optimizer_latent, step, epoch, writer)
-                recon_nats = reco_model(inputs_x, inputs_z, optimizer_reco, step, epoch, writer)
-
-                point_nats_avg_meter.update(recon_nats)
-                latent_nats_avg_meter.update(prior_nats)
-                if step % args.log_freq == 0:
-                    duration = time.time() - start_time
-                    start_time = time.time()
-                    print(
-                        "TEST: [Rank %d] Epoch %d Batch [%2d/%2d] Time [%3.2fs] LatentFlowLoss %2.5f RecoFlowLoss %2.5f"
-                        % (
-                            args.rank,
-                            epoch,
-                            bidx,
-                            len(test_loader),
-                            duration,
-                            latent_nats_avg_meter.avg,
-                            point_nats_avg_meter.avg,
-                            # entropy,
-                            # prior_nats,
-                            # recon_nats
-                        )
-                    )
         # train for one epoch
         for bidx, data in enumerate(train_loader):
             x, y, z = data[0], data[1], data[2]
@@ -298,7 +264,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
                 inputs_x = x.cuda(args.gpu, non_blocking=True)
                 inputs_y = y.cuda(args.gpu, non_blocking=True)
                 inputs_z = z.cuda(args.gpu, non_blocking=True)
-                print(inputs_y.shape, inputs_z.shape)
+                
                 prior_nats = latent_model(inputs_y, inputs_z, optimizer_latent, step, epoch, writer)
                 recon_nats = reco_model(inputs_x, inputs_z, optimizer_reco, step, epoch, writer)
 

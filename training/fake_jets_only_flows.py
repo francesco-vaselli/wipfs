@@ -254,7 +254,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
                 writer.add_scalar("lr/optimizer_latent", scheduler_latent.get_last_lr(), epoch)
                 writer.add_scalar("lr/optimizer_reco", scheduler_reco.get_last_lr(), epoch)
 
-        if not args.no_validation and (epoch + 1) % args.val_freq == 0:
+        if not args.no_validation and ((epoch + 1) % args.val_freq or epoch == 0) == 0:
             # evaluate on the validation set
             for bidx, data in enumerate(test_loader):
                 x, y, N = data[0], data[1], data[2]
@@ -264,6 +264,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
                 inputs_x = x.cuda(args.gpu, non_blocking=True)
                 inputs_y = y.cuda(args.gpu, non_blocking=True)
                 inputs_z = z.cuda(args.gpu, non_blocking=True)
+                print(inputs_y.shape, inputs_z.shape)
                 prior_nats = latent_model(inputs_y, inputs_z, optimizer_latent, step, epoch, writer)
                 recon_nats = reco_model(inputs_x, inputs_z, optimizer_reco, step, epoch, writer)
 

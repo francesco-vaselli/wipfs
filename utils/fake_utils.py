@@ -260,6 +260,12 @@ def validate_double_flow(test_loader, latent_model, reco_model, epoch, writer, s
             N_true_fakes_reco = []
             N_true_fakes_latent = []
             N_true_fakes_full = []
+            mod_pt_full = []
+            mod_pt_flash = []
+            px_full = []
+            py_full = []
+            px_flash = []
+            py_flash = []
             # delta_phi_full = []
             # delta_phi_flash = []
             for bidx, data in enumerate(test_loader):
@@ -298,6 +304,12 @@ def validate_double_flow(test_loader, latent_model, reco_model, epoch, writer, s
                 N_true_fakes_reco.append(np.sum(x_sampled[:, :10] > 0, axis=1))
                 # N_true_fakes_full.append(np.sum(x[:, :10] > 0, axis=1))
                 N_true_fakes_full.append(N)
+                mod_pt_full.append(z[:, 1])
+                mod_pt_flash.append(z_sampled[:, 1])
+                px_full.append(z[:, 2])
+                py_full.append(z[:, 3])
+                px_flash.append(z_sampled[:, 2])
+                py_flash.append(z_sampled[:, 3])
 
                 print("done 10k")
 
@@ -308,6 +320,9 @@ def validate_double_flow(test_loader, latent_model, reco_model, epoch, writer, s
         phis = np.reshape(phis, (-1, 10))
         dphis = delta_phi1v9(pts, phis)
         delta_pt_full = delta_pt(pts)
+        mod_pt_full = np.reshape(mod_pt_full, (-1, 1)).flatten()
+        px_full = np.reshape(px_full, (-1, 1)).flatten()
+        py_full = np.reshape(py_full, (-1, 1)).flatten()
         # np.reshape(dphis, (-1, 9))
         # constraints the angles in the -pi,pi range
         # dphis = np.where(dphis < np.pi, dphis, dphis - 2*np.pi)
@@ -317,6 +332,9 @@ def validate_double_flow(test_loader, latent_model, reco_model, epoch, writer, s
         rphis = np.reshape(rphis, (-1, 10))
         rdphis = delta_phi1v9(rpts, rphis)
         delta_pt_flash = delta_pt(rpts)
+        mod_pt_flash = np.reshape(mod_pt_flash, (-1, 1)).flatten()
+        px_flash = np.reshape(px_flash, (-1, 1)).flatten()
+        py_flash = np.reshape(py_flash, (-1, 1)).flatten()
 
         PU_n_true_int = np.reshape(PU_n_true_int, (-1, 1)).flatten()
         N_reco = np.reshape(N_true_fakes_reco, (-1, 1)).flatten()
@@ -326,10 +344,10 @@ def validate_double_flow(test_loader, latent_model, reco_model, epoch, writer, s
         N_true_fakes_reco = np.reshape(N_true_fakes_reco, (-1, 1)).flatten()
         N_true_fakes_full = np.reshape(N_true_fakes_full, (-1, 1)).flatten()
         print(N_true_fakes_full, N_true_fakes_full.shape)
-        full_sim = [pts, etas, phis, dphis, delta_pt_full, N_full, N_full]
-        flash_sim = [rpts, retas, rphis, rdphis, delta_pt_flash, N_reco, N_latent]
-        names = ["pt", "eta", "phi", "delta_phi", "delta_pt", "N_reco", "N_latent"]
-        print(N_true_fakes_latent)
+        full_sim = [pts, etas, phis, dphis, delta_pt_full, N_full, N_full, mod_pt_full, px_full, py_full]
+        flash_sim = [rpts, retas, rphis, rdphis, delta_pt_flash, N_reco, N_latent, mod_pt_flash, px_flash, py_flash]
+        names = ["pt", "eta", "phi", "delta_phi", "delta_pt", "N_reco", "N_latent", "mod_pt", "px", "py"]
+        # print(N_true_fakes_latent)
 
         for i in range(0, len(full_sim)):
             test_values = full_sim[i].flatten()

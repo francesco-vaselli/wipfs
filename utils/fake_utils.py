@@ -347,7 +347,7 @@ def validate_double_flow(
 
         PU_n_true_int = np.reshape(PU_n_true_int, (-1, 1)).flatten()
         N_reco = np.reshape(N_true_fakes_reco, (-1, 1)).flatten()
-        N_latent = np.reshape(N_true_fakes_latent, (-1, 1)).flatten()
+        N_latent = np.rint(np.reshape(N_true_fakes_latent, (-1, 1)).flatten())
         N_full = np.reshape(N_true_fakes_full, (-1, 1)).flatten()
         N_true_fakes_latent = np.reshape(N_true_fakes_latent, (-1, 1)).flatten()
         N_true_fakes_reco = np.reshape(N_true_fakes_reco, (-1, 1)).flatten()

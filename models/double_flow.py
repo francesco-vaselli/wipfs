@@ -51,33 +51,51 @@ class LatentFlow(nn.Module):
 
     # we pass y as conditioning variable
     def forward(self, y, z, opt, step, epoch, writer=None, val=False):
-        opt.zero_grad()
         batch_size = y.size(0)
+
+        if val==False:
+            opt.zero_grad()
 
         # Compute the prior probability P(z)
 
-        if self.use_latent_flow:
-            """
-            w, delta_log_pw = self.latent_cnf(z, None, torch.zeros(batch_size, 1).to(z))
-            log_pw = standard_normal_logprob(w).view(batch_size, -1).sum(1, keepdim=True)
-            delta_log_pw = delta_log_pw.view(batch_size, 1)
-            log_pz = log_pw - delta_log_pw
-            """
-            # print(z.size(), y.size())
-            log_pz = self.latent_NDE_model.log_prob(z, context=y)
-        else:
-            log_pz = torch.zeros(batch_size, 1).to(z)
+            if self.use_latent_flow:
+                """
+                w, delta_log_pw = self.latent_cnf(z, None, torch.zeros(batch_size, 1).to(z))
+                log_pw = standard_normal_logprob(w).view(batch_size, -1).sum(1, keepdim=True)
+                delta_log_pw = delta_log_pw.view(batch_size, 1)
+                log_pz = log_pw - delta_log_pw
+                """
+                # print(z.size(), y.size())
+                log_pz = self.latent_NDE_model.log_prob(z, context=y)
+            else:
+                log_pz = torch.zeros(batch_size, 1).to(z)
 
-        prior_loss = -log_pz.mean()
-        loss = prior_loss
+            prior_loss = -log_pz.mean()
+            loss = prior_loss
 
-        loss.backward()
-        opt.step()
+            loss.backward()
+            opt.step()
 
-        # LOGGING (after the training)
-        prior = -log_pz.mean()
+            # LOGGING (after the training)
+            prior = -log_pz.mean()
 
-        prior_nats = prior / float(self.zdim)
+            prior_nats = prior / float(self.zdim)
+
+        elif val==True:
+            with torch.no_grad():
+                if self.use_latent_flow:
+                    # print(z.size(), y.size())
+                    log_pz = self.latent_NDE_model.log_prob(z, context=y)
+                else:
+                    log_pz = torch.zeros(batch_size, 1).to(z)
+
+                prior_loss = -log_pz.mean()
+                loss = prior_loss
+
+                # LOGGING (after the training)
+                prior = -log_pz.mean()
+
+                prior_nats = prior / float(self.zdim)
 
         if writer is not None and val is False:
             writer.add_scalar("train/prior", prior, step)
@@ -136,21 +154,34 @@ class RecoFlow(nn.Module):
         return opt
 
     def forward(self, x, z, opt, step, epoch, writer=None, val=False):
-        opt.zero_grad()
-        batch_size = x.size(0)
 
-        # Compute the P(x|z)
-        log_px = self.reco_NDE_model.log_prob(x, context=z.view(-1, self.zdim))
-        posterior_loss = -log_px.mean()
-        loss = posterior_loss
+        if val==False:
+            opt.zero_grad()
 
-        loss.backward()
-        opt.step()
+            # Compute the P(x|z)
+            log_px = self.reco_NDE_model.log_prob(x, context=z.view(-1, self.zdim))
+            posterior_loss = -log_px.mean()
+            loss = posterior_loss
 
-        # LOGGING (after the training)
-        posterior = -log_px.mean()
+            loss.backward()
+            opt.step()
 
-        posterior_nats = posterior / float(self.input_dim)
+            # LOGGING (after the training)
+            posterior = -log_px.mean()
+
+            posterior_nats = posterior / float(self.input_dim)
+
+        elif val==True:
+            with torch.no_grad():
+                # Compute the P(x|z)
+                log_px = self.reco_NDE_model.log_prob(x, context=z.view(-1, self.zdim))
+                posterior_loss = -log_px.mean()
+                loss = posterior_loss
+
+                # LOGGING (after the training)
+                posterior = -log_px.mean()
+
+                posterior_nats = posterior / float(self.input_dim)
 
         if writer is not None and val is False:
             writer.add_scalar("train/posterior", posterior, step)

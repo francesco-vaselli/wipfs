@@ -265,8 +265,8 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
                 inputs_y = y.cuda(args.gpu, non_blocking=True)
                 inputs_z = z.cuda(args.gpu, non_blocking=True)
                 
-                prior_nats = latent_model(inputs_y, inputs_z, optimizer_latent, step, epoch, writer)
-                recon_nats = reco_model(inputs_x, inputs_z, optimizer_reco, step, epoch, writer)
+                prior_nats = latent_model(inputs_y, inputs_z, optimizer_latent, step, epoch, writer, val=True)
+                recon_nats = reco_model(inputs_x, inputs_z, optimizer_reco, step, epoch, writer, val=True)
 
                 point_nats_avg_meter.update(recon_nats)
                 latent_nats_avg_meter.update(prior_nats)

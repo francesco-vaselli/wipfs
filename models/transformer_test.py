@@ -6,7 +6,7 @@ from torch import nn
 
 from torch.nn import Transformer
 
-
+# maybe I need just an encoder  
 class Transformer(nn.Module):
     def __init__(
         self,

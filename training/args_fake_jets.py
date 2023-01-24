@@ -6,7 +6,7 @@ LAYERS = ["ignore", "concat", "concat_v2", "squash", "concatsquash", "scale", "c
 
 X_DIM = 30
 Y_DIM = 6
-Z_DIM = 4  
+Z_DIM = 16  
 
 def add_args(parser):
 

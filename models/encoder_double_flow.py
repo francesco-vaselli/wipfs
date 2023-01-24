@@ -217,85 +217,147 @@ class FakeDoubleFlow(nn.Module):
 
     # we pass y as conditioning variable
     def forward(self, x, y, N, opt, step, epoch, writer=None, val=False):
-        opt.zero_grad()
-        batch_size = x.size(0)
-        num_points = x.size(1)
-        z_mu, z_sigma = self.encoder(x)
-        if self.use_deterministic_encoder:
-            z = z_mu + 0 * z_sigma
-            print("!!USING DETERMINISTIC ENCODER!!")
-        else:
-            z = self.reparameterize_gaussian(z_mu, z_sigma)
-            # print(z.size())
-            # add N of true fakes
-            z = torch.cat([z, N], dim=1)
-            # print(z.size())
 
-        # Compute H[Q(z|X)]
-        if self.use_deterministic_encoder:
-            entropy = torch.zeros(batch_size).to(z)
-        else:
-            entropy = self.gaussian_entropy(z_sigma)
+        if val == False:
+            opt.zero_grad()
+            batch_size = x.size(0)
+            num_points = x.size(1)
+            z_mu, z_sigma = self.encoder(x)
+            if self.use_deterministic_encoder:
+                z = z_mu + 0 * z_sigma
+                print("!!USING DETERMINISTIC ENCODER!!")
+            else:
+                z = self.reparameterize_gaussian(z_mu, z_sigma)
+                # print(z.size())
+                # add N of true fakes
+                z = torch.cat([z, N], dim=1)
+                # print(z.size())
 
-        # Compute the prior probability P(z)
-        # if epoch < self.epochs_to_freeze_latent and self.freeze_latent_flow:
-        #     log_pz = torch.zeros(batch_size, 1).to(z)
-        # we had an elif here
-        if self.use_latent_flow:
+            # Compute H[Q(z|X)]
+            if self.use_deterministic_encoder:
+                entropy = torch.zeros(batch_size).to(z)
+            else:
+                entropy = self.gaussian_entropy(z_sigma)
+
+            # Compute the prior probability P(z)
+            # if epoch < self.epochs_to_freeze_latent and self.freeze_latent_flow:
+            #     log_pz = torch.zeros(batch_size, 1).to(z)
+            # we had an elif here
+            if self.use_latent_flow:
+                """
+                w, delta_log_pw = self.latent_cnf(z, None, torch.zeros(batch_size, 1).to(z))
+                log_pw = standard_normal_logprob(w).view(batch_size, -1).sum(1, keepdim=True)
+                delta_log_pw = delta_log_pw.view(batch_size, 1)
+                log_pz = log_pw - delta_log_pw
+                """
+                # print(z.size(), y.size())
+                log_pz = self.latent_NDE_model.log_prob(z, context=y)
+            else:
+                log_pz = torch.zeros(batch_size, 1).to(z)
+
+            # Compute the reconstruction likelihood P(X|z)
+            z_new = z.view(*z.size())
+            z_new = z_new + (log_pz * 0.0).mean()
             """
-            w, delta_log_pw = self.latent_cnf(z, None, torch.zeros(batch_size, 1).to(z))
-            log_pw = standard_normal_logprob(w).view(batch_size, -1).sum(1, keepdim=True)
-            delta_log_pw = delta_log_pw.view(batch_size, 1)
-            log_pz = log_pw - delta_log_pw
+            y, delta_log_py = self.point_cnf(x, z_new, torch.zeros(batch_size, num_points, 1).to(x))
+            log_py = standard_normal_logprob(y).view(batch_size, -1).sum(1, keepdim=True)
+            delta_log_py = delta_log_py.view(batch_size, num_points, 1).sum(1)
+            log_px = log_py - delta_log_py
             """
-            # print(z.size(), y.size())
-            log_pz = self.latent_NDE_model.log_prob(z, context=y)
-        else:
-            log_pz = torch.zeros(batch_size, 1).to(z)
+            # print(x.size(), x.view(-1, self.input_dim).size())
+            log_px = self.reco_NDE_model.log_prob(x.view(-1, self.input_dim), context=z_new)
 
-        # Compute the reconstruction likelihood P(X|z)
-        z_new = z.view(*z.size())
-        z_new = z_new + (log_pz * 0.0).mean()
-        """
-        y, delta_log_py = self.point_cnf(x, z_new, torch.zeros(batch_size, num_points, 1).to(x))
-        log_py = standard_normal_logprob(y).view(batch_size, -1).sum(1, keepdim=True)
-        delta_log_py = delta_log_py.view(batch_size, num_points, 1).sum(1)
-        log_px = log_py - delta_log_py
-        """
-        # print(x.size(), x.view(-1, self.input_dim).size())
-        log_px = self.reco_NDE_model.log_prob(x.view(-1, self.input_dim), context=z_new)
+            # Loss
+            entropy_loss = -entropy.mean() * self.entropy_weight
+            recon_loss = -log_px.mean() * self.recon_weight
+            prior_loss = -log_pz.mean() * self.prior_weight
 
-        # Loss
-        entropy_loss = -entropy.mean() * self.entropy_weight
-        recon_loss = -log_px.mean() * self.recon_weight
-        prior_loss = -log_pz.mean() * self.prior_weight
+            # freeze the training of the latent flow in the first epochs, then the encoder
+            if epoch < self.epochs_to_freeze_latent and self.freeze_latent_flow:
+                loss = entropy_loss + recon_loss
+            if (self.freeze_encoder
+                and self.epochs_to_freeze_latent
+                <= epoch
+                < self.epochs_to_freeze_encoder + self.epochs_to_freeze_latent):
+                loss = prior_loss + recon_loss
+            else:
+                loss = entropy_loss + prior_loss + recon_loss
 
-        # freeze the training of the latent flow in the first epochs, then the encoder
-        if epoch < self.epochs_to_freeze_latent and self.freeze_latent_flow:
-            loss = entropy_loss + recon_loss
-        if (self.freeze_encoder
-            and self.epochs_to_freeze_latent
-            <= epoch
-            < self.epochs_to_freeze_encoder + self.epochs_to_freeze_latent):
-            loss = prior_loss + recon_loss
-        else:
-            loss = entropy_loss + prior_loss + recon_loss
+            loss.backward()
+            opt.step()
 
-        loss.backward()
-        opt.step()
+            # LOGGING (after the training)
+            if self.distributed:
+                entropy_log = reduce_tensor(entropy.mean())
+                recon = reduce_tensor(-log_px.mean())
+                prior = reduce_tensor(-log_pz.mean())
+            else:
+                entropy_log = entropy.mean()
+                recon = -log_px.mean()
+                prior = -log_pz.mean()
 
-        # LOGGING (after the training)
-        if self.distributed:
-            entropy_log = reduce_tensor(entropy.mean())
-            recon = reduce_tensor(-log_px.mean())
-            prior = reduce_tensor(-log_pz.mean())
-        else:
-            entropy_log = entropy.mean()
-            recon = -log_px.mean()
-            prior = -log_pz.mean()
+            recon_nats = recon / float(x.size(1) * x.size(2))
+            prior_nats = prior / float(self.zdim)
 
-        recon_nats = recon / float(x.size(1) * x.size(2))
-        prior_nats = prior / float(self.zdim)
+        elif val == True:
+            with torch.no_grad():
+                batch_size = x.size(0)
+                num_points = x.size(1)
+                z_mu, z_sigma = self.encoder(x)
+                if self.use_deterministic_encoder:
+                    z = z_mu + 0 * z_sigma
+                    print("!!USING DETERMINISTIC ENCODER!!")
+                else:
+                    z = self.reparameterize_gaussian(z_mu, z_sigma)
+
+                # Compute H[Q(z|X)]
+                if self.use_deterministic_encoder:
+                    entropy = torch.zeros(batch_size).to(z)
+                else:
+                    entropy = self.gaussian_entropy(z_sigma)
+
+                # Compute the prior probability P(z)
+                if self.use_latent_flow:
+                    """
+                    w, delta_log_pw = self.latent_cnf(z, None, torch.zeros(batch_size, 1).to(z))
+                    log_pw = standard_normal_logprob(w).view(batch_size, -1).sum(1, keepdim=True)
+                    delta_log_pw = delta_log_pw.view(batch_size, 1)
+                    log_pz = log_pw - delta_log_pw
+                    """
+                    log_pz = self.latent_NDE_model.log_prob(z, context=y)
+                else:
+                    log_pz = torch.zeros(batch_size, 1).to(z)
+
+                # Compute the reconstruction likelihood P(X|z)
+                z_new = z.view(*z.size())
+                z_new = z_new + (log_pz * 0.0).mean()
+                """
+                y, delta_log_py = self.point_cnf(x, z_new, torch.zeros(batch_size, num_points, 1).to(x))
+                log_py = standard_normal_logprob(y).view(batch_size, -1).sum(1, keepdim=True)
+                delta_log_py = delta_log_py.view(batch_size, num_points, 1).sum(1)
+                log_px = log_py - delta_log_py
+                """
+                log_px = self.reco_NDE_model.log_prob(x.view(-1, self.input_dim), context=z_new)
+
+                # Loss
+                entropy_loss = -entropy.mean() * self.entropy_weight
+                recon_loss = -log_px.mean() * self.recon_weight
+                prior_loss = -log_pz.mean() * self.prior_weight
+
+                loss = entropy_loss + prior_loss + recon_loss
+
+                # LOGGING (after the training)
+                if self.distributed:
+                    entropy_log = reduce_tensor(entropy.mean())
+                    recon = reduce_tensor(-log_px.mean())
+                    prior = reduce_tensor(-log_pz.mean())
+                else:
+                    entropy_log = entropy.mean()
+                    recon = -log_px.mean()
+                    prior = -log_pz.mean()
+
+                recon_nats = recon / float(x.size(1) * x.size(2))
+                prior_nats = prior / float(self.zdim)
 
         if writer is not None and val is False:
             writer.add_scalar("train/entropy", entropy_log, step)

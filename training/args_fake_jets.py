@@ -16,7 +16,7 @@ def add_args(parser):
             "num_transform_blocks": 6, # DNN layers per coupling
             "activation": "relu",
             "batch_norm": True,
-            "num_bins": 32,
+            "num_bins": 64,
             "hidden_dim": 256,
             "block_size": 8,
             "mask_type" : "alternating-binary"

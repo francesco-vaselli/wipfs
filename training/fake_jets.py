@@ -64,6 +64,8 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
 
     if not args.distributed or (args.rank % ngpus_per_node == 0):
         writer = SummaryWriter(logdir=log_dir)
+        # save hparams to tensorboard
+        writer.add_hparams(vars(args), {})
     else:
         writer = None
 

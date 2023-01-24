@@ -232,7 +232,16 @@ def sample_double_flow(latent_model, reco_model, y, n_samples, args):
     return z, x
 
 
-def validate_double_flow(test_loader, latent_model, reco_model, epoch, writer, save_dir, args, clf_loaders=None):
+def validate_double_flow(
+    test_loader,
+    latent_model,
+    reco_model,
+    epoch,
+    writer,
+    save_dir,
+    args,
+    clf_loaders=None,
+):
     latent_model.eval()
     reco_model.eval()
 
@@ -273,8 +282,8 @@ def validate_double_flow(test_loader, latent_model, reco_model, epoch, writer, s
                 # print('x', x.shape, 'y', y.shape, 'N', N.shape)
                 inputs_y = y.cuda(args.gpu, non_blocking=True)
                 # print('inputs_y', inputs_y.shape)
-                z_sampled, x_sampled = sample_double_flow(latent_model, reco_model,
-                    y=inputs_y, n_samples=1, args=args
+                z_sampled, x_sampled = sample_double_flow(
+                    latent_model, reco_model, y=inputs_y, n_samples=1, args=args
                 )
 
                 z_sampled = z_sampled.cpu().detach().numpy()
@@ -344,9 +353,42 @@ def validate_double_flow(test_loader, latent_model, reco_model, epoch, writer, s
         N_true_fakes_reco = np.reshape(N_true_fakes_reco, (-1, 1)).flatten()
         N_true_fakes_full = np.reshape(N_true_fakes_full, (-1, 1)).flatten()
         print(N_true_fakes_full, N_true_fakes_full.shape)
-        full_sim = [pts, etas, phis, dphis, delta_pt_full, N_full, N_full, mod_pt_full, px_full, py_full]
-        flash_sim = [rpts, retas, rphis, rdphis, delta_pt_flash, N_reco, N_latent, mod_pt_flash, px_flash, py_flash]
-        names = ["pt", "eta", "phi", "delta_phi", "delta_pt", "N_reco", "N_latent", "mod_pt", "px", "py"]
+        full_sim = [
+            pts,
+            etas,
+            phis,
+            dphis,
+            delta_pt_full,
+            N_full,
+            N_full,
+            mod_pt_full,
+            px_full,
+            py_full,
+        ]
+        flash_sim = [
+            rpts,
+            retas,
+            rphis,
+            rdphis,
+            delta_pt_flash,
+            N_reco,
+            N_latent,
+            mod_pt_flash,
+            px_flash,
+            py_flash,
+        ]
+        names = [
+            "pt",
+            "eta",
+            "phi",
+            "delta_phi",
+            "delta_pt",
+            "N_reco",
+            "N_latent",
+            "mod_pt",
+            "px",
+            "py",
+        ]
         # print(N_true_fakes_latent)
 
         for i in range(0, len(full_sim)):
@@ -489,9 +531,7 @@ def validate_double_flow(test_loader, latent_model, reco_model, epoch, writer, s
         #     left_of_first_bin3 = N_true_fakes_reco.min() - float(d3) / 2
         #     right_of_last_bin3 = N_true_fakes_reco.max() + float(d3) / 2
 
-        fig, (ax1, ax2, ax3) = plt.subplots(
-            1, 3, figsize=(9, 4.5), tight_layout=False
-        )
+        fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(9, 4.5), tight_layout=False)
         ax1.hist2d(
             PU_n_true_int,
             N_true_fakes_full,
@@ -695,7 +735,8 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
             )
             # ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
             # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
-            plt.savefig(os.path.join(save_dir, f"comparison_{names[i]}.png"))
+            # plt.savefig(os.path.join(save_dir, f"comparison_{names[i]}.png"))
+            writer.add_figure(f"comparison_{names[i]}", fig, epoch)
             plt.close()
 
             if names[i] == "pt":
@@ -746,7 +787,8 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                     )
                     # ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
                     # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
-                    plt.savefig(os.path.join(save_dir, f"comparison_Jet_pt{j}.png"))
+                    # plt.savefig(os.path.join(save_dir, f"comparison_Jet_pt{j}.png"))
+                    writer.add_figure(f"comparison_Jet_pt{j}", fig, epoch)
 
         # a plt hist2d of N_true_fakes_full vs PU_n_true_int
         # with another hist2 of N_true_fakes_latent vs PU_n_true_int
@@ -830,5 +872,6 @@ def validate(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None
                 fontsize=16,
             )
             ax1.legend(frameon=False, loc="upper right")
-            plt.savefig(os.path.join(save_dir, f"comparison_N_true_fakes.png"))
+            # plt.savefig(os.path.join(save_dir, f"comparison_N_true_fakes.png"))
+            writer.add_figure("comparison_N_true_fakes", fig, epoch)
             plt.close()

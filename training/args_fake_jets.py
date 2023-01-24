@@ -4,6 +4,10 @@ NONLINEARITIES = ["tanh", "relu", "softplus", "elu", "swish", "square", "identit
 SOLVERS = ["dopri5", "bdf", "rk4", "midpoint", 'adams', 'explicit_adams', 'fixed_adams']
 LAYERS = ["ignore", "concat", "concat_v2", "squash", "concatsquash", "scale", "concatscale"]
 
+X_DIM = 30
+Y_DIM = 6
+Z_DIM = 4  
+
 def add_args(parser):
 
     # nflows args

@@ -112,7 +112,7 @@ def get_datasets(args):
 def get_new_datasets(args):
 
     tr_dataset = NewFakesDataset(
-        ["./datasets/train_dataset_fake_jets_only_flows_rescaled.hdf5"],
+        ["./datasets/train_dataset_fake_jets_only_flow_rescaled.hdf5"],
         x_dim=args.x_dim,
         y_dim=args.y_dim,
         z_dim=args.zdim,
@@ -132,7 +132,7 @@ def get_new_datasets(args):
     #     limit=5000000,
     # )
     te_dataset = NewFakesDataset(
-        ["./datasets/train_dataset_fake_jets_only_flows_rescaled.hdf5"],
+        ["./datasets/train_dataset_fake_jets_only_flow_rescaled.hdf5"],
         x_dim=args.x_dim,
         y_dim=args.y_dim,
         z_dim=args.zdim,

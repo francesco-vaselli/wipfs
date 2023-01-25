@@ -46,6 +46,10 @@ if __name__=='__main__':
     mod_pt = mod_sum_pt(pts)
     px, py = sum_px_py(pts, phis)
 
+    print('### MAGIC NUMBERS BELOW ###')
+    print('Min of px:', px.min())
+    print('Min of py:', py.min())
+
     # should apply some preprocessing/rescaling for the new variables here
     # should also rescale the pts 
     arr = np.copy(px)
@@ -68,6 +72,7 @@ if __name__=='__main__':
 
     arr = np.copy(mod_pt)
     arr = np.where(arr > 0, np.log1p(arr), arr)
+    print('Min of mod_pt:', arr[arr > 0].min())
     arr[arr <= 0] = np.random.normal(
         loc=arr[arr > 0].min()-1, scale=0.1, size=arr[arr <= 0].shape
     )
@@ -75,6 +80,7 @@ if __name__=='__main__':
 
     arr = np.copy(pts)
     arr = np.where(arr > 0, np.log1p(arr), arr)
+    print('Min of pts:', arr[arr > 0].min())
     arr[arr <= 0] = np.random.normal(
         loc=arr[arr > 0].min()-1, scale=0.1, size=arr[arr <= 0].shape
     )
@@ -85,6 +91,7 @@ if __name__=='__main__':
     df["sum_px"] = px
     df["sum_py"] = py
 
+    print('### MAGIC NUMBERS ABOVE ###')
     print(df.iloc[:, [36, 37, 38, 39]])
 
     save_file = h5py.File(f"../../training/datasets/train_dataset_fake_jets_only_flow_rescaled.hdf5", "w")

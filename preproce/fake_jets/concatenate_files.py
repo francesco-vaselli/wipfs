@@ -40,11 +40,46 @@ if __name__=='__main__':
     pts = np.where(pts < 0, 0, pts)
     # etas = np.reshape(dfft1['FJet_eta'], (-1, 10))
     phis = df.iloc[:, 20:30].values
-    # this is not needed as the 0 module avoids taking into account the unphysical phis
+    # this is not needed as the 0 module avoids taking into account the nonphysical phis
     # phis = np.where(phis < -2*np.pi, 0, phis)
 
     mod_pt = mod_sum_pt(pts)
     px, py = sum_px_py(pts, phis)
+
+    # should apply some preprocessing/rescaling for the new variables here
+    # should also rescale the pts 
+    arr = np.copy(px)
+    arr = np.where(arr == 0, px.min()-10, arr)
+    arr = arr + np.abs(px.min()) + 1 # to avoid min getting into 0
+    arr = np.where(arr > 0, np.log1p(arr), arr)
+    arr[arr < 0] = np.random.normal(
+        loc=arr[arr > 0].min()-1, scale=0.1, size=arr[arr < 0].shape
+    )
+    px = arr
+
+    arr = np.copy(py)
+    arr = np.where(arr == 0, py.min()-10, arr)
+    arr = arr + np.abs(py.min()) + 1 # to avoid min getting into 0
+    arr = np.where(arr > 0, np.log1p(arr), arr)
+    arr[arr < 0] = np.random.normal(
+        loc=arr[arr > 0].min()-1, scale=0.1, size=arr[arr < 0].shape
+    )
+    py = arr
+
+    arr = np.copy(mod_pt)
+    arr = np.where(arr > 0, np.log1p(arr), arr)
+    arr[arr <= 0] = np.random.normal(
+        loc=arr[arr > 0].min()-1, scale=0.1, size=arr[arr <= 0].shape
+    )
+    mod_pt = arr
+
+    arr = np.copy(pts)
+    arr = np.where(arr > 0, np.log1p(arr), arr)
+    arr[arr <= 0] = np.random.normal(
+        loc=arr[arr > 0].min()-1, scale=0.1, size=arr[arr <= 0].shape
+    )
+
+    df.iloc[:, :10] = arr
 
     df["mod_sum_pt"] = mod_pt
     df["sum_px"] = px
@@ -52,7 +87,7 @@ if __name__=='__main__':
 
     print(df.iloc[:, [36, 37, 38, 39]])
 
-    save_file = h5py.File(f"../../training/datasets/train_dataset_fake_jets_only_flows.hdf5", "w")
+    save_file = h5py.File(f"../../training/datasets/train_dataset_fake_jets_only_flow_rescaled.hdf5", "w")
 
     dset = save_file.create_dataset("data", data=df.values, dtype="f4")
 

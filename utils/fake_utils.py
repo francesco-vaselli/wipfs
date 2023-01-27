@@ -111,7 +111,7 @@ def get_datasets(args):
 
 def get_new_datasets(args):
 
-    path = "./datasets/train_dataset_fake_jets_only_flow.hdf5"
+    path = "./datasets/train_dataset_fake_jets_only_flows.hdf5"
     if args.rescale_data == True:
         path = "./datasets/train_dataset_fake_jets_only_flow_rescaled.hdf5"
 

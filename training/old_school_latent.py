@@ -586,10 +586,10 @@ if __name__ == "__main__":
 
     # define additional model parameters
     param_dict = {
-        "num_transform_blocks": 6,
+        "num_transform_blocks": 4,
         "activation": "relu",
-        "num_bins": 128,
-        "hidden_dim": 256,
+        "num_bins": 64,
+        "hidden_dim": 128,
         "batch_norm": True,
         "dropout_probability": 0.0,
     }  # batch norm added

@@ -433,6 +433,10 @@ def train(model, train_loader, test_loader, args, save_dir, writer=None, epochs=
         train_history.append(train_loss)
         test_history.append(test_loss)
 
+        if writer is not None:
+            writer.add_scalar("train/loss", train_loss, epoch)
+            writer.add_scalar("test/loss", test_loss, epoch)
+
         if epoch % 10 == 0:
 
             validate_latent_flow(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None)

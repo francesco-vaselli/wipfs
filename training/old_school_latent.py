@@ -468,7 +468,7 @@ def save_model(epoch, model, scheduler, train_history, test_history, model_dir=N
 
     filename = f"model_fakes_@epoch_{epoch}.pt"
 
-    p = os.path.join(Path(model_dir), "/old_school_latent")
+    p = os.path.join(Path(model_dir))
     p.mkdir(parents=True, exist_ok=True)
 
     dict = {

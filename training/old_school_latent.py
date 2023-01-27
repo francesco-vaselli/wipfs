@@ -416,6 +416,8 @@ def train(model, train_loader, test_loader, args, save_dir, writer=None, epochs=
         T_max=total_epochs,
     )
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
     for epoch in range(0, total_epochs + 1):
 
         print(
@@ -425,7 +427,7 @@ def train(model, train_loader, test_loader, args, save_dir, writer=None, epochs=
         train_loss = train_epoch(
             model, train_loader, optimizer, epoch, device, output_freq
         )
-        test_loss = test_epoch(model, test_loader, epoch, device)
+        test_loss = test_epoch(model, test_loader, epoch, writer=writer, device=device)
 
         scheduler.step()
         train_history.append(train_loss)

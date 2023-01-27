@@ -585,7 +585,7 @@ if __name__ == "__main__":
         "num_bins": 128,
         "hidden_dim": 256,
         "batch_norm": True,
-        "dropout": 0.0,
+        "dropout_probability": 0.0,
     }  # batch norm added
 
     # create model

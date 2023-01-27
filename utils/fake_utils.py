@@ -932,7 +932,6 @@ def validate_latent_flow(
 
                 PU_n_true_int.append(inputs_y[:, 2])
                 N_true_fakes_latent.append(N_sampled)
-                N_true_fakes_reco.append(np.sum(x_sampled[:, :10] > 0, axis=1))
                 # N_true_fakes_full.append(np.sum(x[:, :10] > 0, axis=1))
                 N_true_fakes_full.append(N)
                 mod_pt_full.append(z[:, 1])

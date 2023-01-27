@@ -37,7 +37,7 @@ from args_fake_jets_only_flows import get_args
 from tensorboardX import SummaryWriter
 
 # define hyperparams
-lr = 1e-4
+lr = 1e-3
 total_epochs = 500
 batch_size = 4096
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

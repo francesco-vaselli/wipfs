@@ -192,6 +192,6 @@ class RecoFlow(nn.Module):
 
         return posterior_nats
 
-    def sample(self, num_samples, y):
-        x = self.reco_NDE_model.sample(num_samples, context=y)
+    def sample(self, num_samples, z):
+        x = self.reco_NDE_model.sample(num_samples, context=z)
         return x

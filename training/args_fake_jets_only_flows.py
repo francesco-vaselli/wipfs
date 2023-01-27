@@ -124,6 +124,7 @@ def add_args(parser):
                         help='Learning rate exponential decay frequency')
 
     # data options
+    parser.add_argument('--rescale_data', default=False, action='store_true')
     parser.add_argument('--shuffle_train', type=eval, default=True, choices=[True, False])
     parser.add_argument('--dataset_type', type=str, default="shapenet15k",
                         help="Dataset types.", choices=['shapenet15k', 'modelnet40_15k', 'modelnet10_15k'])

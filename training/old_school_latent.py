@@ -594,7 +594,6 @@ if __name__ == "__main__":
     # print total params number and stuff
     total_params = sum(p.numel() for p in flow.parameters() if p.requires_grad)
     print(total_params)
-    print(len(train_ds))
     print(len(train_loader.dataset))
 
     # set optimizer, send to device and train

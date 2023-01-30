@@ -1457,7 +1457,7 @@ def validate_simple_flow(
             cmap="Reds",
             label="FlashSim Latent",
         )
-        ax2.set_ylim([0, 11])
+        ax2.set_ylim([0, 1.8])
         ax2.set_xlabel("PU_n_true_int")
         ax2.set_ylabel("N_true_fakes_latent")
         

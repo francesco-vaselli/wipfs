@@ -1453,7 +1453,7 @@ def validate_simple_flow(
             #     np.arange(left_of_first_bin, right_of_last_bin + d, d),
             #     np.arange(left_of_first_bin2, right_of_last_bin2 + d2, d2),
             # ],
-            range=[[0, 100], [0, 11]],
+            range=[[0, 100], [0, 1.8]],
             cmap="Reds",
             label="FlashSim Latent",
         )

@@ -22,7 +22,7 @@ def add_args(parser):
             "activation": "relu",
             "dropout_probability" : 0.0,
             "batch_norm": False,
-            "num_bins": 8,
+            "num_bins": 32,
             "hidden_dim": 64,
             "block_size": 2, # useless param if we have alternating-binary mask
             "mask_type" : "alternating-binary"

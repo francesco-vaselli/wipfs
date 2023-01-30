@@ -30,7 +30,7 @@ from fake_utils import (
     init_np_seed,
     reduce_tensor,
     set_random_seed,
-    get_new_datasets,
+    get_simple_datasets,
     validate_latent_flow,
 )
 from args_fake_jets_only_latent import get_args

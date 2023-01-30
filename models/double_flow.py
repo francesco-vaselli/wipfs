@@ -86,7 +86,7 @@ class LatentFlow(nn.Module):
             with torch.no_grad():
                 if self.use_latent_flow:
                     # print(z.size(), y.size())
-                    log_pz = self.latent_NDE_model.log_prob(z, context=y.view(-1, y_size)))
+                    log_pz = self.latent_NDE_model.log_prob(z, context=y.view(-1, y_size))
                 else:
                     log_pz = torch.zeros(batch_size, 1).to(z)
 

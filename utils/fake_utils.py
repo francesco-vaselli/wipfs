@@ -1276,25 +1276,32 @@ def validate_simple_flow(
         ]
         # print(N_true_fakes_latent)
 
+        bins_N = np.arange(-0.1, 1.6, step=0.1)-0.05
+
         for i in range(0, len(full_sim)):
             test_values = full_sim[i].flatten()
             generated_sample = flash_sim[i].flatten()
             fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
+            
+            if i == 0:
+                _, rangeR, _ = ax1.hist(
+                    test_values, histtype="step", label="FullSim", lw=1, bins=bins_N,
+                )
+            else:
+                _, rangeR, _ = ax1.hist(
+                    test_values, histtype="step", label="FullSim", lw=1, bins=100
+                )
+                generated_sample = np.where(
+                    generated_sample < rangeR.min(), rangeR.min(), generated_sample
+                )
+                generated_sample = np.where(
+                    generated_sample > rangeR.max(), rangeR.max(), generated_sample
+                )
 
-            _, rangeR, _ = ax1.hist(
-                test_values, histtype="step", label="FullSim", lw=1, bins=100
-            )
-            generated_sample = np.where(
-                generated_sample < rangeR.min(), rangeR.min(), generated_sample
-            )
-            generated_sample = np.where(
-                generated_sample > rangeR.max(), rangeR.max(), generated_sample
-            )
-
-            if names[i] == "N_true_int":
+            if i == 0:
                 ax1.hist(
                     generated_sample,
-                    bins=100,
+                    bins=bins_N,
                     histtype="step",
                     lw=1,
                     range=[rangeR.min(), rangeR.max()],
@@ -1317,14 +1324,24 @@ def validate_simple_flow(
             ax2.spines["right"].set_visible(False)
             ax2.spines["top"].set_visible(False)
             ax2.set_yscale("log")
-            ax2.hist(test_values, histtype="step", lw=1, bins=100)
-            ax2.hist(
-                generated_sample,
-                bins=100,
-                histtype="step",
-                lw=1,
-                range=[rangeR.min(), rangeR.max()],
-            )
+            if i == 0:
+                ax2.hist(test_values, histtype="step", lw=1, bins=bins_N)
+                ax2.hist(
+                    generated_sample,
+                    bins=bins_N,
+                    histtype="step",
+                    lw=1,
+                    range=[rangeR.min(), rangeR.max()],
+                )
+            else:
+                ax2.hist(test_values, histtype="step", lw=1, bins=100)
+                ax2.hist(
+                    generated_sample,
+                    bins=100,
+                    histtype="step",
+                    lw=1,
+                    range=[rangeR.min(), rangeR.max()],
+                )
             # ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
             # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
             # plt.savefig(os.path.join(save_dir, f"comparison_{names[i]}.png"))

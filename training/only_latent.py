@@ -32,6 +32,7 @@ from fake_utils import (
     set_random_seed,
     get_simple_datasets,
     validate_latent_flow,
+    validate_simple_flow
 )
 from args_fake_jets_only_latent import get_args
 
@@ -156,7 +157,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
     # epoch 0 validation
     if args.validate_at_0:
         epoch = 0
-        validate_latent_flow(
+        validate_simple_flow(
                 test_loader, latent_model, epoch, writer, save_dir, args, clf_loaders=None
             )
     # main training loop
@@ -233,7 +234,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
                     )
 
         if not args.no_validation and (epoch + 1) % args.val_freq == 0:
-            validate_latent_flow(
+            validate_simple_flow(
                 test_loader, latent_model, epoch, writer, save_dir, args, clf_loaders=None
             )
 

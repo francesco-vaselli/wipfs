@@ -52,6 +52,7 @@ class LatentFlow(nn.Module):
     # we pass y as conditioning variable
     def forward(self, y, z, opt, step, epoch, writer=None, val=False):
         batch_size = y.size(0)
+        y_size = y.size(1)
 
         if val==False:
             opt.zero_grad()
@@ -66,7 +67,7 @@ class LatentFlow(nn.Module):
                 log_pz = log_pw - delta_log_pw
                 """
                 # print(z.size(), y.size())
-                log_pz = self.latent_NDE_model.log_prob(z, context=y)
+                log_pz = self.latent_NDE_model.log_prob(z, context=y.view(-1, y_size))
             else:
                 log_pz = torch.zeros(batch_size, 1).to(z)
 
@@ -85,7 +86,7 @@ class LatentFlow(nn.Module):
             with torch.no_grad():
                 if self.use_latent_flow:
                     # print(z.size(), y.size())
-                    log_pz = self.latent_NDE_model.log_prob(z, context=y)
+                    log_pz = self.latent_NDE_model.log_prob(z, context=y.view(-1, y_size)))
                 else:
                     log_pz = torch.zeros(batch_size, 1).to(z)
 

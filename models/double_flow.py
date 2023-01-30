@@ -18,6 +18,7 @@ class LatentFlow(nn.Module):
         self.latent_flow_param_dict = args.latent_flow_param_dict
 
         self.latent_NDE_model = create_NDE_model(**self.latent_flow_param_dict)
+        self.y_dim = args.y_dim
 
         # params printout
         latent_NDE_params = sum(
@@ -52,7 +53,7 @@ class LatentFlow(nn.Module):
     # we pass y as conditioning variable
     def forward(self, y, z, opt, step, epoch, writer=None, val=False):
         batch_size = y.size(0)
-        y_size = y.size(1)
+        y_size = self.y_dim
 
         if val==False:
             opt.zero_grad()

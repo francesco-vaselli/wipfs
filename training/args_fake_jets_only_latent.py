@@ -92,7 +92,7 @@ def add_args(parser):
                         help='Dimension of the shape code')
     parser.add_argument('--optimizer', type=str, default='adam',
                         help='Optimizer to use', choices=['adam', 'adamax', 'sgd'])
-    parser.add_argument('--batch_size', type=int, default=2048,
+    parser.add_argument('--batch_size', type=int, default=4096,
                         help='Batch size (of datasets) for training')
     parser.add_argument('--lr_latent', type=float, default=1e-4,
                         help='Latent learning rate for the Adam optimizer.')

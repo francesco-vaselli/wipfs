@@ -76,6 +76,7 @@ def add_args(parser):
     
 
     # training options
+    parser.add_argument('--n_load_cores', type=int, default=20)
     parser.add_argument('--use_latent_flow', type=bool, default=True,
                         help='Whether to use the latent flow to model the prior.')
     parser.add_argument('--freeze_latent_flow', type=bool, default=False,

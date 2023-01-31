@@ -23,6 +23,7 @@ if __name__=='__main__':
     for h5_file in h5_files[1:]:
         data = np.array(h5py.File(h5_file, "r")["data"][:,:])
         df = pd.concat([df, pd.DataFrame(data=data)], axis=0)
+        df = df.reset_index(drop=True)
 
 
     # df = df.sort_values(by=df.columns[32])

@@ -46,6 +46,9 @@ if __name__=='__main__':
     mod_pt = mod_sum_pt(pts)
     px, py = sum_px_py(pts, phis)
 
+    # saturate mod pT
+    mod_pt = np.where(mod_pt > 200, 200, mod_pt)
+
     # print('### MAGIC NUMBERS BELOW ###')
     # print('Min of px:', px.min())
     # print('Min of py:', py.min())

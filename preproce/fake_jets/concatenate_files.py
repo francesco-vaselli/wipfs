@@ -34,7 +34,7 @@ if __name__=='__main__':
     df.iloc[:, 36] = np.where(df.iloc[:, 36].values > 10, 10, df.iloc[:, 36].values)
     df.iloc[:, 36] = df.iloc[:, 36].values/10
 
-    print(df.iloc[:, 36].values.max())
+    print(df.iloc[:, 36].values.max(), df.iloc[:, 36].values.min(), '\n', df.iloc[:, 36])
 
     # get sum of modpt, px and py
     pts = df.iloc[:, :10].values

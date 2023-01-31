@@ -1276,7 +1276,7 @@ def validate_simple_flow(
         ]
         # print(N_true_fakes_latent)
 
-        bins_N = np.arange(-0.1, 1.6, step=0.1)-0.05
+        bins_N = np.arange(-0.1, 1.1, step=0.1)-0.05
 
         for i in range(0, len(full_sim)):
             test_values = full_sim[i].flatten()
@@ -1453,11 +1453,11 @@ def validate_simple_flow(
             #     np.arange(left_of_first_bin, right_of_last_bin + d, d),
             #     np.arange(left_of_first_bin2, right_of_last_bin2 + d2, d2),
             # ],
-            range=[[0, 100], [0, 1.8]],
+            range=[[0, 100], [0, 1.1]],
             cmap="Reds",
             label="FlashSim Latent",
         )
-        ax2.set_ylim([0, 1.8])
+        ax2.set_ylim([0, 1.1])
         ax2.set_xlabel("PU_n_true_int")
         ax2.set_ylabel("N_true_fakes_latent")
         

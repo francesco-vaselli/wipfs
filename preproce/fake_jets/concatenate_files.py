@@ -30,9 +30,11 @@ if __name__=='__main__':
     print(df.iloc[:, 32])
     print(df)
     # revert N fakes to int and scale
-    df.iloc[:, 36] = np.rint(df.iloc[:, 36].values)/10
+    df.iloc[:, 36] = np.rint(df.iloc[:, 36].values)
+    df.iloc[:, 36] = np.where(df.iloc[:, 36].values > 10, 10, df.iloc[:, 36].values)
+    df.iloc[:, 36] = df.iloc[:, 36].values/10
 
-    # print(df.iloc[:, 36])
+    print(df.iloc[:, 36].values.max())
 
     # get sum of modpt, px and py
     pts = df.iloc[:, :10].values

@@ -118,7 +118,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
         dataset=tr_dataset,
         batch_size=args.batch_size,
         shuffle=(train_sampler is None) and args.shuffle_train,
-        num_workers=0,
+        num_workers=10, # need to find a way to set this automatically
         pin_memory=True,
         sampler=train_sampler,
         drop_last=True,
@@ -131,7 +131,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
         dataset=te_dataset,
         batch_size=10000, # manually set batch size to avoid diff shapes
         shuffle=False,
-        num_workers=0,
+        num_workers=10,
         pin_memory=True,
         drop_last=False,
         worker_init_fn=init_np_seed,

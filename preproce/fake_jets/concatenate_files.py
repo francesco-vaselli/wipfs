@@ -30,7 +30,7 @@ if __name__=='__main__':
     print(df.iloc[:, 32])
     print(df)
     # revert N fakes to int and scale
-    df.iloc[:, 36] = np.rint(df.iloc[:, 36].values)
+    # df.iloc[:, 36] = np.rint(df.iloc[:, 36].values)
     df.iloc[:, 36] = np.where(df.iloc[:, 36].values > 10, 10, df.iloc[:, 36].values)
     df.iloc[:, 36] = df.iloc[:, 36].values/10
 
@@ -99,7 +99,7 @@ if __name__=='__main__':
     print('### MAGIC NUMBERS ABOVE ###')
     print(df.iloc[:, [36, 37, 38, 39]])
 
-    save_file = h5py.File(f"../../training/datasets/train_dataset_fake_jets_only_flows.hdf5", "w")
+    save_file = h5py.File(f"../../training/datasets/train_dataset_fake_jets_only_flows_no_rint.hdf5", "w")
 
     dset = save_file.create_dataset("data", data=df.values, dtype="f4")
 

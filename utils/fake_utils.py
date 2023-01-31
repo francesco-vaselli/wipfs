@@ -151,6 +151,10 @@ def get_simple_datasets(args):
     path = "./datasets/train_dataset_fake_jets_only_flows.hdf5"
     if args.rescale_data == True:
         path = "./datasets/train_dataset_fake_jets_only_flow_rescaled.hdf5"
+        print('!!!USING RESCALED DATA!!!')
+    if args.no_rint == True:
+        path = "./datasets/train_dataset_fake_jets_only_flows_no_rint.hdf5"
+        print('!!!USING DEQUANTIZED N DATA!!!')
 
     tr_dataset = SimpleFakesDataset(
         [path],

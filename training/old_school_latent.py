@@ -360,7 +360,7 @@ def train(model, train_loader, test_loader, args, save_dir, writer=None, epochs=
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    for epoch in range(0, total_epochs + 1):
+    for epoch in range(0, epochs + 1):
 
         print(
             "Learning rate: {}".format(optimizer.state_dict()["param_groups"][0]["lr"])

@@ -1208,6 +1208,7 @@ def validate_simple_flow(
     writer,
     save_dir,
     args,
+    device, 
     clf_loaders=None,
 ):
     latent_model.eval()
@@ -1234,7 +1235,7 @@ def validate_simple_flow(
             for bidx, data in enumerate(test_loader):
                 _, y, z = data[0], data[1], data[2]
                 # print('x', x.shape, 'y', y.shape, 'N', N.shape)
-                inputs_y = y.cuda(args.gpu, non_blocking=True)
+                inputs_y = y.to(device, non_blocking=True)
                 # print('inputs_y', inputs_y.shape)
                 z_sampled = latent_model.sample(num_samples=1, context=inputs_y.view(-1, 1))
 

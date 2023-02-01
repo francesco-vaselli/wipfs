@@ -39,9 +39,7 @@ from args_fake_jets_only_latent import get_args
 from tensorboardX import SummaryWriter
 
 # define hyperparams
-lr = 1e-3
 total_epochs = 500
-batch_size = 4096
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
@@ -346,7 +344,7 @@ def test_epoch(flow, test_loader, epoch, args, writer=None, device=None):
         return test_loss
 
 
-def train(model, train_loader, test_loader, args, save_dir, writer=None, epochs=total_epochs, output_freq=100):
+def train(model, train_loader, test_loader, args, save_dir, writer=None, epochs=500, output_freq=100):
     """Train the model.
     Args:
             epochs:     number of epochs to train for
@@ -383,7 +381,7 @@ def train(model, train_loader, test_loader, args, save_dir, writer=None, epochs=
 
         if epoch % 10 == 0:
 
-            validate_simple_flow(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None)
+            validate_simple_flow(test_loader, model, epoch, writer, save_dir, args, device, clf_loaders=None)
             save_model(
                 epoch,
                 model,
@@ -543,4 +541,4 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(flow.parameters(), lr=args.lr_latent)
     flow.to(device)
 
-    trh, tsh = train(flow, train_loader, test_loader, args, save_dir, writer=writer)
+    trh, tsh = train(flow, train_loader, test_loader, args, save_dir, writer=writer, epochs=args.epochs)

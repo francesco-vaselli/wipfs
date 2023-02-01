@@ -24,8 +24,8 @@ def add_args(parser):
             "batch_norm": True,
             "num_bins": 32,
             "hidden_dim": 256,
-            "block_size": 2, # useless param if we have alternating-binary mask
-            "mask_type" : "alternating-binary"
+            # "block_size": 2, # useless param if we have alternating-binary mask
+            # "mask_type" : "alternating-binary"
             },
 
             "transform_type" : "random-permutation" 

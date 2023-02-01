@@ -122,7 +122,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
         pin_memory=True,
         sampler=train_sampler,
         drop_last=True,
-        worker_init_fn=init_np_seed,
+        # worker_init_fn=init_np_seed,
     )
     if (train_sampler is None) and args.shuffle_train == False:
         print('train dataset NOT shuffled')

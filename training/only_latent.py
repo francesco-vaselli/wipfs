@@ -131,7 +131,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
         dataset=te_dataset,
         batch_size=10000, # manually set batch size to avoid diff shapes
         shuffle=False,
-        num_workers=args.n_load_cores,
+        num_workers=0,
         pin_memory=True,
         drop_last=False,
         worker_init_fn=init_np_seed,

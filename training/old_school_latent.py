@@ -505,9 +505,6 @@ if __name__ == "__main__":
         shuffle=args.shuffle_train,
         num_workers=args.n_load_cores,
         pin_memory=True,
-        sampler=train_sampler,
-        drop_last=True,
-        worker_init_fn=init_np_seed,
     )
     if args.shuffle_train == False:
         print('train dataset NOT shuffled')
@@ -518,8 +515,6 @@ if __name__ == "__main__":
         shuffle=False,
         num_workers=args.n_load_cores,
         pin_memory=True,
-        drop_last=False,
-        worker_init_fn=init_np_seed,
     )
 
 

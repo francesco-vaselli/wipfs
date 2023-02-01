@@ -254,6 +254,7 @@ def train_epoch(
     train_loader,
     optimizer,
     epoch,
+    args,
     device=None,
     output_freq=50,
     add_noise=True,
@@ -283,7 +284,7 @@ def train_epoch(
             y = y.to(device, non_blocking=True)
 
         # Compute log prob
-        loss = -flow.log_prob(z, context=y)
+        loss = -flow.log_prob(z, context=y.view(-1, args.y_dim))
 
         # Keep track of total loss. w is a weight to be applied to each
         # element.
@@ -312,7 +313,7 @@ def train_epoch(
     return train_loss
 
 
-def test_epoch(flow, test_loader, epoch, writer=None, device=None):
+def test_epoch(flow, test_loader, epoch, args, writer=None, device=None):
     """Calculate test loss for one epoch.
     Arguments:
         flow {Flow} -- NSF model
@@ -333,7 +334,7 @@ def test_epoch(flow, test_loader, epoch, writer=None, device=None):
                 y = y.to(device, non_blocking=True)
 
             # Compute log prob
-            loss = -flow.log_prob(z, context=y)
+            loss = -flow.log_prob(z, context=y.view(-1, args.y_dim)))
 
             # Keep track of total loss
             test_loss += (loss).sum()
@@ -368,9 +369,9 @@ def train(model, train_loader, test_loader, args, save_dir, writer=None, epochs=
         )
 
         train_loss = train_epoch(
-            model, train_loader, optimizer, epoch, device, output_freq
+            model, train_loader, optimizer, epoch, args, device, output_freq
         )
-        test_loss = test_epoch(model, test_loader, epoch, writer=writer, device=device)
+        test_loss = test_epoch(model, test_loader, epoch, args, writer=writer, device=device)
 
         scheduler.step()
         train_history.append(train_loss)

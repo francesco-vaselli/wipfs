@@ -355,7 +355,7 @@ def train(model, train_loader, test_loader, args, save_dir, writer=None, epochs=
 
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
         optimizer,
-        T_max=total_epochs,
+        T_max=epochs,
     )
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

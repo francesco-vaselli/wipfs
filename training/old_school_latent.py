@@ -31,9 +31,11 @@ from fake_utils import (
     reduce_tensor,
     set_random_seed,
     get_new_datasets,
+    get_simple_datasets,
     validate_latent_flow,
+    validate_simple_flow,
 )
-from args_fake_jets_only_flows import get_args
+from args_fake_jets_only_latent import get_args
 from tensorboardX import SummaryWriter
 
 # define hyperparams
@@ -41,65 +43,6 @@ lr = 1e-3
 total_epochs = 500
 batch_size = 4096
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-
-class H5Dataset(Dataset):
-    """Pytorch Dataset for reading input data from hdf5 files on disk
-    Expects hdf5 files containing a "data" Dataset, which in turn contains correctly processed data
-    (there is no preprocessing here), and returns two separate tensor for each instance
-    Uses np.searchsorted to getitems from different files (thanks @Nadya!)
-    However, dataloading is a current bottleneck and should be investigated
-    x: target variables (expects a 30:52 ordering on each row)
-    y: conditioning variables (expects a 0:30 ordering on each row)
-    Args:
-        Dataset (Pytorch Dataset): Pytorch Dataset class
-    """
-
-    def __init__(self, h5_paths, limit=-1):
-        """Initialize the class, set indexes across datasets and define lazy loading
-        Args:
-            h5_paths (strings): paths to the various hdf5 files to include in the final Dataset
-            limit (int, optional): optionally limit dataset length to specified values, if negative
-                returns the full length as inferred from files. Defaults to -1.
-        """
-        max_events = int(5e9)
-        self.limit = max_events if limit == -1 else int(limit)
-        self.h5_paths = h5_paths
-        self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
-
-        self.strides = []
-        for archive in self.archives:
-            with archive as f:
-                self.strides.append(len(f["data"]))
-
-        self.len_in_files = self.strides[1:]
-        self.strides = np.cumsum(self.strides)
-        self._archives = None
-
-    @property
-    def archives(self):
-        if self._archives is None:  # lazy loading here!
-            self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
-        return self._archives
-
-    def __getitem__(self, index):
-        file_idx = np.searchsorted(self.strides, index, side="right")
-        idx_in_file = index - self.strides[max(0, file_idx - 1)]
-        y = self.archives[file_idx]["data"][idx_in_file, 0:30]
-        x = self.archives[file_idx]["data"][idx_in_file, 30:52]
-        y = torch.from_numpy(y)
-        x = torch.from_numpy(x)
-        # x = x.float()
-        # y = y.float()
-
-        return x, y
-
-    def __len__(self):
-        # return self.strides[-1] #this will process all files
-        if self.limit <= self.strides[-1]:
-            return self.limit
-        else:
-            return self.strides[-1]
 
 
 def create_linear_transform(param_dim):
@@ -439,7 +382,7 @@ def train(model, train_loader, test_loader, args, save_dir, writer=None, epochs=
 
         if epoch % 10 == 0:
 
-            validate_latent_flow(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None)
+            validate_simple_flow(test_loader, model, epoch, writer, save_dir, args, clf_loaders=None)
             save_model(
                 epoch,
                 model,
@@ -554,30 +497,26 @@ if __name__ == "__main__":
     writer = SummaryWriter(logdir=log_dir)
     save_dir = os.path.join("checkpoints", args.log_name)
 
-    tr_dataset, te_dataset = get_new_datasets(args)
-    if args.distributed:
-        train_sampler = torch.utils.data.distributed.DistributedSampler(tr_dataset)
-    else:
-        train_sampler = None
+    tr_dataset, te_dataset = get_simple_datasets(args)
 
     train_loader = torch.utils.data.DataLoader(
         dataset=tr_dataset,
         batch_size=args.batch_size,
-        shuffle=(train_sampler is None) and args.shuffle_train,
-        num_workers=0,
+        shuffle=args.shuffle_train,
+        num_workers=args.num_load_cores,
         pin_memory=True,
         sampler=train_sampler,
         drop_last=True,
         worker_init_fn=init_np_seed,
     )
-    if (train_sampler is None) and args.shuffle_train == False:
+    if args.shuffle_train == False:
         print('train dataset NOT shuffled')
 
     test_loader = torch.utils.data.DataLoader(
         dataset=te_dataset,
         batch_size=10000, # manually set batch size to avoid diff shapes
         shuffle=False,
-        num_workers=0,
+        num_workers=args.num_load_cores,
         pin_memory=True,
         drop_last=False,
         worker_init_fn=init_np_seed,
@@ -585,14 +524,15 @@ if __name__ == "__main__":
 
 
     # define additional model parameters
-    param_dict = {
-        "num_transform_blocks": 4,
-        "activation": "relu",
-        "num_bins": 64,
-        "hidden_dim": 128,
-        "batch_norm": True,
-        "dropout_probability": 0.0,
-    }  # batch norm added
+    param_dict = args.latent_flow_param_dict['base_transform_kwargs']
+    # {
+    #     "num_transform_blocks": 4,
+    #     "activation": "relu",
+    #     "num_bins": 64,
+    #     "hidden_dim": 128,
+    #     "batch_norm": True,
+    #     "dropout_probability": 0.0,
+    # }  # batch norm added
 
     # create model
     flow = create_NDE_model(args.zdim, args.y_dim, args.zdim, param_dict)

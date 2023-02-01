@@ -203,6 +203,7 @@ def add_args(parser):
                         help='node rank for distributed training')
     parser.add_argument('--gpu', default=0, type=int,
                         help='GPU id to use. None means using all available GPUs.')
+    parser.add_argument('--device', default='cuda', type=str)
 
     # Evaluation options
     parser.add_argument('--evaluate_recon', default=False, action='store_true',

@@ -39,8 +39,8 @@ from args_fake_jets_only_latent import get_args
 from tensorboardX import SummaryWriter
 
 # define hyperparams
-total_epochs = 500
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# total_epochs = 500
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def create_linear_transform(param_dim):
@@ -344,7 +344,7 @@ def test_epoch(flow, test_loader, epoch, args, writer=None, device=None):
         return test_loss
 
 
-def train(model, train_loader, test_loader, args, save_dir, writer=None, epochs=500, output_freq=100):
+def train(model, train_loader, test_loader, args, save_dir, writer=None, epochs=500, output_freq=100, device=None):
     """Train the model.
     Args:
             epochs:     number of epochs to train for
@@ -367,7 +367,7 @@ def train(model, train_loader, test_loader, args, save_dir, writer=None, epochs=
         )
 
         train_loss = train_epoch(
-            model, train_loader, optimizer, epoch, args, device, output_freq
+            model, train_loader, optimizer, epoch, args, device=device, output_freq=output_freq
         )
         test_loss = test_epoch(model, test_loader, epoch, args, writer=writer, device=device)
 
@@ -541,4 +541,4 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(flow.parameters(), lr=args.lr_latent)
     flow.to(device)
 
-    trh, tsh = train(flow, train_loader, test_loader, args, save_dir, writer=writer, epochs=args.epochs)
+    trh, tsh = train(flow, train_loader, test_loader, args, save_dir, writer=writer, epochs=args.epochs, device=torch.device(args.device))

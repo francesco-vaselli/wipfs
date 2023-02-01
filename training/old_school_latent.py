@@ -539,6 +539,6 @@ if __name__ == "__main__":
     # set optimizer, send to device and train
     # remember that the model is being saved every 10 epochs
     optimizer = torch.optim.Adam(flow.parameters(), lr=args.lr_latent)
-    flow.to(device)
+    flow.to(torch.device(args.device))
 
     trh, tsh = train(flow, train_loader, test_loader, args, save_dir, writer=writer, epochs=args.epochs, device=torch.device(args.device))

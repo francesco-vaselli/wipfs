@@ -109,8 +109,8 @@ class LatentFlow(nn.Module):
 
         return prior_nats
 
-    def sample(self, num_samples, y):
-        z = self.latent_NDE_model.sample(num_samples, context=y)
+    def sample(self, num_samples, context=None):
+        z = self.latent_NDE_model.sample(num_samples, context=context)
         return z
 
 

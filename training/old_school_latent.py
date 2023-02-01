@@ -503,7 +503,7 @@ if __name__ == "__main__":
         dataset=tr_dataset,
         batch_size=args.batch_size,
         shuffle=args.shuffle_train,
-        num_workers=args.num_load_cores,
+        num_workers=args.n_load_cores,
         pin_memory=True,
         sampler=train_sampler,
         drop_last=True,
@@ -516,7 +516,7 @@ if __name__ == "__main__":
         dataset=te_dataset,
         batch_size=10000, # manually set batch size to avoid diff shapes
         shuffle=False,
-        num_workers=args.num_load_cores,
+        num_workers=args.n_load_cores,
         pin_memory=True,
         drop_last=False,
         worker_init_fn=init_np_seed,

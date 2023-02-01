@@ -380,7 +380,6 @@ def train(model, train_loader, test_loader, args, save_dir, writer=None, epochs=
             writer.add_scalar("test/loss", test_loss, epoch)
 
         if epoch % 10 == 0:
-
             validate_simple_flow(test_loader, model, epoch, writer, save_dir, args, device, clf_loaders=None)
             save_model(
                 epoch,

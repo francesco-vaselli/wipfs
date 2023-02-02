@@ -11,14 +11,14 @@ from fake_utils import mod_sum_pt, sum_px_py
 if __name__=='__main__':
 
     h5_files = [
-            "~/muonData/amuons1.hdf5",
-            "~/muonData/amuons2.hdf5",
-            "~/muonData/amuons3.hdf5",
-            "~/muonData/amuons4.hdf5",
-            "~/muonData/amuons5.hdf5",
-            "~/muonData/amuons6.hdf5",
-            "~/muonData/amuons8.hdf5",
-            "~/muonData/amuons9.hdf5",
+            "../../../muonData/amuons1.hdf5",
+            "../../../muonData/amuons2.hdf5",
+            "../../../muonData/amuons3.hdf5",
+            "../../../muonData/amuons4.hdf5",
+            "../../../muonData/amuons5.hdf5",
+            "../../../muonData/amuons6.hdf5",
+            "../../../muonData/amuons8.hdf5",
+            "../../../muonData/amuons9.hdf5",
         ]
 
     data = np.array(h5py.File(h5_files[0], "r")["data"][:,:])

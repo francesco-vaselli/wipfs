@@ -158,7 +158,7 @@ class SimpleMuonsDataset(Dataset):
 
         y = self.archives[0]["data"][start:limit, 2]
         x = self.archives[0]["data"][start:limit, 30:52]
-        z = self.archives[0]["data"][start:limit, [35, 51]]
+        z = self.archives[0]["data"][start:limit, [34, 50]]
         self.x_train = torch.tensor(x, dtype=torch.float32) # .view(-1, 1, x_dim) no reshape because no conv1d
         self.y_train = torch.tensor(y, dtype=torch.float32)  
         self.z_train = torch.tensor(z, dtype=torch.float32) 

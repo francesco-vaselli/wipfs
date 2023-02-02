@@ -141,6 +141,41 @@ class SimpleFakesDataset(Dataset):
         return self.x_train[idx], self.y_train[idx], self.z_train[idx]
 
 
+class SimplMuonsDataset(Dataset):
+    """Very simple Dataset for reading hdf5 data for fakes
+        divides each row into 3 parts: reco (x), gen (y), N of fakes (N)
+    Args:
+        Dataset (Pytorch Dataset): Pytorch Dataset class
+    """
+
+    def __init__(self, h5_paths, x_dim, y_dim, z_dim, start=0, limit=-1):
+
+        # we must fix a convention for parametrizing slices
+
+        self.h5_paths = h5_paths
+        self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
+        self._archives = None
+
+        y = self.archives[0]["data"][start:limit, 32]
+        x = self.archives[0]["data"][start:limit, 0:x_dim]
+        z = self.archives[0]["data"][start:limit, (6 + x_dim) : (6 + x_dim + z_dim)]
+        self.x_train = torch.tensor(x, dtype=torch.float32) # .view(-1, 1, x_dim) no reshape because no conv1d
+        self.y_train = torch.tensor(y, dtype=torch.float32)  
+        self.z_train = torch.tensor(z, dtype=torch.float32) 
+
+    @property
+    def archives(self):
+        if self._archives is None:  # lazy loading here!
+            self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
+        return self._archives
+
+    def __len__(self):
+        return len(self.y_train)
+
+    def __getitem__(self, idx):
+        return self.x_train[idx], self.y_train[idx], self.z_train[idx]
+
+
 class ReadDataset(Dataset):
     """Very simple Dataset for reading hdf5 data
         This is way simpler than muons as we heve enough jets in a single file

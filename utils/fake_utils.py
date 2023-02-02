@@ -1597,7 +1597,7 @@ def validate_simpleM_flow(
 
         range = [0, 0.01]
 
-        for i in range(0, args.zdim+1):
+        for i in [0, 1]:
             test_values = full_sim[i].flatten()
             generated_sample = flash_sim[i].flatten()
             fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)

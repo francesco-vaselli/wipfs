@@ -30,9 +30,9 @@ from fake_utils import (
     init_np_seed,
     reduce_tensor,
     set_random_seed,
-    get_simple_datasets,
+    get_simpleM_datasets,
     validate_latent_flow,
-    validate_simple_flow
+    validate_simpleM_flow
 )
 from args_fake_jets_only_latent import get_args
 
@@ -108,7 +108,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
 
     
     # initialize datasets and loaders
-    tr_dataset, te_dataset = get_simple_datasets(args)
+    tr_dataset, te_dataset = get_simpleM_datasets(args)
     if args.distributed:
         train_sampler = torch.utils.data.distributed.DistributedSampler(tr_dataset)
     else:
@@ -131,7 +131,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
         dataset=te_dataset,
         batch_size=10000, # manually set batch size to avoid diff shapes
         shuffle=False,
-        num_workers=0,
+        num_workers=args.n_load_cores,
         pin_memory=True,
         drop_last=False,
         worker_init_fn=init_np_seed,
@@ -157,7 +157,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
     # epoch 0 validation
     if args.validate_at_0:
         epoch = 0
-        validate_simple_flow(
+        validate_simpleM_flow(
                 test_loader, latent_model, epoch, writer, save_dir, args, clf_loaders=None
             )
     # main training loop
@@ -234,7 +234,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
                     )
 
         if not args.no_validation and (epoch + 1) % args.val_freq == 0:
-            validate_simple_flow(
+            validate_simpleM_flow(
                 test_loader, latent_model, epoch, writer, save_dir, args, clf_loaders=None
             )
 

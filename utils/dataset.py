@@ -141,7 +141,7 @@ class SimpleFakesDataset(Dataset):
         return self.x_train[idx], self.y_train[idx], self.z_train[idx]
 
 
-class SimplMuonsDataset(Dataset):
+class SimpleMuonsDataset(Dataset):
     """Very simple Dataset for reading hdf5 data for fakes
         divides each row into 3 parts: reco (x), gen (y), N of fakes (N)
     Args:
@@ -156,9 +156,9 @@ class SimplMuonsDataset(Dataset):
         self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
         self._archives = None
 
-        y = self.archives[0]["data"][start:limit, 32]
-        x = self.archives[0]["data"][start:limit, 0:x_dim]
-        z = self.archives[0]["data"][start:limit, (6 + x_dim) : (6 + x_dim + z_dim)]
+        y = self.archives[0]["data"][start:limit, 2]
+        x = self.archives[0]["data"][start:limit, 30:52]
+        z = self.archives[0]["data"][start:limit, [35, 51]]
         self.x_train = torch.tensor(x, dtype=torch.float32) # .view(-1, 1, x_dim) no reshape because no conv1d
         self.y_train = torch.tensor(y, dtype=torch.float32)  
         self.z_train = torch.tensor(z, dtype=torch.float32) 

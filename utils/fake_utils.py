@@ -8,7 +8,7 @@ import os
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.join("..", "utils"))
-from dataset import FakesDataset, H5FakesDataset, NewFakesDataset, SimpleFakesDataset
+from dataset import FakesDataset, H5FakesDataset, NewFakesDataset, SimpleFakesDataset, SimpleMuonsDataset
 
 
 class AverageValueMeter(object):
@@ -177,6 +177,41 @@ def get_simple_datasets(args):
     #     limit=5000000,
     # )
     te_dataset = SimpleFakesDataset(
+        [path],
+        x_dim=args.x_dim,
+        y_dim=args.y_dim,
+        z_dim=args.zdim,
+        start=5000000,
+        limit=5100000,
+    )
+
+    return tr_dataset, te_dataset
+
+def get_simpleM_datasets(args):
+
+    path = "./datasets/train_dataset_muons.hdf5"
+
+    tr_dataset = SimpleMuonsDataset(
+        [path],
+        x_dim=args.x_dim,
+        y_dim=args.y_dim,
+        z_dim=args.zdim,
+        start=0,
+        limit=5000000,
+    )
+    # H5FakesDataset(
+    #     [
+    #         "./datasets/fake_jets1.hdf5",
+    #         "./datasets/fake_jets2.hdf5",
+    #         "./datasets/fake_jets3.hdf5",
+    #         "./datasets/fake_jets4.hdf5",
+    #         "./datasets/fake_jets5.hdf5",
+    #     ],
+    #     x_dim=30,
+    #     y_dim=6,
+    #     limit=5000000,
+    # )
+    te_dataset = SimpleMuonsDataset(
         [path],
         x_dim=args.x_dim,
         y_dim=args.y_dim,
@@ -1477,4 +1512,161 @@ def validate_simple_flow(
             fig,
             global_step=epoch,
         )
+        plt.close()
+
+
+def validate_simpleM_flow(
+    test_loader,
+    latent_model,
+    epoch,
+    writer,
+    save_dir,
+    args,
+    device, 
+    clf_loaders=None,
+):
+    latent_model.eval()
+
+    # Make epoch wise save directory
+    if writer is not None and args.save_val_results:
+        save_dir = os.path.join(save_dir, f"./figures/validation@epoch-{epoch}")
+        if not os.path.isdir(save_dir):
+            os.makedirs(save_dir)
+    else:
+        save_dir = None
+
+    # samples
+    if args.use_latent_flow:
+        with torch.no_grad():
+
+            PU_n_true_int = []
+            N_true_fakes_reco = []
+            N_true_fakes_latent = []
+            N_true_fakes_full = []
+            mod_pt_full = []
+            mod_pt_flash = []
+
+            for bidx, data in enumerate(test_loader):
+                _, y, z = data[0], data[1], data[2]
+                # print('x', x.shape, 'y', y.shape, 'N', N.shape)
+                inputs_y = y.to(device)
+                # print('inputs_y', inputs_y.shape)
+                z_sampled = latent_model.sample(num_samples=1, context=inputs_y.view(-1, 1))
+
+                z_sampled = z_sampled.cpu().detach().numpy()
+                inputs_y = inputs_y.cpu().detach().numpy()
+                z = z.cpu().detach().numpy()
+                N = z[:, 0]
+
+                z_sampled = z_sampled.reshape(-1, args.zdim)
+                N_sampled = z_sampled[:, 0]
+
+                PU_n_true_int.append(inputs_y[:])
+                N_true_fakes_latent.append(N_sampled)
+                # N_true_fakes_full.append(np.sum(x[:, :10] > 0, axis=1))
+                N_true_fakes_full.append(N)
+                mod_pt_full.append(z[:, 1])
+                mod_pt_flash.append(z_sampled[:, 1])
+
+                print("done 10k")
+
+
+        mod_pt_full = np.reshape(mod_pt_full, (-1, 1)).flatten()
+
+        mod_pt_flash = np.reshape(mod_pt_flash, (-1, 1)).flatten()
+
+        PU_n_true_int = np.reshape(PU_n_true_int, (-1, 1)).flatten()
+        N_latent = np.reshape(N_true_fakes_latent, (-1, 1)).flatten()
+        N_full = np.reshape(N_true_fakes_full, (-1, 1)).flatten()
+        N_true_fakes_latent = np.reshape(N_true_fakes_latent, (-1, 1)).flatten()
+        N_true_fakes_full = np.reshape(N_true_fakes_full, (-1, 1)).flatten()
+        
+        full_sim = [
+            N_full,
+            mod_pt_full,
+        ]
+        flash_sim = [
+            N_latent,
+            mod_pt_flash,
+        ]
+        names = [
+            "dxy error",
+            "softmva",
+        ]
+        # print(N_true_fakes_latent)
+
+        range = [0, 0.01]
+
+        for i in range(0, len(full_sim)):
+            test_values = full_sim[i].flatten()
+            generated_sample = flash_sim[i].flatten()
+            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
+            
+            if i == 0:
+                _, rangeR, _ = ax1.hist(
+                    test_values, histtype="step", label="FullSim", lw=1, bins=100,
+                    range = range
+                )
+            else:
+                _, rangeR, _ = ax1.hist(
+                    test_values, histtype="step", label="FullSim", lw=1, bins=100
+                )
+                generated_sample = np.where(
+                    generated_sample < rangeR.min(), rangeR.min(), generated_sample
+                )
+                generated_sample = np.where(
+                    generated_sample > rangeR.max(), rangeR.max(), generated_sample
+                )
+
+            if i == 0:
+                ax1.hist(
+                    generated_sample,
+                    bins=100,
+                    histtype="step",
+                    lw=1,
+                    range=[rangeR.min(), rangeR.max()],
+                    label=f"FlashSim, {np.mean(generated_sample):.2f}",
+                )
+            else:
+                ax1.hist(
+                    generated_sample,
+                    bins=100,
+                    histtype="step",
+                    lw=1,
+                    range=[rangeR.min(), rangeR.max()],
+                    label=f"FlashSim",
+                )
+            fig.suptitle(f"Comparison of {names[i]} @ epoch {epoch}", fontsize=16)
+            ax1.legend(frameon=False, loc="upper right")
+
+            ax1.spines["right"].set_visible(False)
+            ax1.spines["top"].set_visible(False)
+            ax2.spines["right"].set_visible(False)
+            ax2.spines["top"].set_visible(False)
+            ax2.set_yscale("log")
+            if i == 0:
+                ax2.hist(test_values, histtype="step", lw=1, bins=100, range=range)
+                ax2.hist(
+                    generated_sample,
+                    bins=100,
+                    histtype="step",
+                    lw=1,
+                    range=[rangeR.min(), rangeR.max()],
+                )
+            else:
+                ax2.hist(test_values, histtype="step", lw=1, bins=100)
+                ax2.hist(
+                    generated_sample,
+                    bins=100,
+                    histtype="step",
+                    lw=1,
+                    range=[rangeR.min(), rangeR.max()],
+                )
+            # ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
+            # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
+            # plt.savefig(os.path.join(save_dir, f"comparison_{names[i]}.png"))
+            writer.add_figure(f"comparison_{names[i]}", fig, global_step=epoch)
+            plt.close()
+
+            
         plt.close()

@@ -162,7 +162,7 @@ def get_simple_datasets(args):
         y_dim=args.y_dim,
         z_dim=args.zdim,
         start=0,
-        limit=5000000,
+        limit=200000,
     )
     # H5FakesDataset(
     #     [
@@ -181,8 +181,8 @@ def get_simple_datasets(args):
         x_dim=args.x_dim,
         y_dim=args.y_dim,
         z_dim=args.zdim,
-        start=5000000,
-        limit=5100000,
+        start=200000,
+        limit=300000,
     )
 
     return tr_dataset, te_dataset

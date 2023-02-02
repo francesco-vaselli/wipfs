@@ -197,7 +197,7 @@ def get_simpleM_datasets(args):
         y_dim=args.y_dim,
         z_dim=args.zdim,
         start=0,
-        limit=5000000,
+        limit=200000,
     )
     # H5FakesDataset(
     #     [
@@ -216,8 +216,8 @@ def get_simpleM_datasets(args):
         x_dim=args.x_dim,
         y_dim=args.y_dim,
         z_dim=args.zdim,
-        start=5000000,
-        limit=5100000,
+        start=200000,
+        limit=300000,
     )
 
     return tr_dataset, te_dataset
@@ -1597,7 +1597,7 @@ def validate_simpleM_flow(
 
         range = [0, 0.01]
 
-        for i in range(0, len(full_sim)):
+        for i in range(0, args.zdim+1):
             test_values = full_sim[i].flatten()
             generated_sample = flash_sim[i].flatten()
             fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)

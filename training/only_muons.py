@@ -75,6 +75,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
     latent_model = LatentFlow(args)
     if args.gpu is not None:  # Single process, single GPU per process
         torch.cuda.set_device(args.gpu)
+        device = torch.device("cuda")
         latent_model = latent_model.cuda(args.gpu)
     else: 
         print("!!  USING CPU  !!")
@@ -158,7 +159,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
     if args.validate_at_0:
         epoch = 0
         validate_simpleM_flow(
-                test_loader, latent_model, epoch, writer, save_dir, args, clf_loaders=None
+                test_loader, latent_model, epoch, writer, save_dir, args, device=device, clf_loaders=None
             )
     # main training loop
     start_time = time.time()
@@ -235,7 +236,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
 
         if not args.no_validation and (epoch + 1) % args.val_freq == 0:
             validate_simpleM_flow(
-                test_loader, latent_model, epoch, writer, save_dir, args, clf_loaders=None
+                test_loader, latent_model, epoch, writer, save_dir, args, device=device, clf_loaders=None
             )
 
         # # save visualizations WE DO NOT VISUALIZE

@@ -6,8 +6,8 @@ SOLVERS = ["dopri5", "bdf", "rk4", "midpoint", 'adams', 'explicit_adams', 'fixed
 LAYERS = ["ignore", "concat", "concat_v2", "squash", "concatsquash", "scale", "concatscale"]
 
 X_DIM = 30
-Y_DIM = 1
-Z_DIM = 2   
+Y_DIM = 6
+Z_DIM = 4   
 
 def add_args(parser):
 

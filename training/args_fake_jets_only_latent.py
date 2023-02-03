@@ -15,7 +15,7 @@ def add_args(parser):
     latent_flow_param_dict = {
             "input_dim" : Z_DIM,
             "context_dim" : Y_DIM,
-            "num_flow_steps" : 2, # increasing this could improve conditioning
+            "num_flow_steps" : 4, # increasing this could improve conditioning
 
             "base_transform_kwargs" : {
             "num_transform_blocks": 4, # DNN layers per coupling
@@ -24,6 +24,7 @@ def add_args(parser):
             "batch_norm": True,
             "num_bins": 32,
             "hidden_dim": 128,
+            "base_transform_type": "rq-autoregressive",
             # "block_size": 2, # useless param if we have alternating-binary mask
             # "mask_type" : "alternating-binary"
             },

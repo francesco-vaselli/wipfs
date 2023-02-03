@@ -114,6 +114,9 @@ def get_new_datasets(args):
     path = "./datasets/train_dataset_fake_jets_only_flows.hdf5"
     if args.rescale_data == True:
         path = "./datasets/train_dataset_fake_jets_only_flow_rescaled.hdf5"
+    if args.no_rint == True:
+        path = "./datasets/train_dataset_fake_jets_only_flows_no_rint.hdf5"
+        print('!!!USING DEQUANTIZED N DATA!!!')
 
     tr_dataset = NewFakesDataset(
         [path],
@@ -121,27 +124,16 @@ def get_new_datasets(args):
         y_dim=args.y_dim,
         z_dim=args.zdim,
         start=0,
-        limit=5000000,
+        limit=1000000,
     )
-    # H5FakesDataset(
-    #     [
-    #         "./datasets/fake_jets1.hdf5",
-    #         "./datasets/fake_jets2.hdf5",
-    #         "./datasets/fake_jets3.hdf5",
-    #         "./datasets/fake_jets4.hdf5",
-    #         "./datasets/fake_jets5.hdf5",
-    #     ],
-    #     x_dim=30,
-    #     y_dim=6,
-    #     limit=5000000,
-    # )
+
     te_dataset = NewFakesDataset(
         [path],
         x_dim=args.x_dim,
         y_dim=args.y_dim,
         z_dim=args.zdim,
-        start=5000000,
-        limit=5100000,
+        start=1000000,
+        limit=1100000,
     )
 
     return tr_dataset, te_dataset
@@ -164,18 +156,7 @@ def get_simple_datasets(args):
         start=0,
         limit=200000,
     )
-    # H5FakesDataset(
-    #     [
-    #         "./datasets/fake_jets1.hdf5",
-    #         "./datasets/fake_jets2.hdf5",
-    #         "./datasets/fake_jets3.hdf5",
-    #         "./datasets/fake_jets4.hdf5",
-    #         "./datasets/fake_jets5.hdf5",
-    #     ],
-    #     x_dim=30,
-    #     y_dim=6,
-    #     limit=5000000,
-    # )
+
     te_dataset = SimpleFakesDataset(
         [path],
         x_dim=args.x_dim,
@@ -964,6 +945,7 @@ def validate_latent_flow(
     writer,
     save_dir,
     args,
+    device, 
     clf_loaders=None,
 ):
     latent_model.eval()
@@ -994,7 +976,7 @@ def validate_latent_flow(
             for bidx, data in enumerate(test_loader):
                 _, y, z = data[0], data[1], data[2]
                 # print('x', x.shape, 'y', y.shape, 'N', N.shape)
-                inputs_y = y.cuda(args.gpu, non_blocking=True)
+                inputs_y = y.to(device)
                 # print('inputs_y', inputs_y.shape)
                 z_sampled = latent_model.sample(num_samples=1, context=inputs_y)
 
@@ -1052,31 +1034,37 @@ def validate_latent_flow(
             "px",
             "py",
         ]
-        # print(N_true_fakes_latent)
+        
+        bins_N = np.arange(-0.1, 1.1, step=0.1)-0.05
 
         for i in range(0, len(full_sim)):
             test_values = full_sim[i].flatten()
             generated_sample = flash_sim[i].flatten()
             fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
+            
+            if i == 0:
+                _, rangeR, _ = ax1.hist(
+                    test_values, histtype="step", label="FullSim", lw=1, bins=bins_N,
+                )
+            else:
+                _, rangeR, _ = ax1.hist(
+                    test_values, histtype="step", label="FullSim", lw=1, bins=100
+                )
+                generated_sample = np.where(
+                    generated_sample < rangeR.min(), rangeR.min(), generated_sample
+                )
+                generated_sample = np.where(
+                    generated_sample > rangeR.max(), rangeR.max(), generated_sample
+                )
 
-            _, rangeR, _ = ax1.hist(
-                test_values, histtype="step", label="FullSim", lw=1, bins=100
-            )
-            generated_sample = np.where(
-                generated_sample < rangeR.min(), rangeR.min(), generated_sample
-            )
-            generated_sample = np.where(
-                generated_sample > rangeR.max(), rangeR.max(), generated_sample
-            )
-
-            if names[i] == "N_true_int":
+            if i == 0:
                 ax1.hist(
                     generated_sample,
-                    bins=100,
+                    bins=bins_N,
                     histtype="step",
                     lw=1,
                     range=[rangeR.min(), rangeR.max()],
-                    label=f"FlashSim, {np.mean(generated_sample):.2f}",
+                    label=f"FlashSim",
                 )
             else:
                 ax1.hist(
@@ -1095,14 +1083,24 @@ def validate_latent_flow(
             ax2.spines["right"].set_visible(False)
             ax2.spines["top"].set_visible(False)
             ax2.set_yscale("log")
-            ax2.hist(test_values, histtype="step", lw=1, bins=100)
-            ax2.hist(
-                generated_sample,
-                bins=100,
-                histtype="step",
-                lw=1,
-                range=[rangeR.min(), rangeR.max()],
-            )
+            if i == 0:
+                ax2.hist(test_values, histtype="step", lw=1, bins=bins_N)
+                ax2.hist(
+                    generated_sample,
+                    bins=bins_N,
+                    histtype="step",
+                    lw=1,
+                    range=[rangeR.min(), rangeR.max()],
+                )
+            else:
+                ax2.hist(test_values, histtype="step", lw=1, bins=100)
+                ax2.hist(
+                    generated_sample,
+                    bins=100,
+                    histtype="step",
+                    lw=1,
+                    range=[rangeR.min(), rangeR.max()],
+                )
             # ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
             # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
             # plt.savefig(os.path.join(save_dir, f"comparison_{names[i]}.png"))
@@ -1160,39 +1158,6 @@ def validate_latent_flow(
                     # plt.savefig(os.path.join(save_dir, f"comparison_Jet_pt{j}.png"))
                     writer.add_figure(f"comparison_Jet_pt{j}", fig, global_step=epoch)
 
-        # a plt hist2d of N_true_fakes_full vs PU_n_true_int
-        # with another hist2 of N_true_fakes_latent vs PU_n_true_int
-        # and another hist2 of N_true_fakes_reco vs PU_n_true_int
-        # same style as before (lw etc) and labels
-        # gen_unique = np.diff(np.unique(PU_n_true_int))
-        # full_unique = np.diff(np.unique(N_true_fakes_full))
-        # latent_unique = np.diff(np.unique(N_true_fakes_latent))
-        # reco_unique = np.diff(np.unique(N_true_fakes_reco))
-        # if (
-        #     gen_unique.size > 0
-        #     and full_unique.size > 0
-        #     and latent_unique.size > 0
-        #     and reco_unique.size > 0
-        # ):
-
-        #     d = gen_unique.min()
-        #     left_of_first_bin = PU_n_true_int.min() - float(d) / 2
-        #     right_of_last_bin = PU_n_true_int.max() + float(d) / 2
-
-        #     # same for N_true_fakes_full
-        #     d1 = full_unique.min()
-        #     left_of_first_bin1 = N_true_fakes_full.min() - float(d1) / 2
-        #     right_of_last_bin1 = N_true_fakes_full.max() + float(d1) / 2
-
-        #     # same for N_true_fakes_latent
-        #     d2 = latent_unique.min()
-        #     left_of_first_bin2 = N_true_fakes_latent.min() - float(d2) / 2
-        #     right_of_last_bin2 = N_true_fakes_latent.max() + float(d2) / 2
-
-        #     # same for N_true_fakes_reco
-        #     d3 = reco_unique.min()
-        #     left_of_first_bin3 = N_true_fakes_reco.min() - float(d3) / 2
-        #     right_of_last_bin3 = N_true_fakes_reco.max() + float(d3) / 2
 
         fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(9, 4.5), tight_layout=False)
         ax1.hist2d(

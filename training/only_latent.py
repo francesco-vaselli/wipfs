@@ -30,7 +30,7 @@ from fake_utils import (
     init_np_seed,
     reduce_tensor,
     set_random_seed,
-    get_simple_datasets,
+    get_new_datasets,
     validate_latent_flow,
     validate_simple_flow
 )
@@ -109,7 +109,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
 
     
     # initialize datasets and loaders
-    tr_dataset, te_dataset = get_simple_datasets(args)
+    tr_dataset, te_dataset = get_new_datasets(args)
     if args.distributed:
         train_sampler = torch.utils.data.distributed.DistributedSampler(tr_dataset)
     else:
@@ -158,7 +158,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
     # epoch 0 validation
     if args.validate_at_0:
         epoch = 0
-        validate_simple_flow(
+        validate_latent_flow(
                 test_loader, latent_model, epoch, writer, save_dir, args, device=device, clf_loaders=None
             )
     # main training loop
@@ -235,41 +235,9 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
                     )
 
         if not args.no_validation and (epoch + 1) % args.val_freq == 0:
-            validate_simple_flow(
+            validate_latent_flow(
                 test_loader, latent_model, epoch, writer, save_dir, args, device=device, clf_loaders=None
             )
-
-        # # save visualizations WE DO NOT VISUALIZE
-        # if (epoch + 1) % args.viz_freq == 0:
-        #     # reconstructions
-        #     model.eval()
-        #     samples = model.reconstruct(inputs)
-        #     results = []
-        #     for idx in range(min(10, inputs.size(0))):
-        #         res = visualize_point_clouds(samples[idx], inputs[idx], idx,
-        #                                      pert_order=train_loader.dataset.display_axis_order)
-        #         results.append(res)
-        #     res = np.concatenate(results, axis=1)
-        #     scipy.misc.imsave(os.path.join(save_dir, 'images', 'tr_vis_conditioned_epoch%d-gpu%s.png' % (epoch, args.gpu)),
-        #                       res.transpose((1, 2, 0)))
-        #     if writer is not None:
-        #         writer.add_image('tr_vis/conditioned', torch.as_tensor(res), epoch)
-
-        #     # samples
-        #     if args.use_latent_flow:
-        #         num_samples = min(10, inputs.size(0))
-        #         num_points = inputs.size(1)
-        #         _, samples = model.sample(num_samples, num_points)
-        #         results = []
-        #         for idx in range(num_samples):
-        #             res = visualize_point_clouds(samples[idx], inputs[idx], idx,
-        #                                          pert_order=train_loader.dataset.display_axis_order)
-        #             results.append(res)
-        #         res = np.concatenate(results, axis=1)
-        #         scipy.misc.imsave(os.path.join(save_dir, 'images', 'tr_vis_conditioned_epoch%d-gpu%s.png' % (epoch, args.gpu)),
-        #                           res.transpose((1, 2, 0)))
-        #         if writer is not None:
-        #             writer.add_image('tr_vis/sampled', torch.as_tensor(res), epoch)
 
         # save checkpoints
         if not args.distributed or (args.rank % ngpus_per_node == 0):

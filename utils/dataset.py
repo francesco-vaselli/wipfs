@@ -90,7 +90,8 @@ class NewFakesDataset(Dataset):
         x = self.archives[0]["data"][start:limit, 0:x_dim]
         z = self.archives[0]["data"][start:limit, (y_dim + x_dim) : (y_dim + x_dim + z_dim)]
         self.x_train = torch.tensor(x, dtype=torch.float32) # .view(-1, 1, x_dim) no reshape because no conv1d
-        self.y_train = torch.tensor(y, dtype=torch.float32)  
+        self.y_train = torch.tensor(y, dtype=torch.float32) 
+        z[:, [1, 2, 3]] = z[:, [1, 2, 3]] / 200.0
         self.z_train = torch.tensor(z, dtype=torch.float32)  
 
     @property

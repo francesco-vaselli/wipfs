@@ -179,7 +179,9 @@ def add_args(parser):
                         help='Path to the checkpoint to be loaded.')
     parser.add_argument('--resume_reco_checkpoint', type=str, default=None,
                         help='Path to the checkpoint to be loaded.')
-    parser.add_argument('--resume_optimizer', action='store_true',
+    parser.add_argument('--resume_latent_optimizer', action='store_true',
+                        help='Whether to resume the optimizer when resumed training.')
+    parser.add_argument('--resume_reco_optimizer', action='store_true',
                         help='Whether to resume the optimizer when resumed training.')
     parser.add_argument('--resume_non_strict', action='store_true',
                         help='Whether to resume in none-strict mode.')

@@ -124,7 +124,7 @@ def get_new_datasets(args):
         y_dim=args.y_dim,
         z_dim=args.zdim,
         start=0,
-        limit=1000000,
+        limit=5000000,
     )
 
     te_dataset = NewFakesDataset(
@@ -132,8 +132,8 @@ def get_new_datasets(args):
         x_dim=args.x_dim,
         y_dim=args.y_dim,
         z_dim=args.zdim,
-        start=1000000,
-        limit=1100000,
+        start=5000000,
+        limit=5100000,
     )
 
     return tr_dataset, te_dataset

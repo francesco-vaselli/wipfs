@@ -18,12 +18,12 @@ def add_args(parser):
             "num_flow_steps" : 4, # increasing this could improve conditioning
 
             "base_transform_kwargs" : {
-            "num_transform_blocks": 4, # DNN layers per coupling
+            "num_transform_blocks": 5, # DNN layers per coupling
             "activation": "relu",
             "dropout_probability" : 0.0,
             "batch_norm": True,
             "num_bins": 32,
-            "hidden_dim": 128,
+            "hidden_dim": 256,
             "base_transform_type": "rq-coupling" # "rq-autoregressive",
             # "block_size": 2, # useless param if we have alternating-binary mask
             # "mask_type" : "alternating-binary"

@@ -22,9 +22,9 @@ def add_args(parser):
             "activation": "relu",
             "dropout_probability" : 0.0,
             "batch_norm": True,
-            "num_bins": 32,
+            "num_bins": 64,
             "hidden_dim": 256,
-            "base_transform_type": "rq-autoregressive" # "rq-autoregressive",
+            "base_transform_type": "rq-coupling" # "rq-autoregressive",
             # "block_size": 2, # useless param if we have alternating-binary mask
             # "mask_type" : "alternating-binary"
             },

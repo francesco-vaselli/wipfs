@@ -1179,11 +1179,11 @@ def validate_latent_flow(
             #     np.arange(left_of_first_bin, right_of_last_bin + d, d),
             #     np.arange(left_of_first_bin2, right_of_last_bin2 + d2, d2),
             # ],
-            range=[[0, 100], [0, 11]],
+            range=[[0, 100], [0, 1.1]],
             cmap="Reds",
             label="FlashSim Latent",
         )
-        ax2.set_ylim([0, 11])
+        ax2.set_ylim([0, 1.1])
         ax2.set_xlabel("PU_n_true_int")
         ax2.set_ylabel("N_true_fakes_latent")
         

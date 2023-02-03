@@ -24,7 +24,7 @@ def add_args(parser):
             "batch_norm": True,
             "num_bins": 32,
             "hidden_dim": 128,
-            "base_transform_type": "rq-autoregressive",
+            "base_transform_type": "rq-coupling" # "rq-autoregressive",
             # "block_size": 2, # useless param if we have alternating-binary mask
             # "mask_type" : "alternating-binary"
             },

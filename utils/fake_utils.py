@@ -978,7 +978,7 @@ def validate_latent_flow(
                 # print('x', x.shape, 'y', y.shape, 'N', N.shape)
                 inputs_y = y.to(device)
                 # print('inputs_y', inputs_y.shape)
-                z_sampled = latent_model.sample(num_samples=1, context=inputs_y)
+                z_sampled = latent_model.sample(num_samples=1, context=inputs_y.view(-1, args.y_dim))
 
                 z_sampled = z_sampled.cpu().detach().numpy()
                 inputs_y = inputs_y.cpu().detach().numpy()

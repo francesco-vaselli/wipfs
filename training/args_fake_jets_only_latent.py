@@ -6,7 +6,7 @@ SOLVERS = ["dopri5", "bdf", "rk4", "midpoint", 'adams', 'explicit_adams', 'fixed
 LAYERS = ["ignore", "concat", "concat_v2", "squash", "concatsquash", "scale", "concatscale"]
 
 X_DIM = 30
-Y_DIM = 6
+Y_DIM = 1
 Z_DIM = 4   
 
 def add_args(parser):
@@ -18,13 +18,13 @@ def add_args(parser):
             "num_flow_steps" : 4, # increasing this could improve conditioning
 
             "base_transform_kwargs" : {
-            "num_transform_blocks": 5, # DNN layers per coupling
+            "num_transform_blocks": 2, # DNN layers per coupling
             "activation": "relu",
             "dropout_probability" : 0.0,
-            "batch_norm": True,
-            "num_bins": 64,
-            "hidden_dim": 256,
-            "base_transform_type": "rq-coupling" # "rq-autoregressive",
+            "batch_norm": False,
+            "num_bins": 32,
+            "hidden_dim": 128,
+            "base_transform_type": "rq-autoregressive" # "rq-autoregressive",
             # "block_size": 2, # useless param if we have alternating-binary mask
             # "mask_type" : "alternating-binary"
             },

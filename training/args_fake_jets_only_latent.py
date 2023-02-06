@@ -6,7 +6,7 @@ SOLVERS = ["dopri5", "bdf", "rk4", "midpoint", 'adams', 'explicit_adams', 'fixed
 LAYERS = ["ignore", "concat", "concat_v2", "squash", "concatsquash", "scale", "concatscale"]
 
 X_DIM = 30
-Y_DIM = 0
+Y_DIM = 1
 Z_DIM = 4   
 
 def add_args(parser):
@@ -14,7 +14,7 @@ def add_args(parser):
     # nflows args
     latent_flow_param_dict = {
             "input_dim" : Z_DIM,
-            "context_dim" : None,
+            "context_dim" : Y_DIM,
             "num_flow_steps" : 4, # increasing this could improve conditioning
 
             "base_transform_kwargs" : {

@@ -1044,6 +1044,7 @@ def validate_latent_flow(
         for i in range(0, len(full_sim)):
             test_values = full_sim[i].flatten()
             generated_sample = flash_sim[i].flatten()
+            print(generated_sample.shape)
             fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
             
             if i == 0:

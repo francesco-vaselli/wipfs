@@ -19,6 +19,7 @@ class LatentFlow(nn.Module):
 
         self.latent_NDE_model = create_NDE_model(**self.latent_flow_param_dict)
         self.y_dim = args.y_dim
+        self.use_context = args.use_context
 
         # params printout
         latent_NDE_params = sum(
@@ -68,7 +69,10 @@ class LatentFlow(nn.Module):
                 log_pz = log_pw - delta_log_pw
                 """
                 # print(z.size(), y.size())
-                log_pz = self.latent_NDE_model.log_prob(z, context=y.view(-1, y_size))
+                if self.use_context:
+                    log_pz = self.latent_NDE_model.log_prob(z, context=y.view(-1, y_size))
+                else:
+                    log_pz = self.latent_NDE_model.log_prob(z)
             else:
                 log_pz = torch.zeros(batch_size, 1).to(z)
 
@@ -87,7 +91,10 @@ class LatentFlow(nn.Module):
             with torch.no_grad():
                 if self.use_latent_flow:
                     # print(z.size(), y.size())
-                    log_pz = self.latent_NDE_model.log_prob(z, context=y.view(-1, y_size))
+                    if self.use_context:
+                        log_pz = self.latent_NDE_model.log_prob(z, context=y.view(-1, y_size))
+                    else:
+                        log_pz = self.latent_NDE_model.log_prob(z)
                 else:
                     log_pz = torch.zeros(batch_size, 1).to(z)
 
@@ -110,7 +117,10 @@ class LatentFlow(nn.Module):
         return prior_nats
 
     def sample(self, num_samples, context=None):
-        z = self.latent_NDE_model.sample(num_samples, context=context)
+        if self.use_context:
+            z = self.latent_NDE_model.sample(num_samples, context=context)
+        else:
+            z = self.latent_NDE_model.sample(num_samples)
         return z
 
 

@@ -51,6 +51,7 @@ def add_args(parser):
             "transform_type" : "random-permutation" 
         }
     # model architecture options
+    parser.add_argument('--use_context', type=eval, default=True, choices=[True, False])
     parser.add_argument('--x_dim', type=int, default=X_DIM)
     parser.add_argument('--y_dim', type=int, default=Y_DIM)
     parser.add_argument('--input_dim', type=int, default=30,

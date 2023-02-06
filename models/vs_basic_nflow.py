@@ -251,7 +251,7 @@ def create_NDE_model(
         Flow -- the model
     """
 
-    distribution = distributions.DiagonalNormal((input_dim,))
+    distribution = distributions.ConditionalDiagonalNormal((input_dim,))
     transform = create_transform(
         num_flow_steps, input_dim, context_dim, base_transform_kwargs, transform_type
     )

@@ -14,7 +14,7 @@ def add_args(parser):
     # nflows args
     latent_flow_param_dict = {
             "input_dim" : Z_DIM,
-            "context_dim" : Y_DIM,
+            "context_dim" : None,
             "num_flow_steps" : 4, # increasing this could improve conditioning
 
             "base_transform_kwargs" : {

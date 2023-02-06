@@ -981,7 +981,7 @@ def validate_latent_flow(
                 if args.use_context:
                     z_sampled = latent_model.sample(num_samples=1, context=inputs_y.view(-1, args.y_dim))
                 else:
-                    z_sampled = latent_model.sample(num_samples=1)
+                    z_sampled = latent_model.sample(num_samples=10000)
 
                 z_sampled = z_sampled.cpu().detach().numpy()
                 inputs_y = inputs_y.cpu().detach().numpy()

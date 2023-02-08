@@ -991,8 +991,8 @@ def validate_latent_flow(
                 z_sampled = z_sampled.reshape(-1, args.zdim)
                 N_sampled = z_sampled[:, 0]
 
-                PU_n_true_int.append(inputs_y[:])
-                # PU_n_true_int.append(inputs_y[:, 2])
+                # PU_n_true_int.append(inputs_y[:])
+                PU_n_true_int.append(inputs_y[:, 2])
                 N_true_fakes_latent.append(N_sampled)
                 # N_true_fakes_full.append(np.sum(x[:, :10] > 0, axis=1))
                 N_true_fakes_full.append(N)

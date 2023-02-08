@@ -110,7 +110,7 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
 
     
     # initialize datasets and loaders
-    tr_dataset, te_dataset = get_simple_datasets(args)
+    tr_dataset, te_dataset = get_new_datasets(args)
     if args.distributed:
         train_sampler = torch.utils.data.distributed.DistributedSampler(tr_dataset)
     else:

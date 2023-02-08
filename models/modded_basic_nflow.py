@@ -3,6 +3,7 @@ from torch import nn
 from torch import optim
 from torch.nn import functional as F
 import torch.multiprocessing as mp
+import numpy as np
 
 from nflows import distributions, flows, transforms, utils
 import nflows.nn.nets as nn_

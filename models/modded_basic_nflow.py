@@ -17,7 +17,7 @@ from permutations import BlockPermutation, IdentityPermutation
 
 
 from nflows.transforms.base import Transform
-from nflows.tranforms import (AutoRegressiveTransform)
+from nflows.tranforms.autoregressive import (AutoregressiveTransform)
 from nflows.transforms import made as made_module
 from nflows.transforms.splines.cubic import cubic_spline
 from nflows.transforms.splines.linear import linear_spline

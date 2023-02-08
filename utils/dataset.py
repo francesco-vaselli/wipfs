@@ -127,8 +127,8 @@ class NoZeroFakesDataset(Dataset):
         z = self.archives[0]["data"][start:limit, (y_dim + x_dim) : (y_dim + x_dim + z_dim)]
         self.x_train = torch.tensor(x, dtype=torch.float32) # .view(-1, 1, x_dim) no reshape because no conv1d
         z[:, [1, 2, 3]] = z[:, [1, 2, 3]] / 200.0
-        z = z[z[:, 1] > 0]
         y = y[z[:, 1] > 0]
+        z = z[z[:, 1] > 0]
         self.y_train = torch.tensor(y, dtype=torch.float32) 
         self.z_train = torch.tensor(z, dtype=torch.float32)  
 

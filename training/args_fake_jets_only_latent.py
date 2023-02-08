@@ -18,10 +18,10 @@ def add_args(parser):
             "num_flow_steps" : 4, # increasing this could improve conditioning
 
             "base_transform_kwargs" : {
-            "num_transform_blocks": 5, # DNN layers per coupling
+            "num_transform_blocks": 2, # DNN layers per coupling
             "activation": "relu",
             "dropout_probability" : 0.0,
-            "batch_norm": True,
+            "batch_norm": False,
             "num_bins": 32,
             'tail_bound': 3.0,
             "hidden_dim": 128,

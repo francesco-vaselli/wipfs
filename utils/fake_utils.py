@@ -8,7 +8,7 @@ import os
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.join("..", "utils"))
-from dataset import FakesDataset, H5FakesDataset, NewFakesDataset, SimpleFakesDataset, SimpleMuonsDataset
+from dataset import FakesDataset, H5FakesDataset, NewFakesDataset, SimpleFakesDataset, SimpleMuonsDataset, NoZeroFakesDataset
 
 
 class AverageValueMeter(object):
@@ -128,6 +128,36 @@ def get_new_datasets(args):
     )
 
     te_dataset = NewFakesDataset(
+        [path],
+        x_dim=args.x_dim,
+        y_dim=args.y_dim,
+        z_dim=args.zdim,
+        start=5000000,
+        limit=5100000,
+    )
+
+    return tr_dataset, te_dataset
+
+
+def get_nozero_datasets(args):
+
+    path = "./datasets/train_dataset_fake_jets_only_flows.hdf5"
+    if args.rescale_data == True:
+        path = "./datasets/train_dataset_fake_jets_only_flow_rescaled.hdf5"
+    if args.no_rint == True:
+        path = "./datasets/train_dataset_fake_jets_only_flows_no_rint.hdf5"
+        print('!!!USING DEQUANTIZED N DATA!!!')
+
+    tr_dataset = NoZeroFakesDataset(
+        [path],
+        x_dim=args.x_dim,
+        y_dim=args.y_dim,
+        z_dim=args.zdim,
+        start=0,
+        limit=5000000,
+    )
+
+    te_dataset = NoZeroFakesDataset(
         [path],
         x_dim=args.x_dim,
         y_dim=args.y_dim,

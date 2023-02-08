@@ -192,7 +192,7 @@ def create_base_transform(
     dropout_probability=0.0,
     batch_norm=False,
     num_bins=8,
-    tail_bound=1.0,
+    tail_bound=3.0, # new value also passed in args
     apply_unconditional_transform=False,
     base_transform_type="rq-coupling",
     mask_type="block-binary",

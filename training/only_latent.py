@@ -21,7 +21,7 @@ import os
 sys.path.insert(0, os.path.join("..", "utils"))
 sys.path.insert(0, os.path.join("..", "models"))
 from dataset import FakesDataset
-from basic_nflow import create_NDE_model
+from modded_basic_nflow import create_NDE_model
 from double_flow import LatentFlow
 from fake_utils import (
     AverageValueMeter,
@@ -31,6 +31,7 @@ from fake_utils import (
     reduce_tensor,
     set_random_seed,
     get_simple_datasets,
+    get_new_datasets,
     validate_latent_flow,
     validate_simple_flow
 )

@@ -4,7 +4,7 @@ import torch.nn.functional as F
 from torch import optim
 from torch import nn
 
-from vs_basic_nflow import create_NDE_model
+from modded_basic_nflow import create_NDE_model
 
 
 # Latent Model

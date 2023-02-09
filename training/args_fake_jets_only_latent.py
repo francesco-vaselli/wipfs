@@ -128,7 +128,7 @@ def add_args(parser):
                         help='Learning rate exponential decay frequency')
 
     # data options
-    parser.add_argument('--sorted', default=False, action='store_true')
+    parser.add_argument('--sorted_dataset', default=False, action='store_true')
     parser.add_argument('--no_rint', default=False, action='store_true')
     parser.add_argument('--rescale_data', default=False, action='store_true')
     parser.add_argument('--shuffle_train', type=eval, default=True, choices=[True, False])

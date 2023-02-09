@@ -182,9 +182,9 @@ class SortedNoZeroFakesDataset(Dataset):
         z[:, [1, 2, 3]] = z[:, [1, 2, 3]] / 200.0
         y = y[z[:, 1] > 0]
         z = z[z[:, 1] > 0]
-        _, indx = torch.sort(y[:, 2], dim=0, descending=True)
-        y = y[indx]
-        z = z[indx]
+        _, indx = torch.sort(torch.tensor(y[:, 2]), dim=0, descending=True)
+        y = y[indx.numpy()]
+        z = z[indx.numpy()]
         # print(f"y shape: {y.shape}, z shape: {z.shape}")
         self.y_train = torch.tensor(y, dtype=torch.float32)
         self.z_train = torch.tensor(z, dtype=torch.float32)

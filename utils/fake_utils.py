@@ -1015,6 +1015,7 @@ def validate_latent_flow(
 
                 z_sampled = z_sampled.cpu().detach().numpy()
                 inputs_y = inputs_y.cpu().detach().numpy()
+                print(z_sampled.shape, inputs_y.shape)
                 z = z.cpu().detach().numpy()
                 N = z[:, 0]
 

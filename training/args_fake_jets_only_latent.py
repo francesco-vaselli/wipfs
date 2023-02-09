@@ -18,13 +18,13 @@ def add_args(parser):
             "num_flow_steps" : 4, # increasing this could improve conditioning
 
             "base_transform_kwargs" : {
-            "num_transform_blocks": 4, # DNN layers per coupling
+            "num_transform_blocks": 2, # DNN layers per coupling
             "activation": "relu",
             "dropout_probability" : 0.0,
             "batch_norm": False,
-            "num_bins": 8,
+            "num_bins": 32,
             'tail_bound': 3.0,
-            "hidden_dim": 32,
+            "hidden_dim": 128,
             "base_transform_type": "rq-autoregressive" # "rq-autoregressive",
             # "block_size": 2, # useless param if we have alternating-binary mask
             # "mask_type" : "alternating-binary"
@@ -128,6 +128,7 @@ def add_args(parser):
                         help='Learning rate exponential decay frequency')
 
     # data options
+    parser.add_argument('--sorted', default=False, action='store_true')
     parser.add_argument('--no_rint', default=False, action='store_true')
     parser.add_argument('--rescale_data', default=False, action='store_true')
     parser.add_argument('--shuffle_train', type=eval, default=True, choices=[True, False])

@@ -54,9 +54,11 @@ class FakesDataset(Dataset):
         y = self.archives[0]["data"][start:limit, x_dim : (x_dim + y_dim)]
         x = self.archives[0]["data"][start:limit, 0:x_dim]
         N = self.archives[0]["data"][start:limit, (y_dim + x_dim) : (y_dim + x_dim + 1)]
-        self.x_train = torch.tensor(x, dtype=torch.float32).view(-1, 1, x_dim) # reshape needed for CONV1D 
-        self.y_train = torch.tensor(y, dtype=torch.float32)  
-        self.N_train = torch.tensor(N, dtype=torch.float32)  
+        self.x_train = torch.tensor(x, dtype=torch.float32).view(
+            -1, 1, x_dim
+        )  # reshape needed for CONV1D
+        self.y_train = torch.tensor(y, dtype=torch.float32)
+        self.N_train = torch.tensor(N, dtype=torch.float32)
 
     @property
     def archives(self):
@@ -88,11 +90,15 @@ class NewFakesDataset(Dataset):
 
         y = self.archives[0]["data"][start:limit, x_dim : (x_dim + y_dim)]
         x = self.archives[0]["data"][start:limit, 0:x_dim]
-        z = self.archives[0]["data"][start:limit, (y_dim + x_dim) : (y_dim + x_dim + z_dim)]
-        self.x_train = torch.tensor(x, dtype=torch.float32) # .view(-1, 1, x_dim) no reshape because no conv1d
-        self.y_train = torch.tensor(y, dtype=torch.float32) 
+        z = self.archives[0]["data"][
+            start:limit, (y_dim + x_dim) : (y_dim + x_dim + z_dim)
+        ]
+        self.x_train = torch.tensor(
+            x, dtype=torch.float32
+        )  # .view(-1, 1, x_dim) no reshape because no conv1d
+        self.y_train = torch.tensor(y, dtype=torch.float32)
         z[:, [1, 2, 3]] = z[:, [1, 2, 3]] / 200.0
-        self.z_train = torch.tensor(z, dtype=torch.float32)  
+        self.z_train = torch.tensor(z, dtype=torch.float32)
 
     @property
     def archives(self):
@@ -124,14 +130,64 @@ class NoZeroFakesDataset(Dataset):
 
         y = self.archives[0]["data"][start:limit, x_dim : (x_dim + y_dim)]
         x = self.archives[0]["data"][start:limit, 0:x_dim]
-        z = self.archives[0]["data"][start:limit, (y_dim + x_dim) : (y_dim + x_dim + z_dim)]
-        self.x_train = torch.tensor(x, dtype=torch.float32) # .view(-1, 1, x_dim) no reshape because no conv1d
+        z = self.archives[0]["data"][
+            start:limit, (y_dim + x_dim) : (y_dim + x_dim + z_dim)
+        ]
+        self.x_train = torch.tensor(
+            x, dtype=torch.float32
+        )  # .view(-1, 1, x_dim) no reshape because no conv1d
         z[:, [1, 2, 3]] = z[:, [1, 2, 3]] / 200.0
         y = y[z[:, 1] > 0]
         z = z[z[:, 1] > 0]
         # print(f"y shape: {y.shape}, z shape: {z.shape}")
-        self.y_train = torch.tensor(y, dtype=torch.float32) 
-        self.z_train = torch.tensor(z, dtype=torch.float32) 
+        self.y_train = torch.tensor(y, dtype=torch.float32)
+        self.z_train = torch.tensor(z, dtype=torch.float32)
+
+    @property
+    def archives(self):
+        if self._archives is None:  # lazy loading here!
+            self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
+        return self._archives
+
+    def __len__(self):
+        return len(self.y_train)
+
+    def __getitem__(self, idx):
+        return self.x_train[idx], self.y_train[idx], self.z_train[idx]
+
+
+class SortedNoZeroFakesDataset(Dataset):
+    """Very simple Dataset for reading hdf5 data for fakes
+        divides each row into 3 parts: reco (x), gen (y), N of fakes (N)
+    Args:
+        Dataset (Pytorch Dataset): Pytorch Dataset class
+    """
+
+    def __init__(self, h5_paths, x_dim, y_dim, z_dim, start=0, limit=-1):
+
+        # we must fix a convention for parametrizing slices
+
+        self.h5_paths = h5_paths
+        self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
+        self._archives = None
+
+        y = self.archives[0]["data"][start:limit, x_dim : (x_dim + y_dim)]
+        x = self.archives[0]["data"][start:limit, 0:x_dim]
+        z = self.archives[0]["data"][
+            start:limit, (y_dim + x_dim) : (y_dim + x_dim + z_dim)
+        ]
+        self.x_train = torch.tensor(
+            x, dtype=torch.float32
+        )  # .view(-1, 1, x_dim) no reshape because no conv1d
+        z[:, [1, 2, 3]] = z[:, [1, 2, 3]] / 200.0
+        y = y[z[:, 1] > 0]
+        z = z[z[:, 1] > 0]
+        _, indx = torch.sort(y[:, 2], dim=0, descending=True)
+        y = y[indx]
+        z = z[indx]
+        # print(f"y shape: {y.shape}, z shape: {z.shape}")
+        self.y_train = torch.tensor(y, dtype=torch.float32)
+        self.z_train = torch.tensor(z, dtype=torch.float32)
 
     @property
     def archives(self):
@@ -164,10 +220,12 @@ class SimpleFakesDataset(Dataset):
         y = self.archives[0]["data"][start:limit, 32]
         x = self.archives[0]["data"][start:limit, 0:x_dim]
         z = self.archives[0]["data"][start:limit, (6 + x_dim) : (6 + x_dim + z_dim)]
-        self.x_train = torch.tensor(x, dtype=torch.float32) # .view(-1, 1, x_dim) no reshape because no conv1d
-        self.y_train = torch.tensor(y, dtype=torch.float32) 
+        self.x_train = torch.tensor(
+            x, dtype=torch.float32
+        )  # .view(-1, 1, x_dim) no reshape because no conv1d
+        self.y_train = torch.tensor(y, dtype=torch.float32)
         # z[:, 1] = z[:, 1] / 200.0
-        self.z_train = torch.tensor(z, dtype=torch.float32) 
+        self.z_train = torch.tensor(z, dtype=torch.float32)
 
     @property
     def archives(self):
@@ -200,9 +258,11 @@ class SimpleMuonsDataset(Dataset):
         y = self.archives[0]["data"][start:limit, 2]
         x = self.archives[0]["data"][start:limit, 30:52]
         z = self.archives[0]["data"][start:limit, [34, 48]]
-        self.x_train = torch.tensor(x, dtype=torch.float32) # .view(-1, 1, x_dim) no reshape because no conv1d
-        self.y_train = torch.tensor(y, dtype=torch.float32)  
-        self.z_train = torch.tensor(z, dtype=torch.float32) 
+        self.x_train = torch.tensor(
+            x, dtype=torch.float32
+        )  # .view(-1, 1, x_dim) no reshape because no conv1d
+        self.y_train = torch.tensor(y, dtype=torch.float32)
+        self.z_train = torch.tensor(z, dtype=torch.float32)
 
     @property
     def archives(self):
@@ -333,12 +393,18 @@ class H5FakesDataset(Dataset):
     def __getitem__(self, index):
         file_idx = np.searchsorted(self.strides, index, side="right")
         idx_in_file = index - self.strides[max(0, file_idx - 1)]
-        y = self.archives[file_idx]["data"][idx_in_file, self.x_dim :(self.x_dim + self.y_dim)]
+        y = self.archives[file_idx]["data"][
+            idx_in_file, self.x_dim : (self.x_dim + self.y_dim)
+        ]
         x = self.archives[file_idx]["data"][idx_in_file, 0 : self.x_dim]
-        N = self.archives[file_idx]["data"][idx_in_file, (self.y_dim + self.x_dim) : (self.y_dim + self.x_dim + 1)]
-        x = torch.tensor(x, dtype=torch.float32).view(-1, self.x_dim) # differently from FakesDataset now we are getting the single item to be batched
-        y = torch.tensor(y, dtype=torch.float32)  
-        N = torch.tensor(N, dtype=torch.float32)  
+        N = self.archives[file_idx]["data"][
+            idx_in_file, (self.y_dim + self.x_dim) : (self.y_dim + self.x_dim + 1)
+        ]
+        x = torch.tensor(x, dtype=torch.float32).view(
+            -1, self.x_dim
+        )  # differently from FakesDataset now we are getting the single item to be batched
+        y = torch.tensor(y, dtype=torch.float32)
+        N = torch.tensor(N, dtype=torch.float32)
         # x = x.float()
         # y = y.float()
 

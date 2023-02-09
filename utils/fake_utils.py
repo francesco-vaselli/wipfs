@@ -8,7 +8,15 @@ import os
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.join("..", "utils"))
-from dataset import FakesDataset, H5FakesDataset, NewFakesDataset, SimpleFakesDataset, SimpleMuonsDataset, NoZeroFakesDataset
+from dataset import (
+    FakesDataset,
+    H5FakesDataset,
+    NewFakesDataset,
+    SimpleFakesDataset,
+    SimpleMuonsDataset,
+    NoZeroFakesDataset,
+    SortedNoZeroFakesDataset,
+)
 
 
 class AverageValueMeter(object):
@@ -116,7 +124,7 @@ def get_new_datasets(args):
         path = "./datasets/train_dataset_fake_jets_only_flow_rescaled.hdf5"
     if args.no_rint == True:
         path = "./datasets/train_dataset_fake_jets_only_flows_no_rint.hdf5"
-        print('!!!USING DEQUANTIZED N DATA!!!')
+        print("!!!USING DEQUANTIZED N DATA!!!")
 
     tr_dataset = NewFakesDataset(
         [path],
@@ -146,7 +154,7 @@ def get_nozero_datasets(args):
         path = "./datasets/train_dataset_fake_jets_only_flow_rescaled.hdf5"
     if args.no_rint == True:
         path = "./datasets/train_dataset_fake_jets_only_flows_no_rint.hdf5"
-        print('!!!USING DEQUANTIZED N DATA!!!')
+        print("!!!USING DEQUANTIZED N DATA!!!")
 
     tr_dataset = NoZeroFakesDataset(
         [path],
@@ -168,15 +176,46 @@ def get_nozero_datasets(args):
 
     return tr_dataset, te_dataset
 
+
+def get_sorted_nozero_datasets(args):
+
+    path = "./datasets/train_dataset_fake_jets_only_flows.hdf5"
+    if args.rescale_data == True:
+        path = "./datasets/train_dataset_fake_jets_only_flow_rescaled.hdf5"
+    if args.no_rint == True:
+        path = "./datasets/train_dataset_fake_jets_only_flows_no_rint.hdf5"
+        print("!!!USING DEQUANTIZED N DATA!!!")
+
+    tr_dataset = SortedNoZeroFakesDataset(
+        [path],
+        x_dim=args.x_dim,
+        y_dim=args.y_dim,
+        z_dim=args.zdim,
+        start=0,
+        limit=450000,
+    )
+
+    te_dataset = SortedNoZeroFakesDataset(
+        [path],
+        x_dim=args.x_dim,
+        y_dim=args.y_dim,
+        z_dim=args.zdim,
+        start=450000,
+        limit=550000,
+    )
+
+    return tr_dataset, te_dataset
+
+
 def get_simple_datasets(args):
 
     path = "./datasets/train_dataset_fake_jets_only_flows.hdf5"
     if args.rescale_data == True:
         path = "./datasets/train_dataset_fake_jets_only_flow_rescaled.hdf5"
-        print('!!!USING RESCALED DATA!!!')
+        print("!!!USING RESCALED DATA!!!")
     if args.no_rint == True:
         path = "./datasets/train_dataset_fake_jets_only_flows_no_rint.hdf5"
-        print('!!!USING DEQUANTIZED N DATA!!!')
+        print("!!!USING DEQUANTIZED N DATA!!!")
 
     tr_dataset = SimpleFakesDataset(
         [path],
@@ -197,6 +236,7 @@ def get_simple_datasets(args):
     )
 
     return tr_dataset, te_dataset
+
 
 def get_simpleM_datasets(args):
 
@@ -975,7 +1015,7 @@ def validate_latent_flow(
     writer,
     save_dir,
     args,
-    device, 
+    device,
     clf_loaders=None,
 ):
     latent_model.eval()
@@ -1009,7 +1049,9 @@ def validate_latent_flow(
                 inputs_y = y.to(device)
                 # print('inputs_y', inputs_y.shape)
                 if args.use_context:
-                    z_sampled = latent_model.sample(num_samples=1, context=inputs_y.view(-1, args.y_dim))
+                    z_sampled = latent_model.sample(
+                        num_samples=1, context=inputs_y.view(-1, args.y_dim)
+                    )
                 else:
                     z_sampled = latent_model.sample(num_samples=10000)
 
@@ -1036,7 +1078,6 @@ def validate_latent_flow(
 
                 print("done test batch")
 
-
         mod_pt_full = np.reshape(mod_pt_full, (-1, 1)).flatten()
         px_full = np.reshape(px_full, (-1, 1)).flatten()
         py_full = np.reshape(py_full, (-1, 1)).flatten()
@@ -1050,7 +1091,7 @@ def validate_latent_flow(
         N_full = np.reshape(N_true_fakes_full, (-1, 1)).flatten()
         N_true_fakes_latent = np.reshape(N_true_fakes_latent, (-1, 1)).flatten()
         N_true_fakes_full = np.reshape(N_true_fakes_full, (-1, 1)).flatten()
-        
+
         full_sim = [
             N_full,
             mod_pt_full,
@@ -1069,18 +1110,22 @@ def validate_latent_flow(
             "px",
             "py",
         ]
-        
-        bins_N = np.arange(-0.1, 1.1, step=0.1)-0.05
+
+        bins_N = np.arange(-0.1, 1.1, step=0.1) - 0.05
 
         for i in range(0, len(full_sim)):
             test_values = full_sim[i].flatten()
             generated_sample = flash_sim[i].flatten()
             print(generated_sample.shape)
             fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
-            
+
             if i == 0:
                 _, rangeR, _ = ax1.hist(
-                    test_values, histtype="step", label="FullSim", lw=1, bins=bins_N,
+                    test_values,
+                    histtype="step",
+                    label="FullSim",
+                    lw=1,
+                    bins=bins_N,
                 )
             else:
                 _, rangeR, _ = ax1.hist(
@@ -1195,7 +1240,6 @@ def validate_latent_flow(
                     # plt.savefig(os.path.join(save_dir, f"comparison_Jet_pt{j}.png"))
                     writer.add_figure(f"comparison_Jet_pt{j}", fig, global_step=epoch)
 
-
         fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(9, 4.5), tight_layout=False)
         ax1.hist2d(
             PU_n_true_int,
@@ -1223,7 +1267,7 @@ def validate_latent_flow(
         ax2.set_ylim([0, 1.1])
         ax2.set_xlabel("PU_n_true_int")
         ax2.set_ylabel("N_true_fakes_latent")
-        
+
         fig.suptitle(
             "Comparison of N_true_fakes_full vs N_true_fakes_latent vs N_true_fakes_reco",
             fontsize=16,
@@ -1245,7 +1289,7 @@ def validate_simple_flow(
     writer,
     save_dir,
     args,
-    device, 
+    device,
     clf_loaders=None,
 ):
     latent_model.eval()
@@ -1274,7 +1318,9 @@ def validate_simple_flow(
                 # print('x', x.shape, 'y', y.shape, 'N', N.shape)
                 inputs_y = y.to(device)
                 # print('inputs_y', inputs_y.shape)
-                z_sampled = latent_model.sample(num_samples=1, context=inputs_y.view(-1, 1))
+                z_sampled = latent_model.sample(
+                    num_samples=1, context=inputs_y.view(-1, 1)
+                )
 
                 z_sampled = z_sampled.cpu().detach().numpy()
                 inputs_y = inputs_y.cpu().detach().numpy()
@@ -1293,7 +1339,6 @@ def validate_simple_flow(
 
                 print("done 10k")
 
-
         mod_pt_full = np.reshape(mod_pt_full, (-1, 1)).flatten()
 
         mod_pt_flash = np.reshape(mod_pt_flash, (-1, 1)).flatten()
@@ -1303,7 +1348,7 @@ def validate_simple_flow(
         N_full = np.reshape(N_true_fakes_full, (-1, 1)).flatten()
         N_true_fakes_latent = np.reshape(N_true_fakes_latent, (-1, 1)).flatten()
         N_true_fakes_full = np.reshape(N_true_fakes_full, (-1, 1)).flatten()
-        
+
         full_sim = [
             N_full,
             mod_pt_full,
@@ -1318,16 +1363,20 @@ def validate_simple_flow(
         ]
         # print(N_true_fakes_latent)
 
-        bins_N = np.arange(-0.1, 1.1, step=0.1)-0.05
+        bins_N = np.arange(-0.1, 1.1, step=0.1) - 0.05
 
         for i in range(0, len(full_sim)):
             test_values = full_sim[i].flatten()
             generated_sample = flash_sim[i].flatten()
             fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
-            
+
             if i == 0:
                 _, rangeR, _ = ax1.hist(
-                    test_values, histtype="step", label="FullSim", lw=1, bins=bins_N,
+                    test_values,
+                    histtype="step",
+                    label="FullSim",
+                    lw=1,
+                    bins=bins_N,
                 )
             else:
                 _, rangeR, _ = ax1.hist(
@@ -1502,7 +1551,7 @@ def validate_simple_flow(
         ax2.set_ylim([0, 1.1])
         ax2.set_xlabel("PU_n_true_int")
         ax2.set_ylabel("N_true_fakes_latent")
-        
+
         fig.suptitle(
             "Comparison of N_true_fakes_full vs N_true_fakes_latent vs N_true_fakes_reco",
             fontsize=16,
@@ -1524,7 +1573,7 @@ def validate_simpleM_flow(
     writer,
     save_dir,
     args,
-    device, 
+    device,
     clf_loaders=None,
 ):
     latent_model.eval()
@@ -1553,7 +1602,9 @@ def validate_simpleM_flow(
                 # print('x', x.shape, 'y', y.shape, 'N', N.shape)
                 inputs_y = y.to(device)
                 # print('inputs_y', inputs_y.shape)
-                z_sampled = latent_model.sample(num_samples=1, context=inputs_y.view(-1, 1))
+                z_sampled = latent_model.sample(
+                    num_samples=1, context=inputs_y.view(-1, 1)
+                )
 
                 z_sampled = z_sampled.cpu().detach().numpy()
                 inputs_y = inputs_y.cpu().detach().numpy()
@@ -1572,7 +1623,6 @@ def validate_simpleM_flow(
 
                 print("done 10k")
 
-
         mod_pt_full = np.reshape(mod_pt_full, (-1, 1)).flatten()
 
         mod_pt_flash = np.reshape(mod_pt_flash, (-1, 1)).flatten()
@@ -1582,7 +1632,7 @@ def validate_simpleM_flow(
         N_full = np.reshape(N_true_fakes_full, (-1, 1)).flatten()
         N_true_fakes_latent = np.reshape(N_true_fakes_latent, (-1, 1)).flatten()
         N_true_fakes_full = np.reshape(N_true_fakes_full, (-1, 1)).flatten()
-        
+
         full_sim = [
             N_full,
             mod_pt_full,
@@ -1603,11 +1653,15 @@ def validate_simpleM_flow(
             test_values = full_sim[i].flatten()
             generated_sample = flash_sim[i].flatten()
             fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
-            
+
             if i == 0:
                 _, rangeR, _ = ax1.hist(
-                    test_values, histtype="step", label="FullSim", lw=1, bins=100,
-                    range = range
+                    test_values,
+                    histtype="step",
+                    label="FullSim",
+                    lw=1,
+                    bins=100,
+                    range=range,
                 )
             else:
                 _, rangeR, _ = ax1.hist(
@@ -1670,5 +1724,4 @@ def validate_simpleM_flow(
             writer.add_figure(f"comparison_{names[i]}", fig, global_step=epoch)
             plt.close()
 
-            
         plt.close()

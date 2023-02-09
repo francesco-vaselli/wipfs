@@ -33,6 +33,7 @@ from fake_utils import (
     get_simple_datasets,
     get_new_datasets,
     get_nozero_datasets,
+    get_sorted_nozero_datasets,
     validate_latent_flow,
     validate_simple_flow
 )
@@ -111,7 +112,11 @@ def main_worker(gpu, save_dir, ngpus_per_node, args):
 
     
     # initialize datasets and loaders
-    tr_dataset, te_dataset = get_nozero_datasets(args)
+    if args.sorted_dataset==True:
+        tr_dataset, te_dataset = get_sorted_nozero_datasets(args)
+        print('using sorted dataset')
+    else:
+        tr_dataset, te_dataset = get_nozero_datasets(args)
     if args.distributed:
         train_sampler = torch.utils.data.distributed.DistributedSampler(tr_dataset)
     else:

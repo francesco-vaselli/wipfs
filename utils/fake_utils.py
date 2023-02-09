@@ -1034,7 +1034,7 @@ def validate_latent_flow(
                 px_flash.append(z_sampled[:, 2])
                 py_flash.append(z_sampled[:, 3])
 
-                print("done 10k")
+                print("done test batch")
 
 
         mod_pt_full = np.reshape(mod_pt_full, (-1, 1)).flatten()

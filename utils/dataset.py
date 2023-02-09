@@ -129,8 +129,9 @@ class NoZeroFakesDataset(Dataset):
         z[:, [1, 2, 3]] = z[:, [1, 2, 3]] / 200.0
         y = y[z[:, 1] > 0]
         z = z[z[:, 1] > 0]
+        print(f"y shape: {y.shape}, z shape: {z.shape}")
         self.y_train = torch.tensor(y, dtype=torch.float32) 
-        self.z_train = torch.tensor(z, dtype=torch.float32)  
+        self.z_train = torch.tensor(z, dtype=torch.float32) 
 
     @property
     def archives(self):

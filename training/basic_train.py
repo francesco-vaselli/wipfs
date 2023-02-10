@@ -101,7 +101,7 @@ def main():
             model_dir=save_dir,
             filename="checkpoint-latest.pt",
         )
-    print("Resumed from: " + args.resume_checkpoint)
+        print("Resumed from: " + args.resume_checkpoint)
 
     
     # initialize datasets and loaders

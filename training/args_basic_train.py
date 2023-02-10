@@ -31,7 +31,6 @@ def add_args(parser):
     parser.add_argument('--solver', type=str, default='dopri5', choices=SOLVERS)
     parser.add_argument('--atol', type=float, default=1e-5)
     parser.add_argument('--rtol', type=float, default=1e-5)
-    parser.add_argument('--batch_norm', type=eval, default=True, choices=[True, False])
     parser.add_argument('--sync_bn', type=eval, default=False, choices=[True, False])
     parser.add_argument('--bn_lag', type=float, default=0)
 
@@ -40,6 +39,7 @@ def add_args(parser):
     parser.add_argument('--num_transform_blocks', type=int, default=2)
     parser.add_argument('--activation', type=str, default='relu')
     parser.add_argument('--dropout_probability', type=float, default=0.0)
+    parser.add_argument('--batch_norm', type=eval, default=True, choices=[True, False])
     parser.add_argument('--num_bins', type=int, default=8)
     parser.add_argument('--tail_bound', type=float, default=3.0)
     parser.add_argument('--hidden_dim', type=int, default=128)

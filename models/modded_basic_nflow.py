@@ -790,10 +790,13 @@ def train(model, train_loader, test_loader, epochs, optimizer, device, name, mod
             writer.add_scalar("train/loss", train_loss, epoch)
             writer.add_scalar("test/loss", test_loss, epoch)
 
-        if epoch % save_freq == 0:
+        if epoch % args.val_freq == 0:
             validate_latent_flow(
                 test_loader, model, epoch, writer, save_dir=args.log_name, args=args, device=args.device, clf_loaders=None
             )
+
+        if epoch % save_freq == 0:
+
             save_model(
                 epoch,
                 model,
@@ -802,13 +805,14 @@ def train(model, train_loader, test_loader, epochs, optimizer, device, name, mod
                 test_history,
 		        name,
                 model_dir=model_dir,
+                optimizer=optimizer
             )
             print("saving model")
 
     return train_history, test_history
 
 
-def save_model(epoch, model, scheduler, train_history, test_history, name, model_dir=None):
+def save_model(epoch, model, scheduler, train_history, test_history, name, model_dir=None, optimizer=None):
     """Save a model and optimizer to file.
     Args:
         model:      model to be saved

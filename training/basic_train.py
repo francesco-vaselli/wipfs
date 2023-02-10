@@ -141,3 +141,7 @@ def main():
 
     trh, tsh = train(model, train_loader, test_loader, epochs=args.epochs, optimizer=optimizer, device=torch.device(args.device), 
                     name='model', model_dir=save_dir, args=args, writer=writer, output_freq=100, save_freq=args.save_freq) 
+
+
+if __name__ == "__main__":
+    main()

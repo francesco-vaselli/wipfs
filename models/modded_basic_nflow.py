@@ -338,15 +338,16 @@ def create_transform(
         [
             transforms.CompositeTransform(
                 [
-                    selected_transform,
+                    # selected_transform,
                     create_base_transform(
                         i, param_dim, context_dim=context_dim, **base_transform_kwargs
                     ),
+                    selected_transform
                 ]
             )
             for i in range(num_flow_steps)
         ]
-        + [transforms.LULinear(param_dim, identity_init=True)]
+        # + [transforms.LULinear(param_dim, identity_init=True)]
     )
     return transform
 
@@ -668,6 +669,7 @@ def train_epoch(
     epoch,
     device=None,
     output_freq=50,
+    args=args
     add_noise=True,
     annealing=False,
 ):
@@ -719,7 +721,7 @@ def train_epoch(
             )
 
     train_loss = train_loss.item() / len(train_loader.dataset)
-    print("Train Epoch: {} \tAverage Loss: {:.4f}".format(epoch, train_loss))
+    print("Model:{} Train Epoch: {} \tAverage Loss: {:.4f}".format(args.log_name, epoch, train_loss))
 
     return train_loss
 
@@ -778,7 +780,7 @@ def train(model, train_loader, test_loader, epochs, optimizer, device, name, mod
         )
 
         train_loss = train_epoch(
-            model, train_loader, optimizer, epoch, device, output_freq
+            model, train_loader, optimizer, epoch, device, output_freq, args=args
         )
         test_loss = test_epoch(model, test_loader, epoch, device)
 

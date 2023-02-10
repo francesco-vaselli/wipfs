@@ -669,7 +669,7 @@ def train_epoch(
     epoch,
     device=None,
     output_freq=50,
-    args=args
+    args=args,
     add_noise=True,
     annealing=False,
 ):

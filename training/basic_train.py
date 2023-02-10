@@ -95,11 +95,10 @@ def main():
             save_dir, "checkpoint-latest.pt"
         )  # use the latest checkpoint
     if args.resume_checkpoint is not None:
-        latent_model, _, start_epoch = resume(
-            args.resume_latent_checkpoint,
-            latent_model,
-            optimizer=None,
-            strict=(not args.resume_non_strict),
+        model, _ = load_model(
+            device,
+            model_dir=save_dir,
+            filename="checkpoint-latest.pt",
         )
     print("Resumed from: " + args.resume_latent_checkpoint)
 

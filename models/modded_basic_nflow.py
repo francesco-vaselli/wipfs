@@ -792,7 +792,7 @@ def train(model, train_loader, test_loader, epochs, optimizer, device, name, mod
 
         if epoch % save_freq == 0:
             validate_latent_flow(
-                test_loader, model, epoch, writer, model_dir=args.log_name, args=args, device=args.device, clf_loaders=None
+                test_loader, model, epoch, writer, save_dir=args.log_name, args=args, device=args.device, clf_loaders=None
             )
             save_model(
                 epoch,

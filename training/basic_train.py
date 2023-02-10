@@ -29,7 +29,7 @@ from fake_utils import (
     get_new_datasets,
 
 )
-from args_fake_jets_only_latent import get_args
+from args_basic_train import get_args
 
 
 def main():

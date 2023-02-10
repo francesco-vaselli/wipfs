@@ -84,7 +84,7 @@ def main():
     start_epoch = 0
     optimizer = torch.optim.Adam(
                     model.parameters(),
-                    lr=args.lr_latent,
+                    lr=args.lr,
                     betas=(args.beta1, args.beta2),
                     weight_decay=args.weight_decay,
                 )

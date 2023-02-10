@@ -161,8 +161,8 @@ def get_nozero_datasets(args):
         x_dim=args.x_dim,
         y_dim=args.y_dim,
         z_dim=args.zdim,
-        start=0,
-        limit=450000,
+        start=args.train_start,
+        limit=args.train_limit,
     )
 
     te_dataset = NoZeroFakesDataset(
@@ -170,8 +170,8 @@ def get_nozero_datasets(args):
         x_dim=args.x_dim,
         y_dim=args.y_dim,
         z_dim=args.zdim,
-        start=450000,
-        limit=550000,
+        start=args.test_start,
+        limit=args.test_limit,
     )
 
     return tr_dataset, te_dataset
@@ -191,8 +191,8 @@ def get_sorted_nozero_datasets(args):
         x_dim=args.x_dim,
         y_dim=args.y_dim,
         z_dim=args.zdim,
-        start=0,
-        limit=450000,
+        start=args.train_start,
+        limit=args.train_limit,
     )
 
     te_dataset = SortedNoZeroFakesDataset(
@@ -200,8 +200,8 @@ def get_sorted_nozero_datasets(args):
         x_dim=args.x_dim,
         y_dim=args.y_dim,
         z_dim=args.zdim,
-        start=450000,
-        limit=550000,
+        start=args.test_start,
+        limit=args.test_limit,
     )
 
     return tr_dataset, te_dataset

@@ -26,6 +26,7 @@ from double_flow import LatentFlow
 from fake_utils import (
     get_nozero_datasets,
     get_sorted_nozero_datasets,
+    get_new_datasets,
 
 )
 from args_fake_jets_only_latent import get_args
@@ -109,10 +110,7 @@ def main():
         print('using sorted dataset')
     else:
         tr_dataset, te_dataset = get_nozero_datasets(args)
-    if args.distributed:
-        train_sampler = torch.utils.data.distributed.DistributedSampler(tr_dataset)
-    else:
-        train_sampler = None
+    
 
     train_loader = torch.utils.data.DataLoader(
         dataset=tr_dataset,
@@ -120,7 +118,7 @@ def main():
         shuffle=~args.sorted_dataset,
         num_workers=args.n_load_cores, # need to find a way to set this automatically
         pin_memory=True,
-        sampler=train_sampler,
+        sampler=None,
         drop_last=True,
         # worker_init_fn=init_np_seed,
     )

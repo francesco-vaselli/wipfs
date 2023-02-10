@@ -80,9 +80,13 @@ def add_args(parser):
 
     # data options
     parser.add_argument('--sorted_dataset', default=False, action='store_true')
-    parser.add_argument('--no_rint', default=False, action='store_true')
+    parser.add_argument('--no_rint', default=True, action='store_true')
     parser.add_argument('--rescale_data', default=False, action='store_true')
     parser.add_argument('--shuffle_train', type=eval, default=True, choices=[True, False])
+    parser.add_argument('--train_start', type=int, default=0)
+    parser.add_argument('--train_limit', type=int, default=500000)
+    parser.add_argument('--test_start', type=int, default=500000)
+    parser.add_argument('--test_limit', type=int, default=510000)
     
 
     # logging and saving frequency

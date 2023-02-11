@@ -65,7 +65,7 @@ def main():
             "base_transform_type": args.base_transform_type,  # "rq-autoregressive",
             "block_size": args.block_size, # useless param if we have alternating-binary mask
             "mask_type" : args.mask_type
-            'init_identity': args.init_identity,
+            "init_identity": args.init_identity,
 
     },
         "transform_type": args.transform_type

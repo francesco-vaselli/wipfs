@@ -34,6 +34,7 @@ from nflows.utils import torchutils
 
 from torch.nn.functional import softplus
 
+from nflows.transforms.coupling import (PiecewiseCouplingTransform)
 from nflows.transforms import splines
 from nflows.transforms.base import Transform
 from nflows.transforms.nonlinearities import (
@@ -147,33 +148,6 @@ class MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(AutoregressiveTra
 
     def _elementwise_inverse(self, inputs, autoregressive_params):
         return self._elementwise(inputs, autoregressive_params, inverse=True)
-
-
-class PiecewiseCouplingTransform(CouplingTransform):
-    def _coupling_transform_forward(self, inputs, transform_params):
-        return self._coupling_transform(inputs, transform_params, inverse=False)
-
-    def _coupling_transform_inverse(self, inputs, transform_params):
-        return self._coupling_transform(inputs, transform_params, inverse=True)
-
-    def _coupling_transform(self, inputs, transform_params, inverse=False):
-        if inputs.dim() == 4:
-            b, c, h, w = inputs.shape
-            # For images, reshape transform_params from Bx(C*?)xHxW to BxCxHxWx?
-            transform_params = transform_params.reshape(b, c, -1, h, w).permute(
-                0, 1, 3, 4, 2
-            )
-        elif inputs.dim() == 2:
-            b, d = inputs.shape
-            # For 2D data, reshape transform_params from Bx(D*?) to BxDx?
-            transform_params = transform_params.reshape(b, d, -1)
-
-        outputs, logabsdet = self._piecewise_cdf(inputs, transform_params, inverse)
-
-        return outputs, torchutils.sum_except_batch(logabsdet)
-
-    def _piecewise_cdf(self, inputs, transform_params, inverse=False):
-        raise NotImplementedError()
 
 
 class PiecewiseRationalQuadraticCouplingTransformM(PiecewiseCouplingTransform):

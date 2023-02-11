@@ -31,7 +31,7 @@ from nflows.transforms.splines.rational_quadratic import (
     rational_quadratic_spline,
     unconstrained_rational_quadratic_spline,)
 from nflows.utils import torchutils
-
+from nflows.transforms import splines
 from torch.nn.functional import softplus
 
 from modded_coupling import PiecewiseCouplingTransformM

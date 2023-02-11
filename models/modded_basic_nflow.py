@@ -43,7 +43,7 @@ from nflows.transforms.nonlinearities import (
     PiecewiseRationalQuadraticCDF,
 )
 from nflows.utils import torchutils
-from nflows.transforms.UMNN import *
+# from nflows.transforms.UMNN import *
 
 
 

@@ -32,6 +32,20 @@ from nflows.transforms.splines.rational_quadratic import (
     unconstrained_rational_quadratic_spline,)
 from nflows.utils import torchutils
 
+from torch.nn.functional import softplus
+
+from nflows.transforms import splines
+from nflows.transforms.base import Transform
+from nflows.transforms.nonlinearities import (
+    PiecewiseCubicCDF,
+    PiecewiseLinearCDF,
+    PiecewiseQuadraticCDF,
+    PiecewiseRationalQuadraticCDF,
+)
+from nflows.utils import torchutils
+from nflows.transforms.UMNN import *
+
+
 
 class MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(AutoregressiveTransform):
     def __init__(
@@ -135,6 +149,97 @@ class MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(AutoregressiveTra
         return self._elementwise(inputs, autoregressive_params, inverse=True)
 
 
+class PiecewiseRationalQuadraticCouplingTransformM(PiecewiseCouplingTransform):
+    def __init__(
+        self,
+        mask,
+        transform_net_create_fn,
+        num_bins=10,
+        tails=None,
+        tail_bound=1.0,
+        apply_unconditional_transform=False,
+        img_shape=None,
+        init_identity=True,
+        min_bin_width=splines.rational_quadratic.DEFAULT_MIN_BIN_WIDTH,
+        min_bin_height=splines.rational_quadratic.DEFAULT_MIN_BIN_HEIGHT,
+        min_derivative=splines.rational_quadratic.DEFAULT_MIN_DERIVATIVE,
+    ):
+
+        self.num_bins = num_bins
+        self.min_bin_width = min_bin_width
+        self.min_bin_height = min_bin_height
+        self.min_derivative = min_derivative
+        self.tails = tails
+        self.tail_bound = tail_bound
+
+        if apply_unconditional_transform:
+            unconditional_transform = lambda features: PiecewiseRationalQuadraticCDF(
+                shape=[features] + (img_shape if img_shape else []),
+                num_bins=num_bins,
+                tails=tails,
+                tail_bound=tail_bound,
+                min_bin_width=min_bin_width,
+                min_bin_height=min_bin_height,
+                min_derivative=min_derivative,
+            )
+        else:
+            unconditional_transform = None
+
+        if init_identity:
+          torch.nn.init.constant_(self.transform_net.final_layer.weight, 0.0)
+          torch.nn.init.constant_(
+              self.transform_net.final_layer.bias,
+              np.log(np.exp(1 - min_derivative) - 1),
+          )
+
+        super().__init__(
+            mask,
+            transform_net_create_fn,
+            unconditional_transform=unconditional_transform,
+        )
+
+    def _transform_dim_multiplier(self):
+        if self.tails == "linear":
+            return self.num_bins * 3 - 1
+        else:
+            return self.num_bins * 3 + 1
+
+    def _piecewise_cdf(self, inputs, transform_params, inverse=False):
+        unnormalized_widths = transform_params[..., : self.num_bins]
+        unnormalized_heights = transform_params[..., self.num_bins : 2 * self.num_bins]
+        unnormalized_derivatives = transform_params[..., 2 * self.num_bins :]
+
+        if hasattr(self.transform_net, "hidden_features"):
+            unnormalized_widths /= np.sqrt(self.transform_net.hidden_features)
+            unnormalized_heights /= np.sqrt(self.transform_net.hidden_features)
+        elif hasattr(self.transform_net, "hidden_channels"):
+            unnormalized_widths /= np.sqrt(self.transform_net.hidden_channels)
+            unnormalized_heights /= np.sqrt(self.transform_net.hidden_channels)
+        else:
+            warnings.warn(
+                "Inputs to the softmax are not scaled down: initialization might be bad."
+            )
+
+        if self.tails is None:
+            spline_fn = splines.rational_quadratic_spline
+            spline_kwargs = {}
+        else:
+            spline_fn = splines.unconstrained_rational_quadratic_spline
+            spline_kwargs = {"tails": self.tails, "tail_bound": self.tail_bound}
+
+        return spline_fn(
+            inputs=inputs,
+            unnormalized_widths=unnormalized_widths,
+            unnormalized_heights=unnormalized_heights,
+            unnormalized_derivatives=unnormalized_derivatives,
+            inverse=inverse,
+            min_bin_width=self.min_bin_width,
+            min_bin_height=self.min_bin_height,
+            min_derivative=self.min_derivative,
+            **spline_kwargs
+        )
+
+
 def create_random_transform(param_dim):
     """Create the composite linear transform PLU.
     Arguments:
@@ -197,6 +302,7 @@ def create_base_transform(
     base_transform_type="rq-coupling",
     mask_type="block-binary",
     block_size=1,
+    init_identity=True,
 ):
     """
     NOTE: we are now using block masking
@@ -258,7 +364,7 @@ def create_base_transform(
         raise ValueError
 
     if base_transform_type == "rq-coupling":
-        return transforms.PiecewiseRationalQuadraticCouplingTransform(
+        return PiecewiseRationalQuadraticCouplingTransformM(
             mask=mask,
             transform_net_create_fn=(
                 lambda in_features, out_features: nn_.ResidualNet(
@@ -276,6 +382,7 @@ def create_base_transform(
             tails="linear",
             tail_bound=tail_bound,
             apply_unconditional_transform=apply_unconditional_transform,
+            init_identity=init_identity
         )
 
     elif base_transform_type == "rq-autoregressive":
@@ -292,7 +399,7 @@ def create_base_transform(
             activation=activation_fn,
             dropout_probability=dropout_probability,
             use_batch_norm=batch_norm,
-            init_identity=True # modded version with init_identity
+            init_identity=init_identity # modded version with init_identity
         )
 
     else:

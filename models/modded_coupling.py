@@ -38,6 +38,8 @@ class CouplingTransformM(Transform):
         self.features = len(mask)
         features_vector = torch.arange(self.features)
 
+        self.min_derivative=splines.rational_quadratic.DEFAULT_MIN_DERIVATIVE
+        
         self.register_buffer(
             "identity_features", features_vector.masked_select(mask <= 0)
         )

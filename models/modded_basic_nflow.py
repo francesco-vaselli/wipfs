@@ -34,18 +34,7 @@ from nflows.utils import torchutils
 
 from torch.nn.functional import softplus
 
-from nflows.transforms.coupling import (PiecewiseCouplingTransform)
-from nflows.transforms import splines
-from nflows.transforms.base import Transform
-from nflows.transforms.nonlinearities import (
-    PiecewiseCubicCDF,
-    PiecewiseLinearCDF,
-    PiecewiseQuadraticCDF,
-    PiecewiseRationalQuadraticCDF,
-)
-from nflows.utils import torchutils
-# from nflows.transforms.UMNN import *
-
+from modded_coupling import PiecewiseCouplingTransformM
 
 
 class MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(AutoregressiveTransform):
@@ -150,7 +139,7 @@ class MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(AutoregressiveTra
         return self._elementwise(inputs, autoregressive_params, inverse=True)
 
 
-class PiecewiseRationalQuadraticCouplingTransformM(PiecewiseCouplingTransform):
+class PiecewiseRationalQuadraticCouplingTransformM(PiecewiseCouplingTransformM):
     def __init__(
         self,
         mask,
@@ -185,13 +174,6 @@ class PiecewiseRationalQuadraticCouplingTransformM(PiecewiseCouplingTransform):
             )
         else:
             unconditional_transform = None
-
-        if init_identity:
-          torch.nn.init.constant_(self.transform_net.final_layer.weight, 0.0)
-          torch.nn.init.constant_(
-              self.transform_net.final_layer.bias,
-              np.log(np.exp(1 - min_derivative) - 1),
-          )
 
         super().__init__(
             mask,

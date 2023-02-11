@@ -39,7 +39,7 @@ class CouplingTransformM(Transform):
         features_vector = torch.arange(self.features)
 
         self.min_derivative=splines.rational_quadratic.DEFAULT_MIN_DERIVATIVE
-        
+
         self.register_buffer(
             "identity_features", features_vector.masked_select(mask <= 0)
         )
@@ -58,7 +58,7 @@ class CouplingTransformM(Transform):
           torch.nn.init.constant_(self.transform_net.final_layer.weight, 0.0)
           torch.nn.init.constant_(
               self.transform_net.final_layer.bias,
-              np.log(np.exp(1 - min_derivative) - 1),
+              np.log(np.exp(1 - self.min_derivative) - 1),
           )
 
         if unconditional_transform is None:

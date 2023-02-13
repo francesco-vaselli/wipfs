@@ -224,7 +224,7 @@ class OneDFakesDataset(Dataset):
         )  # .view(-1, 1, x_dim) no reshape because no conv1d
         # print(f"y shape: {y.shape}, z shape: {z.shape}")
         self.y_train = torch.tensor(y[:, 2], dtype=torch.float32)
-        self.z_train = torch.tensor(z[:, 0], dtype=torch.float32)
+        self.z_train = torch.tensor(z[:, 0], dtype=torch.float32).view(-1, 1)
 
     @property
     def archives(self):
@@ -236,7 +236,7 @@ class OneDFakesDataset(Dataset):
         return len(self.y_train)
 
     def __getitem__(self, idx):
-        return self.x_train[idx], self.y_train[idx].view(-1, 1), self.z_train[idx].view(-1, 1)
+        return self.x_train[idx], self.y_train[idx], self.z_train[idx]
 
 
 class SortedNoZeroFakesDataset(Dataset):

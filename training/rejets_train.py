@@ -31,7 +31,7 @@ from fake_utils import (
     get_newvars_datasets,
 )
 from args_basic_train import get_args
-from validate_temp import validate_latent_flowi
+from validate_rejets import validate_rejets
 from utils.datasets import MyDataset
 
 
@@ -107,8 +107,8 @@ def main():
         )
         print(f"Resumed from: {res_epoch}")
 
-    tr_dataset = MyDataset(["./dataset/Ajets_and_muons1+.hdf5"], limit=5000000)    
-    te_dataset = MyDataset(["./dataset/Ajets_and_muons7+.hdf5"], limit=400000)
+    tr_dataset = MyDataset(["./dataset/Ajets_and_muons1+.hdf5"], limit=args.train_limit)    
+    te_dataset = MyDataset(["./dataset/Ajets_and_muons7+.hdf5"], limit=args.test_limit)
     
     train_loader = torch.utils.data.DataLoader(
         dataset=tr_dataset,
@@ -151,7 +151,7 @@ def main():
         output_freq=100,
         save_freq=args.save_freq,
         res_epoch=res_epoch,
-        val_func=validate_latent_flow,
+        val_func=validate_rejets,
     )
 
 

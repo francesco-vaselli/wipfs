@@ -21,7 +21,7 @@ import os
 sys.path.insert(0, os.path.join("..", "utils"))
 sys.path.insert(0, os.path.join("..", "models"))
 sys.path.insert(0, os.path.join("..", "models"))
-from dataset import FakesDataset
+from dataset import MyDataset
 from modded_basic_nflow import create_NDE_model, train, load_model
 from double_flow import LatentFlow
 from fake_utils import (
@@ -32,7 +32,6 @@ from fake_utils import (
 )
 from args_basic_train import get_args
 from validate_rejets import validate_rejets
-from utils import MyDataset
 
 
 def main():

@@ -208,7 +208,8 @@ class OneDFakesDataset(Dataset):
     def __init__(self, h5_paths, x_dim, y_dim, z_dim, start=0, limit=-1):
 
         # we must fix a convention for parametrizing slices
-
+        y_dim = y_dim+5
+        z_dim = z_dim+3 # this is done to preprocess the last two variables into one
         self.h5_paths = h5_paths
         self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
         self._archives = None

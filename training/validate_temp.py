@@ -61,36 +61,39 @@ def validate_latent_flow(
 
             z_sampled = z_sampled.reshape(-1, args.zdim)
             N_sampled = z_sampled[:, 0]
-
-            # PU_n_true_int.append(inputs_y[:])
-            PU_n_true_int.append(inputs_y[:, 2])
+            if args.ydim == 1:
+                PU_n_true_int.append(inputs_y[:])
+            else:
+                PU_n_true_int.append(inputs_y[:, 2])
             N_true_fakes_latent.append(N_sampled)
             # N_true_fakes_full.append(np.sum(x[:, :10] > 0, axis=1))
             N_true_fakes_full.append(N)
-            mod_pt_full.append(z[:, 1])
-            mod_pt_flash.append(z_sampled[:, 1])
-            if args.zdim == 4:
-                px_full.append(z[:, 2])
-                py_full.append(z[:, 3])
-                px_flash.append(z_sampled[:, 2])
-                py_flash.append(z_sampled[:, 3])
-            elif args.zdim == 3:
-                angle_full.append(z[:, 2])
-                angle_flash.append(z_sampled[:, 2])
+            if args.zdim != 1:
+                mod_pt_full.append(z[:, 1])
+                mod_pt_flash.append(z_sampled[:, 1])
+                if args.zdim == 4:
+                    px_full.append(z[:, 2])
+                    py_full.append(z[:, 3])
+                    px_flash.append(z_sampled[:, 2])
+                    py_flash.append(z_sampled[:, 3])
+                elif args.zdim == 3:
+                    angle_full.append(z[:, 2])
+                    angle_flash.append(z_sampled[:, 2])
 
             print("done test batch")
 
-    if args.zdim == 4:
-        px_full = np.reshape(px_full, (-1, 1)).flatten()
-        py_full = np.reshape(py_full, (-1, 1)).flatten()
-        px_flash = np.reshape(px_flash, (-1, 1)).flatten()
-        py_flash = np.reshape(py_flash, (-1, 1)).flatten()
-    elif args.zdim == 3:
-        angle_full = np.reshape(angle_full, (-1, 1)).flatten()
-        angle_flash = np.reshape(angle_flash, (-1, 1)).flatten()
+    if args.zdim != 1:
+        if args.zdim == 4:
+            px_full = np.reshape(px_full, (-1, 1)).flatten()
+            py_full = np.reshape(py_full, (-1, 1)).flatten()
+            px_flash = np.reshape(px_flash, (-1, 1)).flatten()
+            py_flash = np.reshape(py_flash, (-1, 1)).flatten()
+        elif args.zdim == 3:
+            angle_full = np.reshape(angle_full, (-1, 1)).flatten()
+            angle_flash = np.reshape(angle_flash, (-1, 1)).flatten()
 
-    mod_pt_full = np.reshape(mod_pt_full, (-1, 1)).flatten()
-    mod_pt_flash = np.reshape(mod_pt_flash, (-1, 1)).flatten()
+        mod_pt_full = np.reshape(mod_pt_full, (-1, 1)).flatten()
+        mod_pt_flash = np.reshape(mod_pt_flash, (-1, 1)).flatten()
    
 
     PU_n_true_int = np.reshape(PU_n_true_int, (-1, 1)).flatten()
@@ -134,6 +137,10 @@ def validate_latent_flow(
             "mod_pt",
             "angle",
         ]
+    elif args.zdim == 1:
+        full_sim = [N_full]
+        flash_sim = [N_latent]
+        names = ["N_latent"]
 
     bins_N = np.arange(-0.1, 1.1, step=0.1) - 0.05
 

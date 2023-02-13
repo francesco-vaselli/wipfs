@@ -16,7 +16,8 @@ from dataset import (
     SimpleMuonsDataset,
     NoZeroFakesDataset,
     SortedNoZeroFakesDataset,
-    NewVarsDataset
+    NewVarsDataset,
+    OneDFakesDataset,
 )
 
 
@@ -227,6 +228,36 @@ def get_sorted_nozero_datasets(args):
     )
 
     te_dataset = SortedNoZeroFakesDataset(
+        [path],
+        x_dim=args.x_dim,
+        y_dim=args.y_dim,
+        z_dim=args.zdim,
+        start=args.test_start,
+        limit=args.test_limit,
+    )
+
+    return tr_dataset, te_dataset
+
+
+def get_oned_datasets(args):
+
+    path = "./datasets/train_dataset_fake_jets_only_flows.hdf5"
+    if args.rescale_data == True:
+        path = "./datasets/train_dataset_fake_jets_only_flow_rescaled.hdf5"
+    elif args.no_rint == True:
+        path = "./datasets/train_dataset_fake_jets_only_flows_no_rint.hdf5"
+        print("!!!USING DEQUANTIZED N DATA!!!")
+
+    tr_dataset = OneDFakesDataset(
+        [path],
+        x_dim=args.x_dim,
+        y_dim=args.y_dim,
+        z_dim=args.zdim,
+        start=args.train_start,
+        limit=args.train_limit,
+    )
+
+    te_dataset = OneDFakesDataset(
         [path],
         x_dim=args.x_dim,
         y_dim=args.y_dim,

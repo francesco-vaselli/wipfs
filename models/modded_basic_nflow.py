@@ -518,7 +518,7 @@ def train_epoch(
             y = y.to(device, non_blocking=True)
 
         # Compute log prob
-        loss = -flow.log_prob(z.view(-1, args.zdim), context=y.view(-1, args.ydim))
+        loss = -flow.log_prob(z.view(-1, args.zdim), context=y.view(-1, args.y_dim))
 
         # Keep track of total loss. w is a weight to be applied to each
         # element.
@@ -568,7 +568,7 @@ def test_epoch(flow, test_loader, epoch, device=None):
                 y = y.to(device, non_blocking=True)
 
             # Compute log prob
-            loss = -flow.log_prob(z.view(-1, args.zdim), context=y.view(-1, args.ydim))
+            loss = -flow.log_prob(z.view(-1, args.zdim), context=y.view(-1, args.y_dim))
 
             # Keep track of total loss
             test_loss += (loss).sum()

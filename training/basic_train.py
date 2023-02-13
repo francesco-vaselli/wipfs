@@ -20,6 +20,7 @@ import os
 
 sys.path.insert(0, os.path.join("..", "utils"))
 sys.path.insert(0, os.path.join("..", "models"))
+sys.path.insert(0, os.path.join("..", "models"))
 from dataset import FakesDataset
 from modded_basic_nflow import create_NDE_model, train, load_model
 from double_flow import LatentFlow
@@ -28,9 +29,9 @@ from fake_utils import (
     get_sorted_nozero_datasets,
     get_new_datasets,
     get_newvars_datasets,
-
 )
 from args_basic_train import get_args
+from validate_temp import validate_latent_flow
 
 
 def main():
@@ -64,34 +65,32 @@ def main():
             "tail_bound": args.tail_bound,
             "hidden_dim": args.hidden_dim,
             "base_transform_type": args.base_transform_type,  # "rq-autoregressive",
-            "block_size": args.block_size, # useless param if we have alternating-binary mask
-            "mask_type" : args.mask_type,
+            "block_size": args.block_size,  # useless param if we have alternating-binary mask
+            "mask_type": args.mask_type,
             "init_identity": args.init_identity,
-
-    },
-        "transform_type": args.transform_type
+        },
+        "transform_type": args.transform_type,
     }
 
     model = create_NDE_model(**flow_param_dict)
 
-    if args.device == 'cuda':  # Single process, single GPU per process
+    if args.device == "cuda":  # Single process, single GPU per process
         if torch.cuda.is_available():
             device = torch.device("cuda")
             model.to(device)
             print("!!  USING GPU  !!")
-        
-    else: 
+
+    else:
         print("!!  USING CPU  !!")
-        
 
     # resume checkpoints
     res_epoch = 0
     optimizer = torch.optim.Adam(
-                    model.parameters(),
-                    lr=args.lr,
-                    betas=(args.beta1, args.beta2),
-                    weight_decay=args.weight_decay,
-                )
+        model.parameters(),
+        lr=args.lr,
+        betas=(args.beta1, args.beta2),
+        weight_decay=args.weight_decay,
+    )
 
     if args.resume_checkpoint is None and os.path.exists(
         os.path.join(save_dir, "checkpoint-latest.pt")
@@ -107,38 +106,36 @@ def main():
         )
         print(f"Resumed from: {res_epoch}")
 
-    
     # initialize datasets and loaders
     if args.zdim == 4:
         if args.with_zeros:
             tr_dataset, te_dataset = get_new_datasets(args)
-            print('using dataset with zeros')
-        if args.sorted_dataset==True:
+            print("using dataset with zeros")
+        if args.sorted_dataset == True:
             tr_dataset, te_dataset = get_sorted_nozero_datasets(args)
-            print('using sorted dataset')
+            print("using sorted dataset")
         else:
             tr_dataset, te_dataset = get_nozero_datasets(args)
     elif args.zdim == 3:
         tr_dataset, te_dataset = get_newvars_datasets(args)
-        print('using dataset with new vars')
-    
+        print("using dataset with new vars")
 
     train_loader = torch.utils.data.DataLoader(
         dataset=tr_dataset,
         batch_size=args.batch_size,
         shuffle=~args.sorted_dataset,
-        num_workers=args.n_load_cores, 
+        num_workers=args.n_load_cores,
         pin_memory=True,
         sampler=None,
         drop_last=True,
         # worker_init_fn=init_np_seed,
     )
     if args.sorted_dataset:
-        print('train dataset NOT shuffled')
+        print("train dataset NOT shuffled")
 
     test_loader = torch.utils.data.DataLoader(
         dataset=te_dataset,
-        batch_size=args.batch_size, # manually set batch size to avoid diff shapes
+        batch_size=args.batch_size,  # manually set batch size to avoid diff shapes
         shuffle=False,
         num_workers=0,
         pin_memory=True,
@@ -150,8 +147,22 @@ def main():
     print(total_params)
     print(len(train_loader.dataset))
 
-    trh, tsh = train(model, train_loader, test_loader, epochs=args.epochs, optimizer=optimizer, device=torch.device(args.device), 
-                    name='model', model_dir=save_dir, args=args, writer=writer, output_freq=100, save_freq=args.save_freq, res_epoch=res_epoch) 
+    trh, tsh = train(
+        model,
+        train_loader,
+        test_loader,
+        epochs=args.epochs,
+        optimizer=optimizer,
+        device=torch.device(args.device),
+        name="model",
+        model_dir=save_dir,
+        args=args,
+        writer=writer,
+        output_freq=100,
+        save_freq=args.save_freq,
+        res_epoch=res_epoch,
+        val_func=validate_latent_flow,
+    )
 
 
 if __name__ == "__main__":

@@ -223,7 +223,7 @@ class OneDFakesDataset(Dataset):
             x, dtype=torch.float32
         )  # .view(-1, 1, x_dim) no reshape because no conv1d
         # print(f"y shape: {y.shape}, z shape: {z.shape}")
-        self.y_train = torch.tensor(y[:, 2], dtype=torch.float32)
+        self.y_train = torch.tensor(y[:, 2], dtype=torch.float32).view(-1, 1)
         self.z_train = torch.tensor(z[:, 0], dtype=torch.float32).view(-1, 1)
 
     @property

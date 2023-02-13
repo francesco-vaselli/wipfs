@@ -32,7 +32,7 @@ from fake_utils import (
 )
 from args_basic_train import get_args
 from validate_rejets import validate_rejets
-from utils.datasets import MyDataset
+from utils import MyDataset
 
 
 def main():

@@ -106,8 +106,10 @@ def main():
         )
         print(f"Resumed from: {res_epoch}")
 
-    tr_dataset = MyDataset(["/gpfs/ddn/users/cattafe/wipfs/training/dataset/Ajets_and_muons1+.hdf5"], limit=args.train_limit)    
-    te_dataset = MyDataset(["/gpfs/ddn/users/cattafe/wipfs/training/dataset/Ajets_and_muons7+.hdf5"], limit=args.test_limit)
+    dirpath = os.path.dirname(__file__)
+
+    tr_dataset = MyDataset([os.path.join(dirpath, "dataset", "Ajets_and_muons1+.hdf5")], limit=args.train_limit)    
+    te_dataset = MyDataset([os.path.join(dirpath, "dataset", "Ajets_and_muons7+.hdf5")], limit=args.test_limit)
     
     train_loader = torch.utils.data.DataLoader(
         dataset=tr_dataset,

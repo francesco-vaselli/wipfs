@@ -97,12 +97,12 @@ def main():
             save_dir, "checkpoint-latest.pt"
         )  # use the latest checkpoint
     if args.resume_checkpoint is not None:
-        model, _ = load_model(
+        model, _, _, res_epoch, _, _ = load_model(
             device,
             model_dir=save_dir,
             filename="checkpoint-latest.pt",
         )
-        print("Resumed from: " + args.resume_checkpoint)
+        print("Resumed from: " + res_epoch)
 
     
     # initialize datasets and loaders

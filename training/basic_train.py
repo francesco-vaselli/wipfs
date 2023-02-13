@@ -106,6 +106,9 @@ def main():
 
     
     # initialize datasets and loaders
+    if args.with_zeros:
+        tr_dataset, te_dataset = get_new_datasets(args)
+        print('using dataset with zeros')
     if args.sorted_dataset==True:
         tr_dataset, te_dataset = get_sorted_nozero_datasets(args)
         print('using sorted dataset')

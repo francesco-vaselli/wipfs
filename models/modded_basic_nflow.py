@@ -918,6 +918,7 @@ def save_model(epoch, model, scheduler, train_history, test_history, name, model
         raise NameError("Model directory must be specified.")
 
     filename = name + f"_@epoch_{epoch}.pt"
+    resume_filename = 'checkpoint-latest.pt'
 
     p = Path(model_dir)
     p.mkdir(parents=True, exist_ok=True)
@@ -935,6 +936,7 @@ def save_model(epoch, model, scheduler, train_history, test_history, name, model
         dict["scheduler_state_dict"] = scheduler.state_dict()
 
     torch.save(dict, p / filename)
+    torch.save(dict, p / resume_filename)
 
 
 def load_model(device, model_dir=None, filename=None):

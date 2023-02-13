@@ -133,7 +133,7 @@ class NewVarsDataset(Dataset):
         z = self.archives[0]["data"][
             start:limit, (y_dim + x_dim) : (y_dim + x_dim + z_dim)
         ]
-        angle = torch.tensor(np.arctan2(z[:, 3], z[:, 2]))
+        angle = torch.tensor(np.arctan2(z[:, 3], z[:, 2])).view(-1, 1)
         z[:, [1, 2, 3]] = z[:, [1, 2, 3]] / 200.0
         z1 = torch.tensor(z[:, [0, 1]])
         self.x_train = torch.tensor(

@@ -96,7 +96,7 @@ def main():
         args.resume_checkpoint = os.path.join(
             save_dir, "checkpoint-latest.pt"
         )  # use the latest checkpoint
-    if args.resume_checkpoint is not None:
+    if args.resume_checkpoint is not None and args.resume == True:
         model, _, _, res_epoch, _, _ = load_model(
             device,
             model_dir=save_dir,

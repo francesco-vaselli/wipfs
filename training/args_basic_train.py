@@ -107,6 +107,7 @@ def add_args(parser):
     # resuming
     parser.add_argument('--resume_checkpoint', type=str, default=None,
                         help='Path to the checkpoint to be loaded.')
+    parser.add_argument('--resume' , default=False, action='store_true')
     parser.add_argument('--resume_optimizer', action='store_true',
                         help='Whether to resume the optimizer when resumed training.')
     parser.add_argument('--resume_non_strict', action='store_true',

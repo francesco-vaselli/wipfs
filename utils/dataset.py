@@ -128,6 +128,7 @@ class NewVarsDataset(Dataset):
         self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
         self._archives = None
 
+        x = self.archives[0]["data"][start:limit, 0:x_dim]
         y = self.archives[0]["data"][start:limit, x_dim : (x_dim + y_dim)]
         z = self.archives[0]["data"][
             start:limit, (y_dim + x_dim) : (y_dim + x_dim + z_dim)

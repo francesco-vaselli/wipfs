@@ -3,8 +3,10 @@ from torch import nn
 from torch import optim
 from torch.nn import functional as F
 import torch.multiprocessing as mp
+import torch.profiler
 import numpy as np
 import matplotlib.pyplot as plt
+import warnings
 
 from nflows import distributions, flows, transforms, utils
 import nflows.nn.nets as nn_
@@ -35,6 +37,7 @@ from nflows.transforms import splines
 from torch.nn.functional import softplus
 
 from modded_coupling import PiecewiseCouplingTransformM
+
 
 
 
@@ -510,39 +513,52 @@ def train_epoch(
     flow.train()
     train_loss = 0.0
 
-    for batch_idx, (_, y, z) in enumerate(train_loader):
-        optimizer.zero_grad()
+    with torch.profiler.profile(
+        activities=[
+            torch.profiler.ProfilerActivity.CPU,
+            torch.profiler.ProfilerActivity.CUDA
+        ],
+        schedule=torch.profiler.schedule(wait=1, warmup=1, active=3, repeat=2),
+        on_trace_ready=torch.profiler.tensorboard_trace_handler(f'./log/{args.log_name}/profiler'),
+        record_shapes=True,
+        profile_memory=True,
+        with_stack=True
+    ) as prof:
 
-        if device is not None:
-            z = z.to(device, non_blocking=True)
-            y = y.to(device, non_blocking=True)
+        for batch_idx, (_, y, z) in enumerate(train_loader):
+            optimizer.zero_grad()
 
-        # Compute log prob
-        loss = -flow.log_prob(z, context=y)
+            if device is not None:
+                z = z.to(device, non_blocking=True)
+                y = y.to(device, non_blocking=True)
 
-        # Keep track of total loss. w is a weight to be applied to each
-        # element.
-        train_loss += (loss.detach()).sum()
+            # Compute log prob
+            loss = -flow.log_prob(z, context=y)
 
-        # loss = (w * loss).sum() / w.sum()
-        loss = (loss).mean()
+            # Keep track of total loss. w is a weight to be applied to each
+            # element.
+            train_loss += (loss.detach()).sum()
 
-        loss.backward()
-        optimizer.step()
+            # loss = (w * loss).sum() / w.sum()
+            loss = (loss).mean()
 
-        if (output_freq is not None) and (batch_idx % output_freq == 0):
-            print(
-                "Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.4f}".format(
-                    epoch,
-                    batch_idx * train_loader.batch_size,
-                    len(train_loader.dataset),
-                    100.0 * batch_idx / len(train_loader),
-                    loss.item(),
+            loss.backward()
+            optimizer.step()
+
+            if (output_freq is not None) and (batch_idx % output_freq == 0):
+                print(
+                    "Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.4f}".format(
+                        epoch,
+                        batch_idx * train_loader.batch_size,
+                        len(train_loader.dataset),
+                        100.0 * batch_idx / len(train_loader),
+                        loss.item(),
+                    )
                 )
-            )
 
-    train_loss = train_loss.item() / len(train_loader.dataset)
-    print("Model:{} Train Epoch: {} \tAverage Loss: {:.4f}".format(args.log_name, epoch, train_loss))
+        train_loss = train_loss.item() / len(train_loader.dataset)
+        print("Model:{} Train Epoch: {} \tAverage Loss: {:.4f}".format(args.log_name, epoch, train_loss))
+        prof.step()
 
     return train_loss
 

@@ -877,7 +877,7 @@ def test_epoch(flow, test_loader, epoch, device=None):
         return test_loss
 
 
-def train(model, train_loader, test_loader, epochs, optimizer, device, name, model_dir, args, writer=None, output_freq=100, save_freq=10):
+def train(model, train_loader, test_loader, epochs, optimizer, device, name, model_dir, args, writer=None, output_freq=100, save_freq=10, res_epoch=0):
     """Train the model.
     Args:
             epochs:     number of epochs to train for
@@ -891,7 +891,7 @@ def train(model, train_loader, test_loader, epochs, optimizer, device, name, mod
         T_max=epochs,
     )
 
-    for epoch in range(0, epochs + 1):
+    for epoch in range(0+res_epoch, epochs + 1 + res_epoch):
 
         print(
             "Learning rate: {}".format(optimizer.state_dict()["param_groups"][0]["lr"])

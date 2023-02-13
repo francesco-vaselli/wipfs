@@ -83,7 +83,7 @@ def main():
         
 
     # resume checkpoints
-    start_epoch = 0
+    res_epoch = 0
     optimizer = torch.optim.Adam(
                     model.parameters(),
                     lr=args.lr,
@@ -125,7 +125,7 @@ def main():
         dataset=tr_dataset,
         batch_size=args.batch_size,
         shuffle=~args.sorted_dataset,
-        num_workers=args.n_load_cores, # need to find a way to set this automatically
+        num_workers=args.n_load_cores, 
         pin_memory=True,
         sampler=None,
         drop_last=True,
@@ -149,7 +149,7 @@ def main():
     print(len(train_loader.dataset))
 
     trh, tsh = train(model, train_loader, test_loader, epochs=args.epochs, optimizer=optimizer, device=torch.device(args.device), 
-                    name='model', model_dir=save_dir, args=args, writer=writer, output_freq=100, save_freq=args.save_freq) 
+                    name='model', model_dir=save_dir, args=args, writer=writer, output_freq=100, save_freq=args.save_freq, res_epoch=res_epoch) 
 
 
 if __name__ == "__main__":

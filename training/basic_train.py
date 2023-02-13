@@ -102,7 +102,7 @@ def main():
             model_dir=save_dir,
             filename="checkpoint-latest.pt",
         )
-        print("Resumed from: " + res_epoch)
+        print(f"Resumed from: {res_epoch}")
 
     
     # initialize datasets and loaders

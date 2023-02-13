@@ -106,8 +106,8 @@ def main():
         )
         print(f"Resumed from: {res_epoch}")
 
-    tr_dataset = MyDataset(["./dataset/Ajets_and_muons1+.hdf5"], limit=args.train_limit)    
-    te_dataset = MyDataset(["./dataset/Ajets_and_muons7+.hdf5"], limit=args.test_limit)
+    tr_dataset = MyDataset(["dataset/Ajets_and_muons1+.hdf5"], limit=args.train_limit)    
+    te_dataset = MyDataset(["dataset/Ajets_and_muons7+.hdf5"], limit=args.test_limit)
     
     train_loader = torch.utils.data.DataLoader(
         dataset=tr_dataset,

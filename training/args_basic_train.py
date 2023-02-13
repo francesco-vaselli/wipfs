@@ -82,7 +82,7 @@ def add_args(parser):
     # data options
     parser.add_argument('--with_zeros', default=False , action='store_true')
     parser.add_argument('--sorted_dataset', default=False, action='store_true')
-    parser.add_argument('--no_rint', default=True, choices=[True, False])
+    parser.add_argument('--no_rint', type=eval, default=True, choices=[True, False])
     parser.add_argument('--rescale_data', default=False, action='store_true')
     parser.add_argument('--shuffle_train', type=eval, default=True, choices=[True, False])
     parser.add_argument('--train_start', type=int, default=0)

@@ -75,8 +75,10 @@ def main():
     model = create_NDE_model(**flow_param_dict)
 
     if args.device == 'cuda':  # Single process, single GPU per process
-        device = torch.device("cuda")
-        model.to(device)
+        if torch.cuda.is_available():
+            device = torch.device("cuda")
+            model.to(device)
+            print("!!  USING GPU  !!")
         
     else: 
         print("!!  USING CPU  !!")

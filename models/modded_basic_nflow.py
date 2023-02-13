@@ -518,7 +518,7 @@ def train_epoch(
             torch.profiler.ProfilerActivity.CPU,
             torch.profiler.ProfilerActivity.CUDA
         ],
-        on_trace_ready=torch.profiler.tensorboard_trace_handler(f'./runs/{args.log_name}/profiler'),
+        on_trace_ready=torch.profiler.tensorboard_trace_handler(f'runs/{args.log_name}/profiler'),
         record_shapes=True,
         profile_memory=True,
         with_stack=True

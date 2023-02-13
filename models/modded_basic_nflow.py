@@ -515,6 +515,8 @@ def validate_latent_flow(
         py_full = []
         px_flash = []
         py_flash = []
+        angle_full = []
+        angle_flash = []
 
         for bidx, data in enumerate(test_loader):
             _, y, z = data[0], data[1], data[2]
@@ -541,20 +543,29 @@ def validate_latent_flow(
             N_true_fakes_full.append(N)
             mod_pt_full.append(z[:, 1])
             mod_pt_flash.append(z_sampled[:, 1])
-            px_full.append(z[:, 2])
-            py_full.append(z[:, 3])
-            px_flash.append(z_sampled[:, 2])
-            py_flash.append(z_sampled[:, 3])
+            if args.zdim == 4:
+                px_full.append(z[:, 2])
+                py_full.append(z[:, 3])
+                px_flash.append(z_sampled[:, 2])
+                py_flash.append(z_sampled[:, 3])
+            elif args.zdim == 3:
+                angle_full.append(z[:, 2])
+                angle_flash.append(z_sampled[:, 2])
 
             print("done test batch")
 
-    mod_pt_full = np.reshape(mod_pt_full, (-1, 1)).flatten()
-    px_full = np.reshape(px_full, (-1, 1)).flatten()
-    py_full = np.reshape(py_full, (-1, 1)).flatten()
+    if args.zdim == 4:
+        px_full = np.reshape(px_full, (-1, 1)).flatten()
+        py_full = np.reshape(py_full, (-1, 1)).flatten()
+        px_flash = np.reshape(px_flash, (-1, 1)).flatten()
+        py_flash = np.reshape(py_flash, (-1, 1)).flatten()
+    elif args.zdim == 3:
+        angle_full = np.reshape(angle_full, (-1, 1)).flatten()
+        angle_flash = np.reshape(angle_flash, (-1, 1)).flatten()
 
+    mod_pt_full = np.reshape(mod_pt_full, (-1, 1)).flatten()
     mod_pt_flash = np.reshape(mod_pt_flash, (-1, 1)).flatten()
-    px_flash = np.reshape(px_flash, (-1, 1)).flatten()
-    py_flash = np.reshape(py_flash, (-1, 1)).flatten()
+   
 
     PU_n_true_int = np.reshape(PU_n_true_int, (-1, 1)).flatten()
     N_latent = np.reshape(N_true_fakes_latent, (-1, 1)).flatten()
@@ -562,24 +573,41 @@ def validate_latent_flow(
     N_true_fakes_latent = np.reshape(N_true_fakes_latent, (-1, 1)).flatten()
     N_true_fakes_full = np.reshape(N_true_fakes_full, (-1, 1)).flatten()
 
-    full_sim = [
-        N_full,
-        mod_pt_full,
-        px_full,
-        py_full,
-    ]
-    flash_sim = [
-        N_latent,
-        mod_pt_flash,
-        px_flash,
-        py_flash,
-    ]
-    names = [
-        "N_latent",
-        "mod_pt",
-        "px",
-        "py",
-    ]
+    if args.zdim == 4:
+        full_sim = [
+            N_full,
+            mod_pt_full,
+            px_full,
+            py_full,
+        ]
+        flash_sim = [
+            N_latent,
+            mod_pt_flash,
+            px_flash,
+            py_flash,
+        ]
+        names = [
+            "N_latent",
+            "mod_pt",
+            "px",
+            "py",
+        ]
+    elif args.zdim == 3:
+        full_sim = [
+            N_full,
+            mod_pt_full,
+            angle_full,
+        ]
+        flash_sim = [
+            N_latent,
+            mod_pt_flash,
+            angle_flash,
+        ]
+        names = [
+            "N_latent",
+            "mod_pt",
+            "angle",
+        ]
 
     bins_N = np.arange(-0.1, 1.1, step=0.1) - 0.05
 

@@ -27,6 +27,7 @@ from fake_utils import (
     get_nozero_datasets,
     get_sorted_nozero_datasets,
     get_new_datasets,
+    get_newvars_datasets,
 
 )
 from args_basic_train import get_args
@@ -106,14 +107,18 @@ def main():
 
     
     # initialize datasets and loaders
-    if args.with_zeros:
-        tr_dataset, te_dataset = get_new_datasets(args)
-        print('using dataset with zeros')
-    if args.sorted_dataset==True:
-        tr_dataset, te_dataset = get_sorted_nozero_datasets(args)
-        print('using sorted dataset')
-    else:
-        tr_dataset, te_dataset = get_nozero_datasets(args)
+    if args.zdim == 4:
+        if args.with_zeros:
+            tr_dataset, te_dataset = get_new_datasets(args)
+            print('using dataset with zeros')
+        if args.sorted_dataset==True:
+            tr_dataset, te_dataset = get_sorted_nozero_datasets(args)
+            print('using sorted dataset')
+        else:
+            tr_dataset, te_dataset = get_nozero_datasets(args)
+    elif args.zdim == 3:
+        tr_dataset, te_dataset = get_newvars_datasets(args)
+        print('using dataset with new vars')
     
 
     train_loader = torch.utils.data.DataLoader(

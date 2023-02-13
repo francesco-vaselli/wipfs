@@ -710,8 +710,8 @@ def validate_latent_flow(
                 # plt.savefig(os.path.join(save_dir, f"comparison_Jet_pt{j}.png"))
                 writer.add_figure(f"comparison_Jet_pt{j}", fig, global_step=epoch)
 
-    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(9, 4.5), tight_layout=False)
-    ax1.hist2d(
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
+    _, xedges, yedges, _ = ax1.hist2d(
         PU_n_true_int,
         N_true_fakes_full,
         # bins=[
@@ -730,16 +730,16 @@ def validate_latent_flow(
         #     np.arange(left_of_first_bin, right_of_last_bin + d, d),
         #     np.arange(left_of_first_bin2, right_of_last_bin2 + d2, d2),
         # ],
-        range=[[0, 100], [0, 1.1]],
+        range=[[xedges.min(), xedges.max()], [yedges.min(), yedges.max()]],
         cmap="Reds",
         label="FlashSim Latent",
     )
-    ax2.set_ylim([0, 1.1])
+    ax2.set_ylim(ax1.get_ylim())
     ax2.set_xlabel("PU_n_true_int")
     ax2.set_ylabel("N_true_fakes_latent")
 
     fig.suptitle(
-        "Comparison of N_true_fakes_full vs N_true_fakes_latent vs N_true_fakes_reco",
+        "Comparison of N_true_fakes_full vs N_true_fakes_latent",
         fontsize=16,
     )
     ax1.legend(frameon=False, loc="upper right")

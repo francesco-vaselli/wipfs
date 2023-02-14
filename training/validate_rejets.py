@@ -162,8 +162,8 @@ def validate_rejets(
     writer.add_figure(r'p$_T$ and mass correlations', fig, global_step=epoch)
     plt.close()
 
-    limited_pt = total[:, 12]
-    limited_ptj = totalj[:, 12]
+    limited_pt = reco[:, 12]
+    limited_ptj = samples[:, 12]
     gen = df.loc[:, 'GenJet_pt'].values
     limited = np.vstack([gen[:len(limited_pt)], limited_pt]).T
     limitedj = np.vstack([gen[:len(limited_ptj)], limited_ptj]).T

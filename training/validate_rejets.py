@@ -107,7 +107,7 @@ def validate_rejets(
 
         _, rangeR, _ = ax1.hist(reco[:, i], histtype='step', label='FullSim', lw=1, bins=100)
         samples[:, i] = np.where(samples[:, i] < rangeR.min(), rangeR.min(), samples[:, i])
-        samples[:, i] = np.where(samples[:, i] > rangeR.max(), rangeR.max(), sample[:, i])
+        samples[:, i] = np.where(samples[:, i] > rangeR.max(), rangeR.max(), samples[:, i])
         ax1.hist(generated_sample, bins=100,  histtype='step', lw=1,
                 range=[rangeR.min(), rangeR.max()], label=f'FlashSim, ws={round(ws, 4)}')
         fig.suptitle(f"Comparison of {names[i]}", fontsize=16)

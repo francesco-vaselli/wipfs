@@ -55,7 +55,7 @@ def validate_latent_flow(
 
             z_sampled = z_sampled.cpu().detach().numpy()
             inputs_y = inputs_y.cpu().detach().numpy()
-            print(z_sampled.shape, inputs_y.shape)
+            # print(z_sampled.shape, inputs_y.shape)
             z = z.cpu().detach().numpy()
             N = z[:, 0]
 
@@ -67,12 +67,12 @@ def validate_latent_flow(
                 PU_n_true_int.append(inputs_y[:, 2])
 
             if args.no_N:
-                mod_pt_full.append(z[:, 1])
-                mod_pt_flash.append(z_sampled[:, 1])
-                px_full.append(z[:, 2])
-                py_full.append(z[:, 3])
-                px_flash.append(z_sampled[:, 2])
-                py_flash.append(z_sampled[:, 3])
+                mod_pt_full.append(z[:, 0])
+                mod_pt_flash.append(z_sampled[:, 0])
+                px_full.append(z[:, 1])
+                py_full.append(z[:, 2])
+                px_flash.append(z_sampled[:, 1])
+                py_flash.append(z_sampled[:, 2])
             else:
                 N_true_fakes_latent.append(N_sampled)
                 # N_true_fakes_full.append(np.sum(x[:, :10] > 0, axis=1))
@@ -89,7 +89,7 @@ def validate_latent_flow(
                         angle_full.append(z[:, 2])
                         angle_flash.append(z_sampled[:, 2])
 
-            print("done test batch")
+            # print("done test batch")
     if args.no_N:
         px_full = np.reshape(px_full, (-1, 1)).flatten()
         py_full = np.reshape(py_full, (-1, 1)).flatten()

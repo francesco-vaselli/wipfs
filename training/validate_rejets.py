@@ -61,9 +61,9 @@ def validate_rejets(
 
 
     tot_sample = np.array(tot_sample)
-    generated_samples = np.reshape(tot_sample, (100000, 17))
-    dff_test_reco = pd.Dataframe(data=np.array(dff_test_reco).reshape((100000, 17)))
-    dff_test_gen = pd.Dataframe(data=np.array(dff_test_gen).reshape((100000, 14)))
+    generated_samples = np.reshape(tot_sample, (args.test_limit, args.zdim))
+    dff_test_reco = pd.Dataframe(data=np.array(dff_test_reco).reshape((args.test_limit, args.zdim)))
+    dff_test_gen = pd.Dataframe(data=np.array(dff_test_gen).reshape((args.test_limit, args.y_dim)))
 
 
     generated_samples[:, 15] = np.rint(generated_samples[:, 15])

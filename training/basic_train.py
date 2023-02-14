@@ -30,6 +30,7 @@ from fake_utils import (
     get_new_datasets,
     get_newvars_datasets,
     get_oned_datasets,
+    get_noN_datasets,
 )
 from args_basic_train import get_args
 from validate_temp import validate_latent_flow
@@ -108,21 +109,24 @@ def main():
         print(f"Resumed from: {res_epoch}")
 
     # initialize datasets and loaders
-    if args.zdim == 4:
-        if args.with_zeros:
-            tr_dataset, te_dataset = get_new_datasets(args)
-            print("using dataset with zeros")
-        elif args.sorted_dataset == True:
-            tr_dataset, te_dataset = get_sorted_nozero_datasets(args)
-            print("using sorted dataset")
-        else:
-            tr_dataset, te_dataset = get_nozero_datasets(args)
-    elif args.zdim == 3:
-        tr_dataset, te_dataset = get_newvars_datasets(args)
-        print("using dataset with new vars")
-    elif args.zdim == 1:
-        tr_dataset, te_dataset = get_oned_datasets(args)
-        print("using dataset with 1d vars")
+    if args.no_N:
+        tr_dataset, te_dataset = get_noN_datasets(args)
+    else: 
+        if args.zdim == 4:
+            if args.with_zeros:
+                tr_dataset, te_dataset = get_new_datasets(args)
+                print("using dataset with zeros")
+            elif args.sorted_dataset == True:
+                tr_dataset, te_dataset = get_sorted_nozero_datasets(args)
+                print("using sorted dataset")
+            else:
+                tr_dataset, te_dataset = get_nozero_datasets(args)
+        elif args.zdim == 3:
+            tr_dataset, te_dataset = get_newvars_datasets(args)
+            print("using dataset with new vars")
+        elif args.zdim == 1:
+            tr_dataset, te_dataset = get_oned_datasets(args)
+            print("using dataset with 1d vars")
 
     train_loader = torch.utils.data.DataLoader(
         dataset=tr_dataset,

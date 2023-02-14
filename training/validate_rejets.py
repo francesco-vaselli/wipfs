@@ -164,9 +164,9 @@ def validate_rejets(
 
     limited_pt = reco[:, 12]
     limited_ptj = samples[:, 12]
-    gen = df.loc[:, 'GenJet_pt'].values
-    limited = np.vstack([gen[:len(limited_pt)], limited_pt]).T
-    limitedj = np.vstack([gen[:len(limited_ptj)], limited_ptj]).T
+    x = df.loc[:, 'GenJet_pt'].values
+    limited = np.vstack([x[:len(limited_pt)], limited_pt]).T
+    limitedj = np.vstack([x[:len(limited_ptj)], limited_ptj]).T
 
     blue_line = mlines.Line2D([], [], color='tab:blue', label='FullSim')
     red_line = mlines.Line2D([], [], color='tab:orange', label='FlashSim')

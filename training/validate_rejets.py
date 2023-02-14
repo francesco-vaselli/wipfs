@@ -127,39 +127,12 @@ def validate_rejets(
     totalj[:, 12] = totalj[:, 12] * df['GenJet_pt'].values
 
     total = dff_test_reco.values
-    print(total.shape)
-    total = total[~np.isnan(total)]
-    print(total.shape)
     total[:, 7] = total[:, 7] + df['GenJet_eta'].values
     total[:, 9] = total[:, 9] * df['GenJet_mass'].values
     total[:, 11] = total[:, 11] +  df['GenJet_phi'].values
     total[:, 11]= np.where( total[:, 11]< -np.pi, total[:, 11] + 2*np.pi, total[:, 11])
     total[:, 11]= np.where( total[:, 11]> np.pi, total[:, 11] - 2*np.pi, total[:, 11])
     total[:, 12] = total[:, 12] * df['GenJet_pt'].values
-
-
-    for i in range(0, 17):
-        generated_sample = totalj[:, i]
-        ws = wasserstein_distance(total[:, i], generated_sample)
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
-
-        _, rangeR, _ = ax1.hist(total[:, i], histtype='step', lw=1, bins=100, label='FullSim')
-        
-        ax1.hist(generated_sample, bins=100,  histtype='step', lw=1,
-                range=[rangeR.min(), rangeR.max()], label=f'FlashSim, ws = {ws}')
-        fig.suptitle(f"Comparison of {names[i]}", fontsize=16)
-        ax1.legend(fontsize=16, frameon=False)
-
-        ax2.set_yscale("log")
-        ax2.hist(total[:, i], histtype='step', lw=1, bins=100)
-        ax2.hist(generated_sample, bins=100,  histtype='step', lw=1,
-                range=[rangeR.min(), rangeR.max()], label=f'ws = {ws}')
-        ax1.spines['right'].set_visible(False)
-        ax1.spines['top'].set_visible(False)
-        ax2.spines['right'].set_visible(False)
-        ax2.spines['top'].set_visible(False)
-        writer.add_figure("", figure=fig, global_step=epoch)
-    plt.close()
 
 
     blue_line = mlines.Line2D([], [], color='tab:blue', label='FullSim')

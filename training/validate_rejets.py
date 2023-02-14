@@ -57,7 +57,7 @@ def validate_rejets(
             dff_test_reco.append(z)
             z_sampled = z_sampled.reshape(-1, args.zdim)
             tot_sample.append(z_sampled)
-            dff_test_gen.append(y)
+            dff_test_gen.append(inputs_y)
 
 
     tot_sample = np.array(tot_sample)

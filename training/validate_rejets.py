@@ -183,7 +183,7 @@ def validate_rejets(
     # b-tagging FOM
 
     def histANDroc(gen, gen_df):
-        truth = np.abs(gen_df.values)
+        truth = np.abs(gen_df)
         mask_b = np.where(truth[:, 12]==5)
         mask_uds = np.where((truth[:, 12]==1) | (truth[:, 12]==2) | (truth[:, 12]==3))
         print(truth[:, 12])

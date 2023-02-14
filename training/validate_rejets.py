@@ -122,7 +122,7 @@ def validate_rejets(
         ax2.hist(reco[:, i], histtype='step', lw=1, bins=100)
         ax2.hist(samples[:, i], bins=100,  histtype='step', lw=1,
                 range=[rangeR.min(), rangeR.max()])
-        writer.add_figure(f{names[i]}, fig, global_step=epoch)
+        writer.add_figure(f"{names[i]}", fig, global_step=epoch)
     plt.close()
 
     # Corner plot

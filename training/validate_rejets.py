@@ -141,9 +141,9 @@ def validate_rejets(
 
     blue_line = mlines.Line2D([], [], color='tab:blue', label='FullSim')
     red_line = mlines.Line2D([], [], color='tab:orange', label='FlashSim')
-    fig = corner.corner(reco[:, [13, 10]], bins=40, labels=['Jet_qgl', 'Jet_nConstituents'], color='tab:blue', smooth1d=0.5,
+    fig = corner.corner(reco[:, [13, 10]], range=[(0, 1), (0,90)], bins=40, labels=['Jet_qgl', 'Jet_nConstituents'], color='tab:blue', smooth1d=0.5,
                         levels=(0.5,0.9, 0.99), hist_bin_factor=1, scale_hist=True, plot_datapoints=False)
-    corner.corner(samples[:, [13, 10]], bins=40, levels=[0.5, 0.9, 0.99], hist_bin_factor=1, color='tab:orange', smooth1d=0.5,
+    corner.corner(samples[:, [13, 10]], range=[(0, 1), (0,90)], bins=40, levels=[0.5, 0.9, 0.99], hist_bin_factor=1, color='tab:orange', smooth1d=0.5,
                 scale_hist=True, plot_datapoints=False, fig=fig)
     plt.legend(fontsize=16, frameon=False, handles=[blue_line,red_line], bbox_to_anchor=(0., 1.0, 1., 1.0), loc='upper right')
     plt.suptitle('qgl and nConstituens correlations', fontsize=16)

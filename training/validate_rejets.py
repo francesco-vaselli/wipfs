@@ -221,6 +221,7 @@ def validate_rejets(
 
         return figure, fpr, tpr, roc_auc, bs, nbs
 
+    print(gen.shape)
     fig, fpr, tpr, roc_auc, bs, nbs = histANDroc(samples, gen)
     cfig, cfpr, ctpr, croc_auc, cbs, cnbs  = histANDroc(reco, gen)
 

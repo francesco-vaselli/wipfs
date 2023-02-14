@@ -80,6 +80,7 @@ def add_args(parser):
                         help='Learning rate exponential decay frequency')
 
     # data options
+    parser.add_argument('--no_N', type=eval, default=False, choices=[True, False])
     parser.add_argument('--with_zeros', default=False , action='store_true')
     parser.add_argument('--sorted_dataset', default=False, action='store_true')
     parser.add_argument('--no_rint', type=eval, default=True, choices=[True, False])

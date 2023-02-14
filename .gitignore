@@ -132,3 +132,5 @@ dmypy.json
 *.root
 *.hdf5
 /training/saves/
+/training/runs/
+/training/checkpoints/

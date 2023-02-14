@@ -127,7 +127,7 @@ def validate_rejets(
     totalj[:, 12] = totalj[:, 12] * df['GenJet_pt'].values
 
     total = dff_test_reco.values
-    print(total)
+    total = total[~total.isin([np.nan, np.inf, -np.inf]).any(axis="columns")]
     total[:, 7] = total[:, 7] + df['GenJet_eta'].values
     total[:, 9] = total[:, 9] * df['GenJet_mass'].values
     total[:, 11] = total[:, 11] +  df['GenJet_phi'].values
@@ -368,6 +368,6 @@ def validate_rejets(
     plt.title("Receiver operating characteristic", fontsize=16)
     plt.legend(fontsize=16, frameon=False,loc="best")
     writer.add_figure("", figure=fig, global_step=epoch)
-
+plt.close()
 
 

@@ -99,7 +99,7 @@ def validate_rejets(
         fig.suptitle(f"Comparison of {names[i]}", fontsize=16)
         ax1.legend(frameon=False, loc='upper right')
 
-        ax1.spines['right'].set_visible(False)
+        ax1.spines['right'].set_visible(False)  
         ax1.spines['top'].set_visible(False)
         ax2.spines['right'].set_visible(False)
         ax2.spines['top'].set_visible(False)
@@ -127,6 +127,7 @@ def validate_rejets(
     totalj[:, 12] = totalj[:, 12] * df['GenJet_pt'].values
 
     total = dff_test_reco.values
+    print(total)
     total[:, 7] = total[:, 7] + df['GenJet_eta'].values
     total[:, 9] = total[:, 9] * df['GenJet_mass'].values
     total[:, 11] = total[:, 11] +  df['GenJet_phi'].values

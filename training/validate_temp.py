@@ -61,7 +61,7 @@ def validate_latent_flow(
 
             z_sampled = z_sampled.reshape(-1, args.zdim)
             N_sampled = z_sampled[:, 0]
-            if args.ydim == 1:
+            if args.y_dim == 1:
                 PU_n_true_int.append(inputs_y[:])
             else:
                 PU_n_true_int.append(inputs_y[:, 2])

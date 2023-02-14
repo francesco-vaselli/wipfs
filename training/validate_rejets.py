@@ -69,6 +69,9 @@ def validate_rejets(
     print(dff_test_gen.shape)
     dff_test_gen = pd.DataFrame(data=dff_test_gen)
 
+    names = ["Jet_area", "Jet_btagCMVA", "Jet_btagCSVV2", "Jet_btagDeepB", "Jet_btagDeepC", "Jet_btagDeepFlavB", "Jet_btagDeepFlavC",
+        "Jet_etaMinusGen", "Jet_bRegCorr", "Jet_massRatio", "Jet_nConstituents", "Jet_phiMinusGen",
+        "Jet_ptRatio","Jet_qgl", "Jet_muEF", "Jet_puId", "Jet_jetId"]
 
     generated_samples[:, 15] = np.rint(generated_samples[:, 15])
     generated_samples[:, 16] = np.rint(generated_samples[:, 16])

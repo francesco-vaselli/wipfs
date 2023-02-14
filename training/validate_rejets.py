@@ -107,7 +107,7 @@ def validate_rejets(
         ax2.hist(dff_test_reco.values[:, i], histtype='step', lw=1, bins=100)
         ax2.hist(generated_sample, bins=100,  histtype='step', lw=1,
                 range=[rangeR.min(), rangeR.max()])
-        writer.add_figure(figure=fig, global_step=epoch)
+        writer.add_figure("", figure=fig, global_step=epoch)
     plt.close()
 
     jet_cond = ["MClosestMuon_dr", "MClosestMuon_pt", "MClosestMuon_deta", "MClosestMuon_dphi", "MSecondClosestMuon_dr", "MSecondClosestMuon_pt",
@@ -155,7 +155,7 @@ def validate_rejets(
         ax1.spines['top'].set_visible(False)
         ax2.spines['right'].set_visible(False)
         ax2.spines['top'].set_visible(False)
-        writer.add_figure(figure=fig, global_step=epoch)
+        writer.add_figure("", figure=fig, global_step=epoch)
     plt.close()
 
 
@@ -167,7 +167,7 @@ def validate_rejets(
                 scale_hist=True, plot_datapoints=False, fig=fig)
     plt.legend(fontsize=24, frameon=False, handles=[blue_line,red_line], bbox_to_anchor=(0., 1.0, 1., 4.0), loc='upper right')
     plt.suptitle('Jet tagging distributions correlations', fontsize=20)
-    writer.add_figure(figure=fig, global_step=epoch)
+    writer.add_figure("", figure=fig, global_step=epoch)
     plt.close()
 
 
@@ -180,7 +180,7 @@ def validate_rejets(
     plt.legend(fontsize=16, frameon=False, handles=[blue_line,red_line], bbox_to_anchor=(0., 1.0, 1., 1.0), loc='upper right')
     plt.suptitle('qgl and nConstituens correlations', fontsize=16
                 )
-    writer.add_figure(figure=fig, global_step=epoch)
+    writer.add_figure("", figure=fig, global_step=epoch)
     plt.close()
 
 
@@ -205,7 +205,7 @@ def validate_rejets(
     ax2.hist(limited_pt, histtype='step', lw=1, bins=20, range=[0, 100])
     ax2.hist(limited_ptj, bins=20,  histtype='step', lw=1,
             range=[rangeR.min(), rangeR.max()], label=f'ws = {ws}')
-    writer.add_figure(figure=fig, global_step=epoch)
+    writer.add_figure("", figure=fig, global_step=epoch)
     plt.close()
 
 
@@ -219,7 +219,7 @@ def validate_rejets(
     plt.legend(fontsize=16, frameon=False, handles=[blue_line,red_line], bbox_to_anchor=(0., 1.0, 1., 1.0), loc='upper right')
     plt.suptitle(r'p$_T$ and mass correlations', fontsize=16
                 )
-    writer.add_figure(figure=fig, global_step=epoch)
+    writer.add_figure("", figure=fig, global_step=epoch)
     plt.close()
 
 
@@ -232,7 +232,7 @@ def validate_rejets(
     plt.legend(fontsize=16, frameon=False, handles=[blue_line,red_line], bbox_to_anchor=(0., 1.0, 1., 1.0), loc='upper right')
     plt.suptitle(r'GenJet_p$_T$ and p$_T$ correlations', fontsize=16
              )
-    writer.add_figure(figure=fig, global_step=epoch)
+    writer.add_figure("", figure=fig, global_step=epoch)
     plt.close()
 
 
@@ -290,7 +290,7 @@ def validate_rejets(
     ax1.spines['top'].set_visible(False)
     ax2.spines['right'].set_visible(False)
     ax2.spines['top'].set_visible(False)
-    writer.add_figure(figure=fig, global_step=epoch)
+    writer.add_figure("", figure=fig, global_step=epoch)
     plt.close()
 
 
@@ -366,7 +366,7 @@ def validate_rejets(
     ax.spines['top'].set_visible(False)
     plt.title("Receiver operating characteristic", fontsize=16)
     plt.legend(fontsize=16, frameon=False,loc="best")
-    writer.add_figure(figure=fig, global_step=epoch)
+    writer.add_figure("", figure=fig, global_step=epoch)
 
 
 

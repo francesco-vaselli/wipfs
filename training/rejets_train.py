@@ -130,7 +130,7 @@ def main():
         shuffle=False,
         num_workers=0,
         pin_memory=True,
-        drop_last=False,
+        drop_last=True,
     )
 
     # print total params number and stuff

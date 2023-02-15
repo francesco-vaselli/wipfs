@@ -136,4 +136,4 @@ dmypy.json
 /training/checkpoints/
 
 #VSCode
-.vscode/
+/.vscode/

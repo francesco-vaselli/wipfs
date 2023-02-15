@@ -134,3 +134,6 @@ dmypy.json
 /training/saves/
 /training/runs/
 /training/checkpoints/
+
+#VSCode
+.vscode/

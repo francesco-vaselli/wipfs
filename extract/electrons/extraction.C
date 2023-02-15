@@ -401,7 +401,7 @@ void extraction() {
   /store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/20000/40E28BE3-1A22-9D40-A482-2BAA3E9ABC24.root
   */
 
-  TFile *f = TFile::Open("root://cmsxrootd.fnal.gov///store/mc/RunIISummer20UL18NanoAODv2/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v15_L1v1-v1/230000/0088F3A1-0457-AB4D-836B-AC3022A0E34F.root");
+  TFile *f = TFile::Open("root://cmsxrootd.fnal.gov///store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/20000/40E28BE3-1A22-9D40-A482-2BAA3E9ABC24.root");
 
   ROOT::RDataFrame d("Events", f);
 
@@ -660,8 +660,8 @@ void extraction() {
           .Define("MElectron_dz", "Electron_dz[Electron_MGenElectronMask]")
           .Define("MElectron_dzErr",
                   "Electron_dzErr[Electron_MGenElectronMask]")
-          .Define("MElectron_eCorr",
-                  "Electron_eCorr[Electron_MGenElectronMask]")
+          //.Define("MElectron_eCorr",
+          //        "Electron_eCorr[Electron_MGenElectronMask]")
           .Define("MElectron_eInvMinusPInv",
                   "Electron_eInvMinusPInv[Electron_MGenElectronMask]")
           .Define("MElectron_energyErr",
@@ -927,7 +927,7 @@ void extraction() {
                                 "MElectron_dxyErr",
                                 "MElectron_dz",
                                 "MElectron_dzErr",
-                                "MElectron_eCorr",
+                                //"MElectron_eCorr",
                                 "MElectron_eInvMinusPInv",
                                 "MElectron_energyErr",
                                 "MElectron_etaMinusGen",
@@ -988,5 +988,5 @@ void extraction() {
                                 "MElectron_vidNestedWPBitmapHEEP10",
                                 "MElectron_vidNestedWPBitmapHEEP11"};
 
-  d_matched.Snapshot("MElectrons", "MElectrons_v1.root", col_to_save);
+  d_matched.Snapshot("MElectrons", "MElectrons_v7.root", col_to_save);
 }

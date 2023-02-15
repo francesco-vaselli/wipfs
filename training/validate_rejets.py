@@ -59,8 +59,8 @@ def validate_rejets(
             samples.append(z_sampled)
 
     gen = np.array(gen).reshape((-1, args.y_dim))
-    reco = np.array(reco).reshape((args.test_limit, args.zdim))
-    samples = np.array(samples).reshape((args.test_limit, args.zdim))
+    reco = np.array(reco).reshape((-1, args.zdim))
+    samples = np.array(samples).reshape((-1, args.zdim))
 
     # Samples postprocessing 
 

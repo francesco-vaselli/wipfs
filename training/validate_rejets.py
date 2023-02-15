@@ -58,7 +58,7 @@ def validate_rejets(
             reco.append(z)
             samples.append(z_sampled)
 
-    gen = np.array(gen).reshape((args.test_limit, args.y_dim))
+    gen = np.array(gen).reshape((-1, args.y_dim))
     reco = np.array(reco).reshape((args.test_limit, args.zdim))
     samples = np.array(samples).reshape((args.test_limit, args.zdim))
 
@@ -234,6 +234,7 @@ def validate_rejets(
         lw=lw,
         label=f"ROC curve (area = %0.2f) FlashSim" % roc_auc,
     )
+    
     plt.plot(
         ctpr,
         cfpr,

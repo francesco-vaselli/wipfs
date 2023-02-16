@@ -1,10 +1,44 @@
-
 import torch
 import torch.nn as nn
 import numpy as np
 
-from normflows import distributions
 from normflows import utils
+
+
+def is_int(x):
+    return isinstance(x, int)
+
+
+def is_positive_int(x):
+    return is_int(x) and x > 0
+
+
+def split_leading_dim(x, shape):
+    """Reshapes the leading dim of `x` to have the given shape."""
+    new_shape = torch.Size(shape) + x.shape[1:]
+    return torch.reshape(x, new_shape)
+
+
+def merge_leading_dims(x, num_dims):
+    """Reshapes the tensor `x` such that the first `num_dims` dimensions are merged to one."""
+    if not is_positive_int(num_dims):
+        raise TypeError("Number of leading dims must be a positive integer.")
+    if num_dims > x.dim():
+        raise ValueError(
+            "Number of leading dims can't be greater than total number of dims."
+        )
+    new_shape = torch.Size([-1]) + x.shape[num_dims:]
+    return torch.reshape(x, new_shape)
+
+
+def repeat_rows(x, num_reps):
+    """Each row of tensor `x` is repeated `num_reps` times along leading dimension."""
+    if not is_positive_int(num_reps):
+        raise TypeError("Number of repetitions must be a positive integer.")
+    shape = x.shape
+    x = x.unsqueeze(1)
+    x = x.expand(shape[0], num_reps, *shape[1:])
+    return merge_leading_dims(x, num_dims=2)
 
 
 class ContextNormalizingFlow(nn.Module):
@@ -82,6 +116,7 @@ class ContextNormalizingFlow(nn.Module):
         """
         Estimates forward KL divergence, see arXiv 1912.02762
         :param x: Batch sampled from target distribution
+        :param context: Batch of context variables
         :return: Estimate of forward KL divergence averaged over batch
         """
         log_q = torch.zeros(len(x), device=x.device)
@@ -150,17 +185,28 @@ class ContextNormalizingFlow(nn.Module):
         else:
             loss = np.sign(alpha - 1) * torch.logsumexp(alpha * (log_p - log_q), 0)
         return loss
-    
+
     def sample(self, num_samples=1, context=None):
         """
         Samples from flow-based approximate distribution
         :param num_samples: Number of samples to draw
+        :param context: Context for conditional flows (accepts batches and will output one sample per batch element)
         :return: Samples, log probability
         """
-        z, log_q = self.q0(num_samples)
+        repeat_noise, log_q = self.q0(num_samples * context.shape[0])
+        z = torch.reshape(repeat_noise, (context.shape[0], -1, repeat_noise.shape[1]))
+        if context is not None:
+            # Merge the context dimension with sample dimension in order to apply the transform.
+            z = merge_leading_dims(z, num_dims=2)
+            context = repeat_rows(context, num_reps=num_samples)
         for flow in self.flows:
             z, log_det = flow(z, context=context)
             log_q -= log_det
+
+        if context is not None:
+            # Split the context dimension from sample dimension.
+            z = split_leading_dim(z, shape=[-1, num_samples])
+
         return z, log_q
 
     def log_prob(self, x):

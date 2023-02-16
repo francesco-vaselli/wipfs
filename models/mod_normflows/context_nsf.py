@@ -30,6 +30,7 @@ class ContextCoupledRationalQuadraticSpline(Flow):
         activation=nn.ReLU,
         dropout_probability=0.0,
         reverse_mask=False,
+        init_identity=True,
     ):
         """Constructor
         Args:
@@ -65,6 +66,7 @@ class ContextCoupledRationalQuadraticSpline(Flow):
             tail_bound=tail_bound,
             # Setting True corresponds to equations (4), (5), (6) in the NSF paper:
             apply_unconditional_transform=True,
+            init_identity=init_identity,
         )
 
     def forward(self, z, context=None):
@@ -76,7 +78,7 @@ class ContextCoupledRationalQuadraticSpline(Flow):
         return z, log_det.view(-1)
 
 
-class AutoregressiveRationalQuadraticSpline(Flow):
+class ContextAutoregressiveRationalQuadraticSpline(Flow):
     """
     Neural spline flow coupling layer, wrapper for the implementation
     of Durkan et al., see [sources](https://github.com/bayesiains/nsf)

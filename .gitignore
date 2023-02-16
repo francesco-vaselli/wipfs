@@ -135,5 +135,9 @@ dmypy.json
 /training/runs/
 /training/checkpoints/
 
+# Electrons preprocessing figures
+
+/preproce/electrons/figures/
+
 #VSCode
 /.vscode

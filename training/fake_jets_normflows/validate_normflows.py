@@ -81,6 +81,7 @@ def validate_latent_flow(
     py_flash = np.reshape(py_flash, (-1, 1)).flatten()
     mod_pt_full = np.reshape(mod_pt_full, (-1, 1)).flatten()
     mod_pt_flash = np.reshape(mod_pt_flash, (-1, 1)).flatten()
+    print(px_full.shape, px_flash.shape)
 
     arctan = np.arctan2(py_full,px_full).reshape(-1,1)
     arctan_sampled = np.arctan2(py_flash,px_flash).reshape(-1,1)

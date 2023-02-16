@@ -1,7 +1,7 @@
 # basic nflow train args
 import argparse
 
-Y_DIM = type(None)
+Y_DIM = None
 Z_DIM = 4   
 
 def add_args(parser):

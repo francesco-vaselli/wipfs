@@ -23,8 +23,8 @@ from .context_flow import ContextNormalizingFlow
 def create_model(
     num_splines,
     num_input_channels,
-    num_blocks,
     num_hidden_channels,
+    num_blocks,
     transform_type="rq-coupling",
     num_context_channels=None,
     num_bins=8,

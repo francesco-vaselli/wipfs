@@ -56,8 +56,8 @@ def main():
     flow_param_dict = {
         "num_splines": args.num_splines,
         "num_input_channels": args.z_dim,
-        "num_blocks": args.num_blocks,
         "num_hidden_channels": args.num_hidden_channels,
+        "num_blocks": args.num_blocks,
         "transform_type": args.transform_type,
         "num_context_channels": args.y_dim,
         "num_bins": args.num_bins,

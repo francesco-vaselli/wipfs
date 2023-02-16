@@ -22,6 +22,7 @@ def add_args(parser):
     parser.add_argument('--batch_norm', type=eval, default=True, choices=[True, False])
     parser.add_argument('--num_bins', type=int, default=8)
     parser.add_argument('--tail_bound', type=float, default=3.0)
+    parser.add_argument('--tails', type=str, default='linear', choices=['linear', 'logistic', 'exp'])
     parser.add_argument('--num_hidden_channels', type=int, default=128)
     parser.add_argument('--transform_type', type=str, default='rq-autoregressive', choices=['rq-autoregressive', 'rq-coupling'])
     parser.add_argument('--reverse_mask', type=eval, default=False, choices=[True, False])

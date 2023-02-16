@@ -35,6 +35,7 @@ def create_model(
     reverse_mask=False,
     permute_mask=False,
     init_identity=True,
+    batch_norm=False,
 ):
     """Build a sequence of NSF transforms, which maps parameters x into the
     base distribution u (noise). Transforms are conditioned on strain data y.
@@ -66,6 +67,7 @@ def create_model(
             dropout_probability=dropout_probability,
             reverse_mask=reverse_mask,
             init_identity=init_identity,
+            batch_norm=batch_norm,
         )
 
     elif transform_type == "rq-autoregressive":
@@ -81,6 +83,7 @@ def create_model(
             dropout_probability=dropout_probability,
             permute_mask=permute_mask,
             init_identity=init_identity,
+            batch_norm=batch_norm,
         )
 
     else:
@@ -111,6 +114,7 @@ def create_model(
         "reverse_mask": reverse_mask,
         "permute_mask": permute_mask,
         "init_identity": init_identity,
+        "batch_norm": batch_norm,
     }
 
     return flow
@@ -142,20 +146,26 @@ def train_epoch(
 
     flow.train()
     train_loss = 0.0
+    train_log_p = 0.0
+    train_log_det = 0.0
 
-    for batch_idx, (_, y, z) in enumerate(train_loader):
+    for batch_idx, (y, z) in enumerate(train_loader):
         optimizer.zero_grad()
 
         if device is not None:
             z = z.to(device, non_blocking=True)
-            y = y.to(device, non_blocking=True)
+            if args.y_dim is not None:
+                y = y.to(device, non_blocking=True)
 
         # Compute log prob
-        loss = -flow.forward_kld(z, context=y)
+        log_p, log_det = flow.forward_kld(z, context=y)
+        loss = log_p + log_det
 
         # Keep track of total loss. w is a weight to be applied to each
         # element.
         train_loss += (loss.detach()).sum()
+        train_log_p += (log_p.detach()).sum()
+        train_log_det += (log_det.detach()).sum()
 
         loss = (loss).mean()
         if ~(torch.isnan(loss) | torch.isinf(loss)):
@@ -180,7 +190,7 @@ def train_epoch(
         )
     )
 
-    return train_loss
+    return train_loss, train_log_p, train_log_det
 
 
 def test_epoch(flow, test_loader, epoch, args, device=None):
@@ -197,23 +207,29 @@ def test_epoch(flow, test_loader, epoch, args, device=None):
     with torch.no_grad():
         flow.eval()
         test_loss = 0.0
-        for _, y, z in test_loader:
+        test_log_p = 0.0
+        test_log_det = 0.0
+        for y, z in test_loader:
 
             if device is not None:
                 z = z.to(device, non_blocking=True)
-                y = y.to(device, non_blocking=True)
+                if args.y_dim is not None:
+                    y = y.to(device, non_blocking=True)
 
             # Compute log prob
-            loss = -flow.forward_kld(z, context=y)
+            log_p, log_det = flow.forward_kld(z, context=y)
+            loss = log_p + log_det
 
             # Keep track of total loss
             test_loss += (loss).sum()
+            test_log_p += (log_p).sum()
+            test_log_det += (log_det).sum()
 
         test_loss = test_loss.item() * args.batch_size / len(test_loader.dataset)
         # test_loss = test_loss.item() / total_weight.item()
         print("Test set: Average loss: {:.4f}\n".format(test_loss))
 
-        return test_loss
+        return test_loss, test_log_p, test_log_det
 
 
 def train(
@@ -251,10 +267,10 @@ def train(
             "Learning rate: {}".format(optimizer.state_dict()["param_groups"][0]["lr"])
         )
 
-        train_loss = train_epoch(
+        train_loss, train_log_p, train_log_det = train_epoch(
             model, train_loader, optimizer, epoch, device, output_freq, args=args
         )
-        test_loss = test_epoch(model, test_loader, epoch, args, device)
+        test_loss, test_log_p, test_log_det = test_epoch(model, test_loader, epoch, args, device)
 
         scheduler.step()
         train_history.append(train_loss)
@@ -263,6 +279,10 @@ def train(
         if writer is not None:
             writer.add_scalar("train/loss", train_loss, epoch)
             writer.add_scalar("test/loss", test_loss, epoch)
+            writer.add_scalar("train/log_p", train_log_p, epoch)
+            writer.add_scalar("test/log_p", test_log_p, epoch)
+            writer.add_scalar("train/log_det", train_log_det, epoch)
+            writer.add_scalar("test/log_det", test_log_det, epoch)
 
         if epoch % args.val_freq == 0:
             val_func(

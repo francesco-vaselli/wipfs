@@ -31,6 +31,7 @@ class ContextCoupledRationalQuadraticSpline(Flow):
         dropout_probability=0.0,
         reverse_mask=False,
         init_identity=True,
+        batch_norm=False,
     ):
         """Constructor
         Args:
@@ -55,7 +56,7 @@ class ContextCoupledRationalQuadraticSpline(Flow):
                 num_blocks=num_blocks,
                 activation=activation(),
                 dropout_probability=dropout_probability,
-                use_batch_norm=False,
+                use_batch_norm=batch_norm,
             )
 
         self.prqct = PiecewiseRationalQuadraticCoupling(
@@ -96,6 +97,7 @@ class ContextAutoregressiveRationalQuadraticSpline(Flow):
         dropout_probability=0.0,
         permute_mask=False,
         init_identity=True,
+        batch_norm=False,
     ):
         """Constructor
         Args:
@@ -124,7 +126,7 @@ class ContextAutoregressiveRationalQuadraticSpline(Flow):
             permute_mask=permute_mask,
             activation=activation(),
             dropout_probability=dropout_probability,
-            use_batch_norm=False,
+            use_batch_norm=batch_norm,
             init_identity=init_identity,
         )
 

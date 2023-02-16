@@ -124,8 +124,10 @@ class ContextNormalizingFlow(nn.Module):
         for i in range(len(self.flows) - 1, -1, -1):
             z, log_det = self.flows[i].inverse(z, context=context)
             log_q += log_det
-        log_q += self.q0.log_prob(z)
-        return -torch.mean(log_q)
+        # log_q += self.q0.log_prob(z)
+        log_p = self.q0.log_prob(z)
+        # return -torch.mean(log_q)
+        return -torch.mean(log_p), -torch.mean(log_q)
 
     def reverse_kld(self, num_samples=1, beta=1.0, score_fn=True):
         """Estimates reverse KL divergence, see [arXiv 1912.02762](https://arxiv.org/abs/1912.02762)

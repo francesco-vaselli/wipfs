@@ -18,21 +18,13 @@ from tensorboardX import SummaryWriter
 import sys
 import os
 
-sys.path.insert(0, os.path.join("..", "utils"))
-sys.path.insert(0, os.path.join("..", "models"))
-sys.path.insert(0, os.path.join("..", "models"))
-from dataset import FakesDataset
-from modded_basic_nflow import create_NDE_model, train, load_model
-from double_flow import LatentFlow
-from fake_utils import (
-    get_nozero_datasets,
-    get_sorted_nozero_datasets,
-    get_new_datasets,
-    get_newvars_datasets,
-    get_oned_datasets,
-    get_noN_datasets,
-)
-from args_basic_train import get_args
+sys.path.insert(0, os.path.join("...", "utils"))
+sys.path.insert(0, os.path.join("...", "models"))
+
+from dataset_normflows import SimpleFakesDataset, get_datasets
+from mod_normflows.basic_normflows import create_model, train, load_model
+
+from args_normflows import get_args
 from validate_temp import validate_latent_flow
 
 
@@ -55,26 +47,24 @@ def main():
 
     # define model
     flow_param_dict = {
-        "input_dim": args.zdim,
-        "context_dim": args.y_dim,
-        "num_flow_steps": args.num_flow_steps,  # increasing this could improve conditioning
-        "base_transform_kwargs": {
-            "num_transform_blocks": args.num_transform_blocks,  # DNN layers per coupling
-            "activation": args.activation,
-            "dropout_probability": args.dropout_probability,
-            "batch_norm": args.batch_norm,
-            "num_bins": args.num_bins,
-            "tail_bound": args.tail_bound,
-            "hidden_dim": args.hidden_dim,
-            "base_transform_type": args.base_transform_type,  # "rq-autoregressive",
-            "block_size": args.block_size,  # useless param if we have alternating-binary mask
-            "mask_type": args.mask_type,
-            "init_identity": args.init_identity,
-        },
+        "num_splines": args.num_splines,
+        "num_input_channels": args.z_dim,
+        "num_blocks": args.num_blocks,
+        "num_hidden_channels": args.num_hidden_channels,
         "transform_type": args.transform_type,
+        "num_context_channels": args.y_dim,
+        "num_bins": args.num_bins,
+        "tails": args.tails,
+        "tail_bound": args.tail_bound,
+        "activation": args.activation,
+        "dropout_probability": args.dropout_probability,
+        "reverse_mask": args.reverse_mask,
+        "permute_mask": args.permute_mask,
+        "init_identity": args.init_identity,
+        "batch_norm": args.batch_norm,
     }
 
-    model = create_NDE_model(**flow_param_dict)
+    model = create_model(**flow_param_dict)
 
     if args.device == "cuda":  # Single process, single GPU per process
         if torch.cuda.is_available():
@@ -109,24 +99,9 @@ def main():
         print(f"Resumed from: {res_epoch}")
 
     # initialize datasets and loaders
-    if args.no_N:
-        tr_dataset, te_dataset = get_noN_datasets(args)
-    else: 
-        if args.zdim == 4:
-            if args.with_zeros:
-                tr_dataset, te_dataset = get_new_datasets(args)
-                print("using dataset with zeros")
-            elif args.sorted_dataset == True:
-                tr_dataset, te_dataset = get_sorted_nozero_datasets(args)
-                print("using sorted dataset")
-            else:
-                tr_dataset, te_dataset = get_nozero_datasets(args)
-        elif args.zdim == 3:
-            tr_dataset, te_dataset = get_newvars_datasets(args)
-            print("using dataset with new vars")
-        elif args.zdim == 1:
-            tr_dataset, te_dataset = get_oned_datasets(args)
-            print("using dataset with 1d vars")
+
+    tr_dataset, te_dataset = get_datasets(args)
+
 
     train_loader = torch.utils.data.DataLoader(
         dataset=tr_dataset,
@@ -174,4 +149,7 @@ def main():
 
 
 if __name__ == "__main__":
+    torch.manual_seed(0)
+    random.seed(0)
+    np.random.seed(0)
     main()

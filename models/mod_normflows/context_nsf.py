@@ -67,7 +67,7 @@ class ContextCoupledRationalQuadraticSpline(Flow):
             tail_bound=tail_bound,
             # Setting True corresponds to equations (4), (5), (6) in the NSF paper:
             apply_unconditional_transform=True,
-            init_identity=init_identity,
+            # init_identity=init_identity,
         )
 
     def forward(self, z, context=None):

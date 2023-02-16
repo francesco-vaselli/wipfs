@@ -158,7 +158,7 @@ def validate_latent_flow(
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
         _, xedges, yedges, _ = ax1.hist2d(
             PU_n_true_int,
-            mod_pt_full,
+            mod_pt_full.flatten(),
             # bins=[
             #     np.arange(left_of_first_bin, right_of_last_bin + d, d),
             #     np.arange(left_of_first_bin1, right_of_last_bin1 + d1, d1),
@@ -170,7 +170,7 @@ def validate_latent_flow(
         ax1.set_ylabel("modpt_full")
         ax2.hist2d(
             PU_n_true_int,
-            mod_pt_flash,
+            mod_pt_flash.flatten(),
             # bins=[
             #     np.arange(left_of_first_bin, right_of_last_bin + d, d),
             #     np.arange(left_of_first_bin2, right_of_last_bin2 + d2, d2),

@@ -139,7 +139,7 @@ def preprocessing(df, vars_dictionary):
 
 if __name__ == "__main__":
 
-    root_files = ["MElectrons_v{i}.root:MElectrons" for i in range(1, 8)]
+    root_files = [f"MElectrons_v{i}.root:MElectrons" for i in range(1, 8)]
 
     tree = uproot.open(root_files[0], num_workers=20)
     df = pd.make_dataset(tree, version=f, dictionary=False)

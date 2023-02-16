@@ -27,7 +27,7 @@ class ContextCoupledRationalQuadraticSpline(Flow):
         num_bins=8,
         tails="linear",
         tail_bound=3.0,
-        activation=nn.ReLU,
+        activation='relu',
         dropout_probability=0.0,
         reverse_mask=False,
         init_identity=True,
@@ -46,6 +46,15 @@ class ContextCoupledRationalQuadraticSpline(Flow):
           reverse_mask (bool): Flag whether the reverse mask should be used
         """
         super().__init__()
+
+        if activation == 'relu':
+            activation = nn.ReLU
+        elif activation == 'elu':
+            activation = nn.ELU
+        elif activation == 'leaky_relu':
+            activation = nn.LeakyReLU
+        else:
+            raise ValueError('Activation function not supported')
 
         def transform_net_create_fn(in_features, out_features, num_context_channels=num_context_channels):
             return ResidualNet(
@@ -93,7 +102,7 @@ class ContextAutoregressiveRationalQuadraticSpline(Flow):
         num_context_channels=None,
         num_bins=8,
         tail_bound=3,
-        activation=nn.ReLU,
+        activation='relu',
         dropout_probability=0.0,
         permute_mask=False,
         init_identity=True,
@@ -112,6 +121,15 @@ class ContextAutoregressiveRationalQuadraticSpline(Flow):
           init_identity (bool): Flag, initialize transform as identity
         """
         super().__init__()
+
+        if activation == 'relu':
+            activation = nn.ReLU
+        elif activation == 'elu':
+            activation = nn.ELU
+        elif activation == 'leaky_relu':
+            activation = nn.LeakyReLU
+        else:
+            raise ValueError('Activation function not supported')
 
         self.mprqat = MaskedPiecewiseRationalQuadraticAutoregressive(
             features=num_input_channels,

@@ -27,12 +27,7 @@ class SimpleFakesDataset(Dataset):
         
         z3 = z[:, [1, 2, 3]]
   
-
-        if args.y_dim is not None:
-            self.y_train = torch.tensor(y, dtype=torch.float32)
-        else:
-            self.y_train = None
-
+        self.y_train = torch.tensor(y, dtype=torch.float32)
         self.z_train = torch.tensor(z3, dtype=torch.float32) 
 
 

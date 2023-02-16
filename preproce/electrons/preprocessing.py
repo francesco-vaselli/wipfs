@@ -142,11 +142,11 @@ if __name__ == "__main__":
     root_files = [f"MElectrons_v{i}.root:MElectrons" for i in range(1, 8)]
 
     tree = uproot.open(root_files[0], num_workers=20)
-    df = make_dataset(tree, version=f, dictionary=False)
+    df = make_dataset(tree)
 
     for file in root_files[1:]:
         tree = uproot.open(file, num_workers=20)
-        df = pd.concat([df, make_dataset(tree, dictionary=False)], axis=0)
+        df = pd.concat([df, make_dataset(tree)], axis=0)
         df.reset_index(drop=True)
 
     df = preprocessing(df, vars_dictionary)

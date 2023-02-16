@@ -146,20 +146,19 @@ def create_model(
     for i in range(num_splines):
         flows += [
             create_transform(
-                num_input_channels,
-                num_hidden_channels,
-                num_blocks,
-                transform_type="rq-coupling",
-                num_context_channels=None,
-                num_bins=8,
-                tails="linear",
-                tail_bound=3.0,
-                activation=nn.ReLU,
-                dropout_probability=0.0,
-                reverse_mask=False,
-                permute_mask=False,
-                init_identity=True,
-                batch_norm=False,
+            num_input_channels=num_input_channels,
+            num_blocks=num_blocks,
+            num_hidden_channels=num_hidden_channels,
+            num_context_channels=num_context_channels,
+            num_bins=num_bins,
+            tails=tails,
+            tail_bound=tail_bound,
+            activation=activation,
+            dropout_probability=dropout_probability,
+            reverse_mask=reverse_mask,
+            permute_mask=permute_mask,
+            init_identity=init_identity,
+            batch_norm=batch_norm,
             )
         ]
         flows += [ContextLULinearPermute(num_input_channels)]

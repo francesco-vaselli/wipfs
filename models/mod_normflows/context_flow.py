@@ -195,19 +195,26 @@ class ContextNormalizingFlow(nn.Module):
         :param context: Context for conditional flows (accepts batches and will output one sample per batch element)
         :return: Samples, log probability
         """
-        repeat_noise, log_q = self.q0(num_samples * context.shape[0])
-        z = torch.reshape(repeat_noise, (context.shape[0], -1, repeat_noise.shape[1]))
+
         if context is not None:
+            repeat_noise, log_q = self.q0(num_samples * context.shape[0])
+            z = torch.reshape(repeat_noise, (context.shape[0], -1, repeat_noise.shape[1]))
             # Merge the context dimension with sample dimension in order to apply the transform.
             z = merge_leading_dims(z, num_dims=2)
             context = repeat_rows(context, num_reps=num_samples)
-        for flow in self.flows:
-            z, log_det = flow(z, context=context)
-            log_q -= log_det
+            for flow in self.flows:
+                z, log_det = flow(z, context=context)
+                log_q -= log_det
 
-        if context is not None:
             # Split the context dimension from sample dimension.
             z = split_leading_dim(z, shape=[-1, num_samples])
+
+        else:
+            z, log_q = self.q0(num_samples)
+
+            for flow in self.flows:
+                z, log_det = flow(z)
+                log_q -= log_det
 
         return z, log_q
 

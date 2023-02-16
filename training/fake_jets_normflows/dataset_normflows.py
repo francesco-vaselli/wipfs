@@ -46,10 +46,9 @@ class SimpleFakesDataset(Dataset):
         return len(self.z_train)
 
     def __getitem__(self, idx):
-        if self.y_train is not None:
-            return self.y_train[idx], self.z_train[idx]
-        else:
-            return None, self.z_train[idx]
+
+        return self.y_train[idx], self.z_train[idx]
+
 
 
 def get_datasets(args):

@@ -225,9 +225,14 @@ def train_epoch(
             z = z.to(device, non_blocking=True)
             if args.y_dim is not None:
                 y = y.to(device, non_blocking=True)
+                # Compute log prob
+                log_p, log_det = flow.forward_kld(z, context=y)
+
+            else:
+                log_p, log_det = flow.forward_kld(z)
 
         # Compute log prob
-        log_p, log_det = flow.forward_kld(z, context=y)
+        # log_p, log_det = flow.forward_kld(z, context=y)
         loss = log_p + log_det
 
         # Keep track of total loss. w is a weight to be applied to each
@@ -284,9 +289,12 @@ def test_epoch(flow, test_loader, epoch, args, device=None):
                 z = z.to(device, non_blocking=True)
                 if args.y_dim is not None:
                     y = y.to(device, non_blocking=True)
+                    # Compute log prob
+                    log_p, log_det = flow.forward_kld(z, context=y)
 
-            # Compute log prob
-            log_p, log_det = flow.forward_kld(z, context=y)
+                else:
+                    log_p, log_det = flow.forward_kld(z)
+            
             loss = log_p + log_det
 
             # Keep track of total loss

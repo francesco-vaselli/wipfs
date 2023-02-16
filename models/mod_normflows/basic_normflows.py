@@ -332,7 +332,7 @@ def train(
     val_func(
                 test_loader,
                 model,
-                epoch,
+                0,
                 writer,
                 save_dir=args.log_name,
                 args=args,

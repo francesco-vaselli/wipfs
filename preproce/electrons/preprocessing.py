@@ -10,7 +10,7 @@ import warnings
 
 warnings.filterwarnings("ignore")  # temporary for MatPlotLibDeprecationWarning bug
 
-from dictionary import vars_dictionary  # operation dictionary
+from preproce.electrons.prep_actions import vars_dictionary  # operation dictionary
 
 np.random.seed(0)  # fixed seed for gaussian random smearing
 
@@ -139,14 +139,19 @@ def preprocessing(df, vars_dictionary):
 
 if __name__ == "__main__":
 
-    f = sys.argv[1]
-    tree = uproot.open(f"MElectrons_v{f}.root:MElectrons", num_workers=20)
+    root_files = ["MElectrons_v{i}.root:MElectrons" for i in range(1, 8)]
 
-    df = make_dataset(tree, version=f, dictionary=False)
+    tree = uproot.open(root_files[0], num_workers=20)
+    df = pd.make_dataset(tree, version=f, dictionary=False)
+
+    for file in root_files[1:]:
+        tree = uproot.open(file, num_workers=20)
+        df = pd.concat([df, make_dataset(tree, version=f, dictionary=False)], axis=0)
+        df.reset_index(drop=True)
 
     df = preprocessing(df, vars_dictionary)
     print(df.columns)
-    file = h5py.File(f"electrons_v{f}.hdf5", "w")
+    file = h5py.File(f"MElectrons.hdf5", "w")
 
     dset = file.create_dataset("data", data=df.values, dtype="f4")
 

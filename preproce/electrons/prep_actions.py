@@ -79,7 +79,7 @@ vars_dictionary = {
     "MElectron_dxyErr": [["t", np.log, [1, 1e-3]]],
     "MElectron_dz": [["t", np.arctan, [50, 0]]],
     "MElectron_dzErr": [["t", np.log, [1, 1e-3]]],
-    "MElectron_eCorr": [["t", np.arctan, [1e-1, -1e-1]]],
+    # "MElectron_eCorr": [["t", np.arctan, [1e-1, -1e-1]]],
     "MElectron_eInvMinusPInv": [["t", np.arctan, [150, 0]]],
     "MElectron_energyErr": [["t", np.log1p, [1, 0]]],
     "MElectron_etaMinusGen": [["t", np.arctan, [100, 0]]],

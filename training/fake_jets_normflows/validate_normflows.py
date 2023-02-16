@@ -52,6 +52,7 @@ def validate_latent_flow(
                 z_sampled = model.sample(
                         num_samples=1, context=inputs_y
                 )
+                print(z_sampled)
             else:
                 z_sampled = model.sample(num_samples=args.batch_size)
 
@@ -59,7 +60,6 @@ def validate_latent_flow(
             inputs_y = inputs_y.cpu().detach().numpy()
             # print(z_sampled.shape, inputs_y.shape)
             z = z.cpu().detach().numpy()
-            N = z[:, 0]
 
             z_sampled = z_sampled.reshape(-1, args.z_dim)
             N_sampled = z_sampled[:, 0]

@@ -43,13 +43,16 @@ def validate_latent_flow(
         angle_flash = []
 
         for bidx, data in enumerate(test_loader):
-            _, y, z = data[0], data[1], data[2]
+            y, z = data[0], data[1]
             # print('x', x.shape, 'y', y.shape, 'N', N.shape)
             inputs_y = y.to(device)
             # print('inputs_y', inputs_y.shape)
-            z_sampled = model.sample(
-                    num_samples=1, context=inputs_y.view(-1, args.y_dim)
+            if args.y_dim is not None:
+                z_sampled = model.sample(
+                        num_samples=1, context=inputs_y.view(-1, args.y_dim)
                 )
+            else:
+                z_sampled = model.sample(num_samples=len(z))
 
             z_sampled = z_sampled.cpu().detach().numpy()
             inputs_y = inputs_y.cpu().detach().numpy()

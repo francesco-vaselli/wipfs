@@ -41,7 +41,7 @@ class SimpleFakesDataset(Dataset):
         return self._archives
 
     def __len__(self):
-        return len(self.y_train)
+        return len(self.z_train)
 
     def __getitem__(self, idx):
         return self.y_train[idx], self.z_train[idx]

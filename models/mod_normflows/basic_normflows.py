@@ -258,6 +258,8 @@ def train_epoch(
             )
 
     train_loss = train_loss.item() * args.batch_size / len(train_loader.dataset)
+    train_log_p = train_log_p.item() * args.batch_size / len(train_loader.dataset)
+    train_log_det = train_log_det.item() * args.batch_size / len(train_loader.dataset)
     print(
         "Model:{} Train Epoch: {} \tAverage Loss: {:.4f}".format(
             args.log_name, epoch, train_loss
@@ -303,6 +305,8 @@ def test_epoch(flow, test_loader, epoch, args, device=None):
             test_log_det += (log_det).sum()
 
         test_loss = test_loss.item() * args.batch_size / len(test_loader.dataset)
+        test_log_p = test_log_p.item() * args.batch_size / len(test_loader.dataset)
+        test_log_det = test_log_det.item() * args.batch_size / len(test_loader.dataset)
         # test_loss = test_loss.item() / total_weight.item()
         print("Test set: Average loss: {:.4f}\n".format(test_loss))
 

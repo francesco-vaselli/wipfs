@@ -56,9 +56,9 @@ def create_model(
     """
     if transform_type == "rq-coupling":
         selected_flow = ContextCoupledRationalQuadraticSpline(
-            num_input_channels,
-            num_blocks,
-            num_hidden_channels,
+            num_input_channels=num_input_channels,
+            num_blocks=num_blocks,
+            num_hidden_channels=num_hidden_channels,
             num_context_channels=num_context_channels,
             num_bins=num_bins,
             tails=tails,
@@ -72,9 +72,9 @@ def create_model(
 
     elif transform_type == "rq-autoregressive":
         selected_flow = ContextAutoregressiveRationalQuadraticSpline(
-            num_input_channels,
-            num_blocks,
-            num_hidden_channels,
+            num_input_channels=num_input_channels,
+            num_blocks=num_blocks,
+            num_hidden_channels=num_hidden_channels,
             num_context_channels=num_context_channels,
             num_bins=num_bins,
             tails=tails,

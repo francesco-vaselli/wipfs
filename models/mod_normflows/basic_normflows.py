@@ -329,6 +329,16 @@ def train(
         optimizer,
         T_max=epochs,
     )
+    val_func(
+                test_loader,
+                model,
+                epoch,
+                writer,
+                save_dir=args.log_name,
+                args=args,
+                device=args.device,
+                clf_loaders=None,
+    )
 
     for epoch in range(0 + res_epoch, epochs + 1 + res_epoch):
 

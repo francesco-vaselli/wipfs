@@ -24,7 +24,7 @@ def add_args(parser):
     parser.add_argument('--tail_bound', type=float, default=3.0)
     parser.add_argument('--num_hidden_channels', type=int, default=128)
     parser.add_argument('--transform_type', type=str, default='rq-autoregressive', choices=['rq-autoregressive', 'rq-coupling'])
-    parrser.add_argument('--reverse_mask', type=eval, default=False, choices=[True, False])
+    parser.add_argument('--reverse_mask', type=eval, default=False, choices=[True, False])
     parser.add_argument('--permute_mask', type=eval, default=False, choices=[True, False])
     parser.add_argument('--init_identity', type=eval, default=True, choices=[True, False])
 

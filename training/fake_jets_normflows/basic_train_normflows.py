@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.join("...", "utils"))
 sys.path.insert(0, os.path.join("...", "models"))
 
 from dataset_normflows import SimpleFakesDataset, get_datasets
-from mod_normflows.basic_normflows import create_model, train, load_model
+from models.mod_normflows.basic_normflows import create_model, train, load_model
 
 from args_normflows import get_args
 from validate_temp import validate_latent_flow

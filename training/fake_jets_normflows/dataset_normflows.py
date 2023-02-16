@@ -24,15 +24,17 @@ class SimpleFakesDataset(Dataset):
         z = z/200
         y = y[z[:, 1] > 0]
         z = z[z[:, 1] > 0]
-        print(z.shape)
+        
         z3 = z[:, [1, 2, 3]]
-        print(z3.shape)
+  
+
         if args.y_dim is not None:
             self.y_train = torch.tensor(y, dtype=torch.float32)
         else:
             self.y_train = None
+
         self.z_train = torch.tensor(z3, dtype=torch.float32) 
-        print(self.z_train.size())
+
 
     @property
     def archives(self):
@@ -44,7 +46,10 @@ class SimpleFakesDataset(Dataset):
         return len(self.z_train)
 
     def __getitem__(self, idx):
-        return self.y_train[idx], self.z_train[idx]
+        if self.y_train is not None:
+            return self.y_train[idx], self.z_train[idx]
+        else:
+            return None, self.z_train[idx]
 
 
 def get_datasets(args):

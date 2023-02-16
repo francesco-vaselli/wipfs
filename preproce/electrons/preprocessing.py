@@ -10,7 +10,7 @@ import warnings
 
 warnings.filterwarnings("ignore")  # temporary for MatPlotLibDeprecationWarning bug
 
-from preproce.electrons.prep_actions import vars_dictionary  # operation dictionary
+from prep_actions import vars_dictionary  # operation dictionary
 
 np.random.seed(0)  # fixed seed for gaussian random smearing
 

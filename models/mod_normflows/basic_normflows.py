@@ -12,12 +12,12 @@ from pathlib import Path
 import sys
 import os
 
-from context_LUL import ContextLULinearPermute
-from context_nsf import (
+from .context_LUL import ContextLULinearPermute
+from .context_nsf import (
     ContextCoupledRationalQuadraticSpline,
     ContextAutoregressiveRationalQuadraticSpline,
 )
-from context_flow import ContextNormalizingFlow
+from .context_flow import ContextNormalizingFlow
 
 
 def create_model(

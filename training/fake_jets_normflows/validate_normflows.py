@@ -48,7 +48,6 @@ def validate_latent_flow(
             inputs_y = y.to(device)
             # print('inputs_y', inputs_y.shape)
             if args.y_dim is not None:
-                print(inputs_y.shape[0])
                 z_sampled = model.sample(
                         num_samples=1, context=inputs_y
                 )
@@ -76,7 +75,7 @@ def validate_latent_flow(
 
             # print("done test batch")
 
-    px_full = np.reshape(px_full, (-1, 1)).flatten()
+    px_full = np.array(px_full).flatten()# np.reshape(px_full, (-1, 1)).flatten()
     py_full = np.reshape(py_full, (-1, 1)).flatten()
     px_flash = np.reshape(px_flash, (-1, 1)).flatten()
     py_flash = np.reshape(py_flash, (-1, 1)).flatten()

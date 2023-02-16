@@ -75,7 +75,7 @@ def validate_latent_flow(
 
             # print("done test batch")
 
-    px_full = np.array(px_full).flatten()# np.reshape(px_full, (-1, 1)).flatten()
+    px_full = np.reshape(px_full, (-1, 1)).flatten()
     py_full = np.reshape(py_full, (-1, 1)).flatten()
     px_flash = np.reshape(px_flash, (-1, 1)).flatten()
     py_flash = np.reshape(py_flash, (-1, 1)).flatten()
@@ -87,6 +87,8 @@ def validate_latent_flow(
     arctan_sampled = np.arctan2(py_flash,px_flash).reshape(-1,1)
     sqrt = np.sqrt(px_full**2 + py_full**2).reshape(-1,1)
     sqrt_sampled =  np.sqrt(px_flash**2 + py_flash**2).reshape(-1,1)
+
+    PU_n_true_int = np.reshape(PU_n_true_int, (-1, 1)).flatten()
 
     full_sim = [
         mod_pt_full,
@@ -157,7 +159,7 @@ def validate_latent_flow(
     if args.y_dim is not None:
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
         _, xedges, yedges, _ = ax1.hist2d(
-            PU_n_true_int,
+            PU_n_true_int.flatten(),
             mod_pt_full.flatten(),
             # bins=[
             #     np.arange(left_of_first_bin, right_of_last_bin + d, d),
@@ -169,7 +171,7 @@ def validate_latent_flow(
         ax1.set_xlabel("PU_n_true_int")
         ax1.set_ylabel("modpt_full")
         ax2.hist2d(
-            PU_n_true_int,
+            PU_n_true_int.flatten(),
             mod_pt_flash.flatten(),
             # bins=[
             #     np.arange(left_of_first_bin, right_of_last_bin + d, d),

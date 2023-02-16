@@ -23,12 +23,12 @@ class ContextLULinearPermute(Flow):
         self.permutation = _RandomPermutation(num_channels)
         self.linear = _LULinear(num_channels, identity_init=identity_init)
 
-    def forward(self, z, context):
+    def forward(self, z, context=None):
         z, log_det = self.linear.inverse(z)
         z, _ = self.permutation.inverse(z)
         return z, log_det.view(-1)
 
-    def inverse(self, z, context):
+    def inverse(self, z, context=None):
         z, _ = self.permutation(z)
         z, log_det = self.linear(z)
         return z, log_det.view(-1)

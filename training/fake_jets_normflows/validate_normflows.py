@@ -57,24 +57,22 @@ def validate_latent_flow(
                 z_sampled = model.sample(num_samples=args.batch_size)
 
             z_sampled = z_sampled[0].cpu().detach().numpy()
-            print(z_sampled)
             inputs_y = inputs_y.cpu().detach().numpy()
             # print(z_sampled.shape, inputs_y.shape)
             z = z.cpu().detach().numpy()
 
             z_sampled = z_sampled.reshape(-1, args.z_dim)
-            print(z_sampled)
+            
             N_sampled = z_sampled[:, 0]
             if args.y_dim is not None:
                 PU_n_true_int.append(inputs_y[:, 2])
 
-            if args.no_N:
-                mod_pt_full.append(z[:, 0])
-                mod_pt_flash.append(z_sampled[:, 0])
-                px_full.append(z[:, 1])
-                py_full.append(z[:, 2])
-                px_flash.append(z_sampled[:, 1])
-                py_flash.append(z_sampled[:, 2])
+            mod_pt_full.append(z[:, 0])
+            mod_pt_flash.append(z_sampled[:, 0])
+            px_full.append(z[:, 1])
+            py_full.append(z[:, 2])
+            px_flash.append(z_sampled[:, 1])
+            py_flash.append(z_sampled[:, 2])
 
             # print("done test batch")
 

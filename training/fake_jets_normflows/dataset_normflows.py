@@ -49,7 +49,7 @@ class SimpleFakesDataset(Dataset):
 
 def get_datasets(args):
 
-    path = "./datasets/train_dataset_fake_jets_only_flows_no_rint.hdf5"
+    path = "../datasets/train_dataset_fake_jets_only_flows_no_rint.hdf5"
 
     tr_dataset = SimpleFakesDataset(
         [path],

@@ -54,7 +54,7 @@ def get_datasets(args):
     tr_dataset = SimpleFakesDataset(
         [path],
         y_dim=args.y_dim,
-        z_dim=args.zdim,
+        z_dim=args.z_dim,
         args = args,
         start=args.train_start,
         limit=args.train_limit,
@@ -63,7 +63,7 @@ def get_datasets(args):
     te_dataset = SimpleFakesDataset(
         [path],
         y_dim=args.y_dim,
-        z_dim=args.zdim,
+        z_dim=args.z_dim,
         args = args,
         start=args.test_start,
         limit=args.test_limit,

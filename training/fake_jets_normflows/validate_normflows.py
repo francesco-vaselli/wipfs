@@ -49,8 +49,9 @@ def validate_latent_flow(
             # print('inputs_y', inputs_y.shape)
             if args.y_dim is not None:
                 z_sampled, _ = model.sample(
-                        num_samples=1, context=inputs_y.view(-1, args.y_dim)
+                        num_samples=1, context=inputs_y
                 )
+                print('here')
             else:
                 z_sampled, _ = model.sample(num_samples=args.batch_size)
 

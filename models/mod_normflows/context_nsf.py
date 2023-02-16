@@ -56,7 +56,7 @@ class ContextCoupledRationalQuadraticSpline(Flow):
         else:
             raise ValueError('Activation function not supported')
 
-        def transform_net_create_fn(in_features, out_features, num_context_channels=num_context_channels):
+        def transform_net_create_fn(in_features, out_features):
             return ResidualNet(
                 in_features=in_features,
                 out_features=out_features,

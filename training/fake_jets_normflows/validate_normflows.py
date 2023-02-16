@@ -109,14 +109,14 @@ def validate_latent_flow(
     for i in range(0, len(full_sim)):
         test_values = full_sim[i].flatten()
         generated_sample = flash_sim[i].flatten()
-        print(generated_sample.shape)
+        # print(generated_sample.shape)
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
 
 
         _, rangeR, _ = ax1.hist(
             test_values, histtype="step", label="FullSim", lw=1, bins=100
         )
-        print(rangeR.shape)
+        # print(rangeR.shape)
         generated_sample = np.where(
             generated_sample < rangeR.min(), rangeR.min(), generated_sample
         )

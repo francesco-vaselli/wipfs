@@ -1,16 +1,14 @@
-
 import sys
 import os
-
-sys.path.insert(0, os.path.join("..", "utils"))
-sys.path.insert(0, os.path.join("..", "models"))
 
 import torch
 from tensorboardX import SummaryWriter
 
-sys.path.insert(0, os.path.join("..", "utils"))
-sys.path.insert(0, os.path.join("..", "models"))
-from dataset import _
+sys.path.insert(0, os.path.join("..", "..", "utils"))
+sys.path.insert(0, os.path.join("..", "..", "models"))
+sys.path.insert(0, "..")
+
+from dataset import ElectronDataset
 from modded_basic_nflow import create_NDE_model, train, load_model
 
 from args_basic_train import get_args
@@ -89,8 +87,20 @@ def main():
         )
         print(f"Resumed from: {res_epoch}")
 
-    tr_dataset = 
-    te_dataset = 
+    tr_dataset = ElectronDataset(
+        [os.path.join(dirpath, "MElectrons.hdf5")],
+        x_dim=args.zdim,
+        y_dim=args.y_dim,
+        start=0,
+        limit=args.train_limit,
+    )
+    te_dataset = ElectronDataset(
+        [os.path.join(dirpath, "MElectrons.hdf5")],
+        x_dim=args.zdim,
+        y_dim=args.y_dim,
+        start=args._train_limit,
+        limit=args.test_limit,
+    )
 
     train_loader = torch.utils.data.DataLoader(
         dataset=tr_dataset,

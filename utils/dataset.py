@@ -404,15 +404,14 @@ class SimpleMuonsDataset(Dataset):
         return self.x_train[idx], self.y_train[idx], self.z_train[idx]
 
 
-class ReadDataset(Dataset):
-    """Very simple Dataset for reading hdf5 data
-        This is way simpler than muons as we heve enough jets in a single file
-        Still, dataloading is a bottleneck even here
+class ElectronDataset(Dataset):
+    """Dataset for Electron training 
+
     Args:
-        Dataset (Pytorch Dataset): Pytorch Dataset class
+        Dataset (Dataset): _description_
     """
 
-    def __init__(self, h5_paths, limit, x_dim, y_dim):
+    def __init__(self, h5_paths, start, limit, x_dim, y_dim):
 
         # we must fix a convention for parametrizing slices
 
@@ -420,8 +419,8 @@ class ReadDataset(Dataset):
         self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
         self._archives = None
 
-        y = self.archives[0]["data"][:limit, 0:y_dim]
-        x = self.archives[0]["data"][:limit, y_dim : (y_dim + x_dim)]
+        y = self.archives[0]["data"][start:limit, 0:y_dim]
+        x = self.archives[0]["data"][start:limit, y_dim : (y_dim + x_dim)]
         self.x_train = torch.tensor(x, dtype=torch.float32)  # .to(device)
         self.y_train = torch.tensor(y, dtype=torch.float32)  # .to(device)
 
@@ -543,3 +542,4 @@ class H5FakesDataset(Dataset):
             return self.limit
         else:
             return self.strides[-1]
+            

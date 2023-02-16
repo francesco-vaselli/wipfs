@@ -11,7 +11,7 @@ import normflows as nf
 from pathlib import Path
 import sys
 import os
-sys.path.insert(0, os.path.join("."))
+
 from context_LUL import ContextLULinearPermute
 from context_nsf import (
     ContextCoupledRationalQuadraticSpline,

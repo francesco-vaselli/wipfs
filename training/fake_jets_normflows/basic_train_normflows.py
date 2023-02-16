@@ -27,6 +27,13 @@ from mod_normflows.basic_normflows import create_model, train, load_model
 from args_normflows import get_args
 from validate_temp import validate_latent_flow
 
+from mod_normflows.context_LUL import ContextLULinearPermute
+from mod_normflows.context_nsf import (
+    ContextCoupledRationalQuadraticSpline,
+    ContextAutoregressiveRationalQuadraticSpline,
+)
+from mod_normflows.context_flow import ContextNormalizingFlow
+
 
 def main():
 

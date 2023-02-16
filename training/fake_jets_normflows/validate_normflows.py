@@ -49,13 +49,13 @@ def validate_latent_flow(
             # print('inputs_y', inputs_y.shape)
             if args.y_dim is not None:
                 print(inputs_y.shape[0])
-                z_sampled, _ = model.sample(
+                z_sampled = model.sample(
                         num_samples=1, context=inputs_y
                 )
             else:
-                z_sampled, _ = model.sample(num_samples=args.batch_size)
+                z_sampled = model.sample(num_samples=args.batch_size)
 
-            z_sampled = z_sampled.cpu().detach().numpy()
+            z_sampled = z_sampled[0].cpu().detach().numpy()
             inputs_y = inputs_y.cpu().detach().numpy()
             # print(z_sampled.shape, inputs_y.shape)
             z = z.cpu().detach().numpy()

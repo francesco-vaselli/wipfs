@@ -20,6 +20,59 @@ from .context_nsf import (
 from .context_flow import ContextNormalizingFlow
 
 
+def create_transform(
+    num_input_channels,
+    num_hidden_channels,
+    num_blocks,
+    transform_type="rq-coupling",
+    num_context_channels=None,
+    num_bins=8,
+    tails="linear",
+    tail_bound=3.0,
+    activation=nn.ReLU,
+    dropout_probability=0.0,
+    reverse_mask=False,
+    permute_mask=False,
+    init_identity=True,
+    batch_norm=False,
+):
+
+    if transform_type == "rq-coupling":
+        return ContextCoupledRationalQuadraticSpline(
+            num_input_channels=num_input_channels,
+            num_blocks=num_blocks,
+            num_hidden_channels=num_hidden_channels,
+            num_context_channels=num_context_channels,
+            num_bins=num_bins,
+            tails=tails,
+            tail_bound=tail_bound,
+            activation=activation,
+            dropout_probability=dropout_probability,
+            reverse_mask=reverse_mask,
+            init_identity=init_identity,
+            batch_norm=batch_norm,
+        )
+
+    elif transform_type == "rq-autoregressive":
+        return ContextAutoregressiveRationalQuadraticSpline(
+            num_input_channels=num_input_channels,
+            num_blocks=num_blocks,
+            num_hidden_channels=num_hidden_channels,
+            num_context_channels=num_context_channels,
+            num_bins=num_bins,
+            tails=tails,
+            tail_bound=tail_bound,
+            activation=activation,
+            dropout_probability=dropout_probability,
+            permute_mask=permute_mask,
+            init_identity=init_identity,
+            batch_norm=batch_norm,
+        )
+
+    else:
+        raise ValueError
+
+
 def create_model(
     num_splines,
     num_input_channels,
@@ -54,44 +107,61 @@ def create_model(
     Returns:
         Transform -- the constructed transform
     """
-    if transform_type == "rq-coupling":
-        selected_flow = ContextCoupledRationalQuadraticSpline(
-            num_input_channels=num_input_channels,
-            num_blocks=num_blocks,
-            num_hidden_channels=num_hidden_channels,
-            num_context_channels=num_context_channels,
-            num_bins=num_bins,
-            tails=tails,
-            tail_bound=tail_bound,
-            activation=activation,
-            dropout_probability=dropout_probability,
-            reverse_mask=reverse_mask,
-            init_identity=init_identity,
-            batch_norm=batch_norm,
-        )
+    # if transform_type == "rq-coupling":
+    #     selected_flow = ContextCoupledRationalQuadraticSpline(
+    #         num_input_channels=num_input_channels,
+    #         num_blocks=num_blocks,
+    #         num_hidden_channels=num_hidden_channels,
+    #         num_context_channels=num_context_channels,
+    #         num_bins=num_bins,
+    #         tails=tails,
+    #         tail_bound=tail_bound,
+    #         activation=activation,
+    #         dropout_probability=dropout_probability,
+    #         reverse_mask=reverse_mask,
+    #         init_identity=init_identity,
+    #         batch_norm=batch_norm,
+    #     )
 
-    elif transform_type == "rq-autoregressive":
-        selected_flow = ContextAutoregressiveRationalQuadraticSpline(
-            num_input_channels=num_input_channels,
-            num_blocks=num_blocks,
-            num_hidden_channels=num_hidden_channels,
-            num_context_channels=num_context_channels,
-            num_bins=num_bins,
-            tails=tails,
-            tail_bound=tail_bound,
-            activation=activation,
-            dropout_probability=dropout_probability,
-            permute_mask=permute_mask,
-            init_identity=init_identity,
-            batch_norm=batch_norm,
-        )
+    # elif transform_type == "rq-autoregressive":
+    #     selected_flow = ContextAutoregressiveRationalQuadraticSpline(
+    #         num_input_channels=num_input_channels,
+    #         num_blocks=num_blocks,
+    #         num_hidden_channels=num_hidden_channels,
+    #         num_context_channels=num_context_channels,
+    #         num_bins=num_bins,
+    #         tails=tails,
+    #         tail_bound=tail_bound,
+    #         activation=activation,
+    #         dropout_probability=dropout_probability,
+    #         permute_mask=permute_mask,
+    #         init_identity=init_identity,
+    #         batch_norm=batch_norm,
+    #     )
 
-    else:
-        raise ValueError
+    # else:
+    #     raise ValueError
 
     flows = []
     for i in range(num_splines):
-        flows += [selected_flow]
+        flows += [
+            create_transform(
+                num_input_channels,
+                num_hidden_channels,
+                num_blocks,
+                transform_type="rq-coupling",
+                num_context_channels=None,
+                num_bins=8,
+                tails="linear",
+                tail_bound=3.0,
+                activation=nn.ReLU,
+                dropout_probability=0.0,
+                reverse_mask=False,
+                permute_mask=False,
+                init_identity=True,
+                batch_norm=False,
+            )
+        ]
         flows += [ContextLULinearPermute(num_input_channels)]
 
     q0 = nf.distributions.DiagGaussian(num_input_channels, trainable=False)
@@ -270,7 +340,9 @@ def train(
         train_loss, train_log_p, train_log_det = train_epoch(
             model, train_loader, optimizer, epoch, device, output_freq, args=args
         )
-        test_loss, test_log_p, test_log_det = test_epoch(model, test_loader, epoch, args, device)
+        test_loss, test_log_p, test_log_det = test_epoch(
+            model, test_loader, epoch, args, device
+        )
 
         scheduler.step()
         train_history.append(train_loss)

@@ -8,7 +8,7 @@ def add_args(parser):
 
     # model architecture options
     parser.add_argument('--use_context', type=eval, default=True, choices=[True, False])
-    parser.add_argument('--y_dim', type=int, default=Y_DIM,
+    parser.add_argument('--y_dim', default=Y_DIM,
                         help='Dimension of the conditioning variable')
     parser.add_argument('--z_dim', type=int, default=Z_DIM,
                         help='Dimension of the target variable')

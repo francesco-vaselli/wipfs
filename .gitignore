@@ -138,6 +138,7 @@ dmypy.json
 # Electrons preprocessing figures
 
 /preproce/electrons/figures/
+/training/electrons/figures/
 
 #VSCode
 .vscode/

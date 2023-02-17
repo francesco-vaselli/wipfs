@@ -2,12 +2,14 @@ import numpy as np
 import pandas as pd
 import h5py
 
+from matplotlib import pyplot as plt
+
 from post_actions import vars_dictionary
 
 
 def transform(df, column_name, function, p):
 
-    df[column_name] = df[column_name].apply(lambda x: (function(x) - p[1]) / p[1])
+    df[column_name] = df[column_name].apply(lambda x: (function(x) - p[1]) / p[0])
     return df[column_name]
 
 

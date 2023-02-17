@@ -1,5 +1,8 @@
 import numpy as np
 import pandas as pd
+import h5py
+
+from post_actions import vars_dictionary
 
 
 def transform(df, column_name, function, p):
@@ -38,9 +41,9 @@ def process_column_var(column_name, operations, df):
     return df[column_name]
 
 
-def preprocessing(df, vars_dictionary):
+def postprocessing(df, vars_dictionary):
     """
-    Preprocessing general function given any dataframe and its dictionary
+    Postprocessing general function given any dataframe and its dictionary
     """
 
     for column_name, operation in vars_dictionary.items():
@@ -48,6 +51,22 @@ def preprocessing(df, vars_dictionary):
 
     return df
 
+
+def postprocessing_test(df, vars_dictionary):
+    """
+    Preprocessing general function given any dataframe and its dictionary
+    """
+
+    for column_name, operation in vars_dictionary.items():
+        fig, axs = plt.subplots(1, 2)
+        plt.suptitle(f"{column_name}")
+        axs[0].hist(df[column_name], bins=30, histtype="step")
+        df[column_name] = process_column_var(column_name, operation, df)
+        axs[1].hist(df[column_name], bins=30, histtype="step")
+        plt.savefig(f"figures/{column_name}.pdf", format="pdf")
+        plt.close()  # produces MatplotlibDeprecationWarning. It is a bug (https://github.com/matplotlib/matplotlib/issues/23921)
+
+    return df
 
 gen_columnns = [
     "MGenElectron_eta",
@@ -144,3 +163,14 @@ reco_columns = [
     "MElectron_sip3d",
     "MElectron_tightCharge",
 ]
+
+if __name__== "main":
+
+    df = pd.DataFrame(data=np.array(h5py.File("MElectrons.hdf5")["variable_1"]))
+    df = postprocessing_test(df, vars_dictionary)
+
+    file = h5py.File(f"MElectrons_post.hdf5", "w")
+
+    dset = file.create_dataset("data", data=df.values, dtype="f4")
+
+    file.close()

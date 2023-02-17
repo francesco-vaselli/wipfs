@@ -68,7 +68,8 @@ def postprocessing_test(df, vars_dictionary):
 
     return df
 
-gen_columnns = [
+
+gen_columns = [
     "MGenElectron_eta",
     "MGenElectron_phi",
     "MGenElectron_pt",
@@ -116,6 +117,9 @@ gen_columnns = [
 reco_columns = [
     "MElectron_charge",
     "MElectron_convVeto",
+    "MElectron_cutBased",
+    "MElectron_cutBased_Fall17_V1",
+    "MElectron_cutBased_HEEP",
     "MElectron_deltaEtaSC",
     "MElectron_dr03EcalRecHitSumEt",
     "MElectron_dr03HcalDepth1TowerSumEt",
@@ -125,6 +129,7 @@ reco_columns = [
     "MElectron_dxyErr",
     "MElectron_dz",
     "MElectron_dzErr",
+    "MElectron_eCorr",
     "MElectron_eInvMinusPInv",
     "MElectron_energyErr",
     "MElectron_etaMinusGen",
@@ -162,15 +167,38 @@ reco_columns = [
     "MElectron_sieie",
     "MElectron_sip3d",
     "MElectron_tightCharge",
+    "MElectron_vidNestedWPBitmap0",
+    "MElectron_vidNestedWPBitmap1",
+    "MElectron_vidNestedWPBitmap2",
+    "MElectron_vidNestedWPBitmap3",
+    "MElectron_vidNestedWPBitmap4",
+    "MElectron_vidNestedWPBitmap5",
+    "MElectron_vidNestedWPBitmap6",
+    "MElectron_vidNestedWPBitmap7",
+    "MElectron_vidNestedWPBitmap8",
+    "MElectron_vidNestedWPBitmap9",
+    "MElectron_vidNestedWPBitmapHEEP0",
+    "MElectron_vidNestedWPBitmapHEEP1",
+    "MElectron_vidNestedWPBitmapHEEP2",
+    "MElectron_vidNestedWPBitmapHEEP3",
+    "MElectron_vidNestedWPBitmapHEEP4",
+    "MElectron_vidNestedWPBitmapHEEP5",
+    "MElectron_vidNestedWPBitmapHEEP6",
+    "MElectron_vidNestedWPBitmapHEEP7",
+    "MElectron_vidNestedWPBitmapHEEP8",
+    "MElectron_vidNestedWPBitmapHEEP9",
+    "MElectron_vidNestedWPBitmapHEEP10",
+    "MElectron_vidNestedWPBitmapHEEP11",
 ]
 
-if __name__== "main":
+if __name__ == "__main__":
 
-    df = pd.DataFrame(data=np.array(h5py.File("MElectrons.hdf5")["variable_1"]))
+    f = h5py.File("MElectrons.hdf5", "r")
+    df = pd.DataFrame(data=f.get("data"), columns=gen_columns+reco_columns)
+    f.close()
+
     df = postprocessing_test(df, vars_dictionary)
 
     file = h5py.File(f"MElectrons_post.hdf5", "w")
-
     dset = file.create_dataset("data", data=df.values, dtype="f4")
-
     file.close()

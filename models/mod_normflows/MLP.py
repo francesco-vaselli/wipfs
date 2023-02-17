@@ -48,7 +48,7 @@ class MLP(nn.Module):
 
         if context_shape is not None:
             self._context_shape = torch.Size(context_shape)
-            self._input_layer = nn.Linear(np.prod(in_shape+context_shape), hidden_sizes[0])
+            self._input_layer = nn.Linear(np.prod(in_shape)+np.prod(context_shape), hidden_sizes[0])
         else:
             self._input_layer = nn.Linear(np.prod(in_shape), hidden_sizes[0])
         # self._context_layer = nn.Linear(np.prod(context_shape), hidden_sizes[0])

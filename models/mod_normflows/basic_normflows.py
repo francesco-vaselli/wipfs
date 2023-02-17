@@ -151,6 +151,7 @@ def create_model(
             num_hidden_channels=num_hidden_channels,
             num_context_channels=num_context_channels,
             num_bins=num_bins,
+            transform_type=transform_type,
             tails=tails,
             tail_bound=tail_bound,
             activation=activation,

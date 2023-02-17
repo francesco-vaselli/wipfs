@@ -125,6 +125,7 @@ def process_column_var(column_name, operations, df):
     Processes single dataframe column. Operation type is specified by string.
     """
     print(f"Processing {column_name}...")
+    
     for op in operations:
         if op[0] == "s":
             interval = op[1]
@@ -156,6 +157,9 @@ def preprocessing(df, vars_dictionary):
     Preprocessing general function given any dataframe and its dictionary
     """
     dict_to_save = {}
+
+    df = df[~df.isin([np.nan, np.inf, -np.inf]).any(axis="columns")]
+
     for column_name, operation in vars_dictionary.items():
         fig, axs = plt.subplots(1, 2)
         plt.suptitle(f"{column_name}")
@@ -167,6 +171,8 @@ def preprocessing(df, vars_dictionary):
         plt.savefig(f"figures/{column_name}.pdf", format="pdf")
         plt.close()  # produces MatplotlibDeprecationWarning. It is a bug (https://github.com/matplotlib/matplotlib/issues/23921)
 
+    df = df[~df.isin([np.nan, np.inf, -np.inf]).any(axis="columns")]
+
     f = open("scale_factors.json", "w")
     f.write(json.dumps(dict_to_save))
     f.close()
@@ -177,7 +183,7 @@ def preprocessing(df, vars_dictionary):
 
 
 if __name__ == "__main__":
-
+    
     root_files = [f"MElectrons_v{i}.root:MElectrons" for i in range(1, 8)]
 
     tree = uproot.open(root_files[0], num_workers=20)
@@ -189,7 +195,6 @@ if __name__ == "__main__":
         df.reset_index(drop=True)
 
     df = preprocessing(df, vars_dictionary)
-    df = df[~df.isin([np.nan, np.inf, -np.inf]).any(axis="columns")]
 
     print(df.columns)
     file = h5py.File(f"MElectrons.hdf5", "w")

@@ -15,7 +15,7 @@ class MLP(nn.Module):
         out_shape,
         hidden_sizes,
         context_shape=None,
-        activation=nn.ReLU,
+        activation=nn.ReLU(),
         activate_output=False,
         batch_norm=False,
     ):

@@ -76,7 +76,7 @@ class ContextCoupledRationalQuadraticSpline(Flow):
                     out_shape=(out_features,),
                     hidden_sizes=[num_hidden_channels] * num_blocks,
                     context_shape=(num_context_channels,) if num_context_channels is not None else None,
-                    activation=activation,
+                    activation=activation(),
                     activate_output=False,
                     batch_norm=batch_norm,
                 )

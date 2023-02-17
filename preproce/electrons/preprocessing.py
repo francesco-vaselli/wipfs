@@ -172,6 +172,7 @@ def preprocessing(df, vars_dictionary):
         plt.savefig(f"figures/{column_name}.pdf", format="pdf")
         plt.close()  # produces MatplotlibDeprecationWarning. It is a bug (https://github.com/matplotlib/matplotlib/issues/23921)
 
+    df = df[~df.isin([np.nan, np.inf, -np.inf]).any(axis="columns")]
 
     f = open("scale_factors.json", "w")
     f.write(json.dumps(dict_to_save))

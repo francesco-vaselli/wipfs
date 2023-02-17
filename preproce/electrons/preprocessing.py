@@ -114,7 +114,8 @@ def fix_range(column_name, df):
 
     scale_factor = np.max(np.abs(df[column_name].values))
 
-    df[column_name] = df[column_name] / scale_factor
+    if scale_factor != 0:
+        df[column_name] = df[column_name] / scale_factor
 
     return df[column_name], scale_factor
 
@@ -157,7 +158,7 @@ def preprocessing(df, vars_dictionary):
     Preprocessing general function given any dataframe and its dictionary
     """
     dict_to_save = {}
-
+    
     df = df[~df.isin([np.nan, np.inf, -np.inf]).any(axis="columns")]
 
     for column_name, operation in vars_dictionary.items():
@@ -171,7 +172,6 @@ def preprocessing(df, vars_dictionary):
         plt.savefig(f"figures/{column_name}.pdf", format="pdf")
         plt.close()  # produces MatplotlibDeprecationWarning. It is a bug (https://github.com/matplotlib/matplotlib/issues/23921)
 
-    df = df[~df.isin([np.nan, np.inf, -np.inf]).any(axis="columns")]
 
     f = open("scale_factors.json", "w")
     f.write(json.dumps(dict_to_save))

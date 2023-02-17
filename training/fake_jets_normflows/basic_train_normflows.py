@@ -52,6 +52,9 @@ def main():
     # save hparams to tensorboard
     writer.add_hparams(vars(args), {})
 
+    if args.use_context == False:
+        args.y_dim = None
+
     # define model
     flow_param_dict = {
         "num_splines": args.num_splines,

@@ -6,6 +6,7 @@ from torch.nn import functional as F
 import torch.multiprocessing as mp
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.stats import wasserstein_distance
 
 
 def validate_latent_flow(
@@ -109,6 +110,7 @@ def validate_latent_flow(
     for i in range(0, len(full_sim)):
         test_values = full_sim[i].flatten()
         generated_sample = flash_sim[i].flatten()
+        ws = wasserstein_distance(test_values, generated_sample)
         # print(generated_sample.shape)
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
 
@@ -130,7 +132,7 @@ def validate_latent_flow(
             histtype="step",
             lw=1,
             range=[rangeR.min(), rangeR.max()],
-            label=f"FlashSim",
+            label=f"FlashSim, ws={round(ws, 4)}",
         )
         fig.suptitle(f"Comparison of {names[i]} @ epoch {epoch}", fontsize=16)
         ax1.legend(frameon=False, loc="upper right")

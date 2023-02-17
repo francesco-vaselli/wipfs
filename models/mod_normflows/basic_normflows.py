@@ -35,6 +35,7 @@ def create_transform(
     permute_mask=False,
     init_identity=True,
     batch_norm=False,
+    net_type="resnet",
 ):
 
     if transform_type == "rq-coupling":
@@ -51,6 +52,7 @@ def create_transform(
             reverse_mask=reverse_mask,
             init_identity=init_identity,
             batch_norm=batch_norm,
+            net_type=net_type,
         )
 
     elif transform_type == "rq-autoregressive":
@@ -67,6 +69,7 @@ def create_transform(
             permute_mask=permute_mask,
             init_identity=init_identity,
             batch_norm=batch_norm,
+            net_type=net_type,
         )
 
     else:
@@ -89,6 +92,7 @@ def create_model(
     permute_mask=False,
     init_identity=True,
     batch_norm=False,
+    net_type="resnet",
 ):
     """Build a sequence of NSF transforms, which maps parameters x into the
     base distribution u (noise). Transforms are conditioned on strain data y.
@@ -160,6 +164,7 @@ def create_model(
             permute_mask=permute_mask,
             init_identity=init_identity,
             batch_norm=batch_norm,
+            net_type=net_type,
             )
         ]
         flows += [ContextLULinearPermute(num_input_channels)]
@@ -185,6 +190,7 @@ def create_model(
         "permute_mask": permute_mask,
         "init_identity": init_identity,
         "batch_norm": batch_norm,
+        "net_type": net_type,
     }
 
     return flow

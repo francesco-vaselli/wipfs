@@ -15,7 +15,7 @@ class MLP(nn.Module):
         out_shape,
         hidden_sizes,
         context_shape=None,
-        activation='relu',
+        activation=nn.ReLU,
         activate_output=False,
         batch_norm=False,
     ):
@@ -30,15 +30,6 @@ class MLP(nn.Module):
             batch_norm: bool, whether to use batch normalization.
         """
         super().__init__()
-
-        if activation == 'relu':
-            activation = nn.ReLU
-        elif activation == 'elu':
-            activation = nn.ELU
-        elif activation == 'leaky_relu':
-            activation = nn.LeakyReLU
-        else:
-            raise ValueError('Activation function not supported')
 
         self._in_shape = torch.Size(in_shape)
         self._out_shape = torch.Size(out_shape)

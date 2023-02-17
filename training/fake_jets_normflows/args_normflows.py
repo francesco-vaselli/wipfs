@@ -15,6 +15,7 @@ def add_args(parser):
 
 
     # flow options
+    parser.add_argument('--net_type', type=str, default='resnet', choices=['resnet', 'mlp'])
     parser.add_argument('--num_splines', type=int, default=4)
     parser.add_argument('--num_blocks', type=int, default=2)
     parser.add_argument('--activation', type=str, default='relu')

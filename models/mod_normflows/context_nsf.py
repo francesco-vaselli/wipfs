@@ -9,6 +9,7 @@ from normflows.nets.resnet import ResidualNet
 from normflows.utils.masks import create_alternating_binary_mask
 # from normflows.utils.nn import PeriodicFeaturesElementwise
 from normflows.utils.splines import DEFAULT_MIN_DERIVATIVE
+from .MLP import MLP
 
 
 class ContextCoupledRationalQuadraticSpline(Flow):
@@ -32,6 +33,7 @@ class ContextCoupledRationalQuadraticSpline(Flow):
         reverse_mask=False,
         init_identity=True,
         batch_norm=False,
+        net_type='resnet',
     ):
         """Constructor
         Args:
@@ -57,16 +59,30 @@ class ContextCoupledRationalQuadraticSpline(Flow):
             raise ValueError('Activation function not supported')
 
         def transform_net_create_fn(in_features, out_features):
-            return ResidualNet(
-                in_features=in_features,
-                out_features=out_features,
-                context_features=num_context_channels,
-                hidden_features=num_hidden_channels,
-                num_blocks=num_blocks,
-                activation=activation(),
-                dropout_probability=dropout_probability,
-                use_batch_norm=batch_norm,
-            )
+            if net_type == 'resnet':
+                return ResidualNet(
+                    in_features=in_features,
+                    out_features=out_features,
+                    context_features=num_context_channels,
+                    hidden_features=num_hidden_channels,
+                    num_blocks=num_blocks,
+                    activation=activation(),
+                    dropout_probability=dropout_probability,
+                    use_batch_norm=batch_norm,
+                )
+            elif net_type == 'mlp':
+                return MLP(
+                    in_shape=(in_features,),
+                    out_shape=(out_features,),
+                    hidden_sizes=[num_hidden_channels] * num_blocks,
+                    context_shape=(num_context_channels,) if num_context_channels is not None else None,
+                    activation=activation,
+                    activate_output=False,
+                    batch_norm=batch_norm,
+                )
+            else:
+                raise ValueError('Net type not supported')
+
 
         self.prqct = PiecewiseRationalQuadraticCoupling(
             mask=create_alternating_binary_mask(num_input_channels, even=reverse_mask),
@@ -108,6 +124,7 @@ class ContextAutoregressiveRationalQuadraticSpline(Flow):
         permute_mask=False,
         init_identity=True,
         batch_norm=False,
+        net_type='resnet',
     ):
         """Constructor
         Args:

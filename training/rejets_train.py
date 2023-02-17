@@ -108,8 +108,8 @@ def main():
 
     dirpath = os.path.dirname(__file__)
 
-    tr_dataset = MyDataset([os.path.join(dirpath, "datasets", "Ajets_and_muons1+.hdf5")], x_dim=args.zdim, y_dim=args.y_dim, limit=args.train_limit)    
-    te_dataset = MyDataset([os.path.join(dirpath, "datasets", "Ajets_and_muons7+.hdf5")], x_dim=args.zdim, y_dim=args.y_dim, limit=args.test_limit)
+    tr_dataset = MyDataset([os.path.join(dirpath, "datasets", "Ajets_and_muons1+.hdf5")], limit=args.train_limit)    
+    te_dataset = MyDataset([os.path.join(dirpath, "datasets", "Ajets_and_muons7+.hdf5")], limit=args.test_limit)
     
     train_loader = torch.utils.data.DataLoader(
         dataset=tr_dataset,

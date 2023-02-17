@@ -57,6 +57,7 @@ def main():
 
     # define model
     flow_param_dict = {
+        "net_type": args.net_type,
         "num_splines": args.num_splines,
         "num_input_channels": args.z_dim,
         "num_hidden_channels": args.num_hidden_channels,

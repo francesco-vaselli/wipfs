@@ -205,3 +205,6 @@ if __name__ == "__main__":
     dset = file.create_dataset("data", data=df.values, dtype="f4")
 
     file.close()
+
+    os.system("mv MElectrons.hdf5 ../../training/electrons/")  
+

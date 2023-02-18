@@ -113,6 +113,7 @@ def transform(df, column_name, function, p):
 def fix_range(column_name, df):
 
     scale_factor = np.max(np.abs(df[column_name].values))
+    print(f"Scale factor = {scale_factor}")
 
     if scale_factor != 0:
         df[column_name] = df[column_name] / scale_factor

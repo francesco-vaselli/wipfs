@@ -1,3 +1,4 @@
+import json
 import numpy as np
 import pandas as pd
 import h5py
@@ -7,21 +8,36 @@ from matplotlib import pyplot as plt
 from post_actions import vars_dictionary
 
 
-def transform(df, column_name, function, p):
+def restore_range(column_name, scale_dict, df):
+    """
+    Restore data range to the original value before dividing by max
+    """
+    scale = scale_dict[column_name]
+    df[column_name] = df[column_name] * scale
+    return df[column_name]
+
+
+def inverse_transform(df, column_name, function, p):
 
     df[column_name] = df[column_name].apply(lambda x: (function(x) - p[1]) / p[0])
     return df[column_name]
 
 
-def gaus_to_int(df, column_name, interval):
-
+def desmearing(df, column_name, interval):
+    """Desmearing for in variables. We have gaussian and uniform smearing.
+    With the right choice of sigma and half_width we are sure that a 
+    truncation is enough to return to the original int value.
+    If we have interval, that means that we built a fake gaussian dataset 
+    in the selected interval, and then we just have to compute the sample mean
+    in this range.
+    """
     val = df[column_name].values
     if interval != None:
         mask_condition = np.logical_and(val >= interval[0], val <= interval[1])
         loc = np.mean(val[mask_condition])
         val[mask_condition] = np.ones_like(val[mask_condition]) * loc
     else:
-        df[column_name] = np.rint(df[column_name].values)
+        df[column_name] = np.trunc(df[column_name].values)
     return df[column_name]
 
 
@@ -29,14 +45,14 @@ def process_column_var(column_name, operations, df):
 
     for op in operations:
 
-        if op[0] == "g":
+        if op[0] == "d":
             mask_condition = op[1]
-            df[column_name] = gaus_to_int(df, column_name, mask_condition)
+            df[column_name] = desmearing(df, column_name, mask_condition)
 
-        if op[0] == "t":
+        if op[0] == "i":
             function = op[1]
             p = op[2]
-            df[column_name] = transform(df, column_name, function, p)
+            df[column_name] = inverse_transform(df, column_name, function, p)
 
         else:
             return df[column_name]
@@ -48,8 +64,14 @@ def postprocessing(df, vars_dictionary):
     Postprocessing general function given any dataframe and its dictionary
     """
 
+    with open("scale_factors.json") as scale_file:
+        scale_dict = json.load(scale_file)
+
     for column_name, operation in vars_dictionary.items():
+        df[column_name] = restore_range(column_name, scale_dict, df)
         df[column_name] = process_column_var(column_name, operation, df)
+
+    df = df[~df.isin([np.nan, np.inf, -np.inf]).any(axis="columns")]
 
     return df
 
@@ -58,15 +80,20 @@ def postprocessing_test(df, vars_dictionary):
     """
     Preprocessing general function given any dataframe and its dictionary
     """
+    with open("scale_factors.json") as scale_file:
+        scale_dict = json.load(scale_file)
 
     for column_name, operation in vars_dictionary.items():
         fig, axs = plt.subplots(1, 2)
         plt.suptitle(f"{column_name}")
         axs[0].hist(df[column_name], bins=30, histtype="step")
+        df[column_name] = restore_range(column_name, scale_dict, df)        
         df[column_name] = process_column_var(column_name, operation, df)
         axs[1].hist(df[column_name], bins=30, histtype="step")
-        plt.savefig(f"figures/{column_name}.pdf", format="pdf")
+        plt.savefig(f"figures_post/{column_name}.pdf", format="pdf")
         plt.close()  # produces MatplotlibDeprecationWarning. It is a bug (https://github.com/matplotlib/matplotlib/issues/23921)
+
+    df = df[~df.isin([np.nan, np.inf, -np.inf]).any(axis="columns")]
 
     return df
 

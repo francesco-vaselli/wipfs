@@ -169,7 +169,7 @@ def preprocessing(df, vars_dictionary):
         axs[0].hist(df[column_name], bins=30, histtype="step")
         df[column_name] = process_column_var(column_name, operation, df)
         df[column_name], scale = fix_range(column_name, df)
-        dict_to_save[column_name] = scale
+        dict_to_save[column_name] = float(scale)
         axs[1].hist(df[column_name], bins=30, histtype="step")
         plt.savefig(f"figures/{column_name}.pdf", format="pdf")
         plt.close()  # produces MatplotlibDeprecationWarning. It is a bug (https://github.com/matplotlib/matplotlib/issues/23921)

@@ -25,8 +25,8 @@ def inverse_transform(df, column_name, function, p):
 
 def desmearing(df, column_name, interval):
     """Desmearing for in variables. We have gaussian and uniform smearing.
-    With the right choice of sigma and half_width we are sure that a 
-    truncation is enough to return to the original int value.
+    With the right choice of sigma and half_width we are sure that np.ceil
+    is enough to return to the original int value.
     If we have interval, that means that we built a fake gaussian dataset 
     in the selected interval, and then we just have to compute the sample mean
     in this range.
@@ -37,7 +37,7 @@ def desmearing(df, column_name, interval):
         loc = np.mean(val[mask_condition])
         val[mask_condition] = np.ones_like(val[mask_condition]) * loc
     else:
-        df[column_name] = np.trunc(df[column_name].values)
+        df[column_name] = np.ceil(df[column_name].values)
     return df[column_name]
 
 

@@ -66,7 +66,7 @@ def add_args(parser):
                         help='Beta2 for Adam.')
     parser.add_argument('--momentum', type=float, default=0.9,
                         help='Momentum for SGD')
-    parser.add_argument('--weight_decay', type=float, default=1e-5,
+    parser.add_argument('--weight_decay', type=float, default=0,
                         help='Weight decay for the optimizer.')
     parser.add_argument('--epochs', type=int, default=500,
                         help='Number of epochs for training (default: 500)')

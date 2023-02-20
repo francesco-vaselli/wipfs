@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import h5py
 
-import corner
+from corner import corner
 from matplotlib import pyplot as plt
 from matplotlib import lines as mlines
 
@@ -20,7 +20,7 @@ df["MElectron_phi"] = df["MElectron_phiMinusGen"] + df["MGenElectron_phi"]
 
 labels = ["MElectron_pt", "MElectron_eta", "MElectron_phi"]
 
-fig = corner.corner(
+fig = corner(
     df[labels],
     labels=labels,
     color="tab:blue",
@@ -49,7 +49,7 @@ labels = [
     "MElectron_pfRelIso03_chg",
 ]
 
-fig = corner.corner(
+fig = corner(
     df[labels],
     labels=labels,
     color="tab:blue",
@@ -75,7 +75,7 @@ labels = [
     "MElectron_dzErr",
 ]
 
-fig = corner.corner(
+fig = corner(
     df[labels],
     labels=labels,
     color="tab:blue",
@@ -101,7 +101,7 @@ labels = [
     "MElectron_mvaFall17V2noIso",
 ]
 
-fig = corner.corner(
+fig = corner(
     df[labels],
     labels=labels,
     color="tab:blue",

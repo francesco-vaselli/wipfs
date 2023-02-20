@@ -429,16 +429,16 @@ def create_transform(
         [
             transforms.CompositeTransform(
                 [
-                    # selected_transform,
+                    selected_transform,
                     create_base_transform(
                         i, param_dim, context_dim=context_dim, **base_transform_kwargs
                     ),
-                    selected_transform
+                    # selected_transform
                 ]
             )
             for i in range(num_flow_steps)
         ]
-        # + [transforms.LULinear(param_dim, identity_init=True)]
+         + [transforms.LULinear(param_dim, identity_init=True)]
     )
     return transform
 

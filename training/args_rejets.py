@@ -6,8 +6,8 @@ SOLVERS = ["dopri5", "bdf", "rk4", "midpoint", 'adams', 'explicit_adams', 'fixed
 LAYERS = ["ignore", "concat", "concat_v2", "squash", "concatsquash", "scale", "concatscale"]
 
 X_DIM = 30
-Y_DIM = 6
-Z_DIM = 4   
+Y_DIM = 14
+Z_DIM = 17   
 
 def add_args(parser):
 
@@ -35,17 +35,17 @@ def add_args(parser):
     parser.add_argument('--bn_lag', type=float, default=0)
 
     # flow options
-    parser.add_argument('--num_flow_steps', type=int, default=4)
-    parser.add_argument('--num_transform_blocks', type=int, default=2)
+    parser.add_argument('--num_flow_steps', type=int, default=Z_DIM)
+    parser.add_argument('--num_transform_blocks', type=int, default=10)
     parser.add_argument('--activation', type=str, default='relu')
     parser.add_argument('--dropout_probability', type=float, default=0.0)
     parser.add_argument('--batch_norm', type=eval, default=True, choices=[True, False])
-    parser.add_argument('--num_bins', type=int, default=8)
-    parser.add_argument('--tail_bound', type=float, default=3.0)
-    parser.add_argument('--hidden_dim', type=int, default=128)
-    parser.add_argument('--base_transform_type', type=str, default='rq-autoregressive', choices=['rq-autoregressive', 'rq-coupling'])
+    parser.add_argument('--num_bins', type=int, default=128)
+    parser.add_argument('--tail_bound', type=float, default=1.0)
+    parser.add_argument('--hidden_dim', type=int, default=298)
+    parser.add_argument('--base_transform_type', type=str, default='rq-coupling', choices=['rq-autoregressive', 'rq-coupling'])
     parser.add_argument('--transform_type', type=str, default='random-permutation', choices=['random-permutation', 'block-permutation', 'no-permutation'])
-    parser.add_argument('--block_size', type=int, default=2)
+    parser.add_argument('--block_size', type=int, default=2) # related to mask
     parser.add_argument('--mask_type', type=str, default='alternating-binary', choices=['alternating-binary', 'block-binary', 'identity'])
     parser.add_argument('--init_identity', type=eval, default=True, choices=[True, False])
 

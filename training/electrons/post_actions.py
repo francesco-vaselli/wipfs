@@ -9,7 +9,7 @@ sepcify preprocessing operation. Every operation has the following template
 
 where "string" tells which operation to perform and *pars its parameters. Such operations are
 
-gaus to int: ["d", [inf, sup]]
+unsmearing: ["d", [inf, sup]]
 transformation: ["i", func, [a, b]]  # func(x - b) / a
 
 In the case of multiple operations, order follows the operation list indexing.
@@ -58,7 +58,7 @@ vars_dictionary = {
     "Pileup_pudensity": [],
     "Pileup_sumEOOT": [],
     "Pileup_sumLOOT": [],
-    "MElectron_charge": [["d", None]],
+    "MElectron_charge": [["c", 0, [-1, 1]]],
     "MElectron_convVeto": [["d", None]],
 #    "MElectron_cutBased": [["d", 0.1, None]],
 #    "MElectron_cutBased_Fall17_V1": [["d", 0.1, None]],

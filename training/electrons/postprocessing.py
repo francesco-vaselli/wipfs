@@ -23,8 +23,8 @@ def inverse_transform(df, column_name, function, p):
     return df[column_name]
 
 
-def desmearing(df, column_name, interval):
-    """Desmearing for in variables. We have gaussian and uniform smearing.
+def unsmearing(df, column_name, interval):
+    """Unsmearing for in variables. We have gaussian and uniform smearing.
     If we have interval, that means that we built a fake gaussian dataset 
     in the selected interval, and then we just have to compute the sample mean
     in this range.
@@ -38,6 +38,12 @@ def desmearing(df, column_name, interval):
         df[column_name] = np.rint(df[column_name].values)
     return df[column_name]
 
+def cut_unsmearing(df, column_name, cut, x1, x2):
+
+    val = df[column_name].values
+    df[column_name] = np.where(val < cut, x1, x2)
+    return df[column_name]
+
 
 def process_column_var(column_name, operations, df):
 
@@ -45,7 +51,12 @@ def process_column_var(column_name, operations, df):
 
         if op[0] == "d":
             mask_condition = op[1]
-            df[column_name] = desmearing(df, column_name, mask_condition)
+            df[column_name] = unsmearing(df, column_name, mask_condition)
+
+        if op[0] == "c":
+            cut = op[1]
+            vals = op[2]
+            df[column_name] = cut_unsmearing(df, column_name, cut, *vals)
 
         if op[0] == "i":
             function = op[1]

@@ -30,7 +30,7 @@ fig = corner.corner(
     plot_datapoints=False,
 )
 plt.suptitle("MElectrons kinematics variables", fontsize=20)
-plt.savefig("corner_kinematics.pdf", format="pdf")
+plt.savefig("corner_fig/corner_kinematics.pdf", format="pdf")
 plt.close()
 
 # Corner plot: isolation
@@ -59,7 +59,7 @@ fig = corner.corner(
     plot_datapoints=False,
 )
 plt.suptitle("MElectrons isolation variables", fontsize=20)
-plt.savefig("corner_isolation.pdf", format="pdf")
+plt.savefig("corner_fig/corner_isolation.pdf", format="pdf")
 plt.close()
 
 # Corner plot: ip
@@ -85,7 +85,7 @@ fig = corner.corner(
     plot_datapoints=False,
 )
 plt.suptitle("MElectrons ip variables", fontsize=20)
-plt.savefig("corner_ip.pdf", format="pdf")
+plt.savefig("corner_fig/corner_ip.pdf", format="pdf")
 plt.close()
 
 # Corner plot: supercluster
@@ -111,5 +111,5 @@ fig = corner.corner(
     plot_datapoints=False,
 )
 plt.suptitle("MElectrons supercluster variables", fontsize=20)
-plt.savefig("corner_supercluster.pdf", format="pdf")
+plt.savefig("corner_fig/corner_supercluster.pdf", format="pdf")
 plt.close()

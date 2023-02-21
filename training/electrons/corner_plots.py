@@ -167,6 +167,7 @@ if __name__ == "__main__":
     fig = corner.corner(
         df[labels],
         labels=labels,
+        range=ranges,
         color="tab:blue",
         levels=(0.5, 0.9, 0.99),
         hist_bin_factor=3,

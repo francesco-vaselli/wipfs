@@ -88,8 +88,9 @@ def main():
         )
         print(f"Resumed from: {res_epoch}")
 
+
     dirpath = os.path.dirname(__file__)
-    
+
     tr_dataset = ElectronDataset(
         [os.path.join(dirpath, "MElectrons.hdf5")],
         x_dim=args.zdim,

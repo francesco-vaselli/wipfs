@@ -600,11 +600,6 @@ def train(model, train_loader, test_loader, epochs, optimizer, device, name, mod
             "Learning rate: {}".format(optimizer.state_dict()["param_groups"][0]["lr"])
         )
 
-        if epoch % args.val_freq == 0:
-            val_func(
-                test_loader, model, epoch, writer, save_dir=args.log_name, args=args, device=args.device, clf_loaders=None
-            )
-
         train_loss = train_epoch(
             model, train_loader, optimizer, epoch, device, output_freq, args=args
         )
@@ -618,6 +613,10 @@ def train(model, train_loader, test_loader, epochs, optimizer, device, name, mod
             writer.add_scalar("train/loss", train_loss, epoch)
             writer.add_scalar("test/loss", test_loss, epoch)
 
+        if epoch % args.val_freq == 0:
+            val_func(
+                test_loader, model, epoch, writer, save_dir=args.log_name, args=args, device=args.device, clf_loaders=None
+            )
 
         if epoch % save_freq == 0:
 

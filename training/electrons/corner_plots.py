@@ -128,7 +128,7 @@ if __name__ == "__main__":
 
     fig = corner.corner(
         df[labels],
-        range=range
+        range=ranges,
         labels=labels,
         color="tab:blue",
         levels=(0.5, 0.9, 0.99),

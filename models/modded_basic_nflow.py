@@ -510,7 +510,7 @@ def train_epoch(
     flow.train()
     train_loss = 0.0
 
-    for batch_idx, (_, y, z) in enumerate(train_loader):
+    for batch_idx, (z, y) in enumerate(train_loader):
         optimizer.zero_grad()
 
         if device is not None:

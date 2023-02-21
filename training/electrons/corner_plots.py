@@ -153,6 +153,17 @@ if __name__ == "__main__":
         "MElectron_mvaFall17V2noIso",
     ]
 
+    ranges = [
+        (0, 200),
+        (-2, 2),
+        None,
+        (0, 5),
+        None,
+        None,
+        None,
+        None,
+    ]    
+
     fig = corner.corner(
         df[labels],
         labels=labels,

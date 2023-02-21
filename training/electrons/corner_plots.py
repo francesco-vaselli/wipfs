@@ -156,12 +156,12 @@ if __name__ == "__main__":
     ranges = [
         (0, 200),
         (-2, 2),
-        None,
+        (0, 0.6),
         (0, 5),
-        None,
-        None,
-        None,
-        None,
+        (-1, 1),
+        (-1, 1),
+        (-1, 1),
+        (-1, 1),
     ]    
 
     fig = corner.corner(

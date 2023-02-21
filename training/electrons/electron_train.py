@@ -102,7 +102,7 @@ def main():
         [os.path.join(dirpath, "MElectrons.hdf5")],
         x_dim=args.zdim,
         y_dim=args.y_dim,
-        start=args._train_limit,
+        start=args.train_limit,
         limit=args.test_limit,
     )
 

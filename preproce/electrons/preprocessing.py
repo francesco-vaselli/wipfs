@@ -202,6 +202,7 @@ if __name__ == "__main__":
     df = preprocessing(df, vars_dictionary)
     
     print(df.columns)
+    print(df.shape)
     file = h5py.File(f"MElectrons.hdf5", "w")
 
     dset = file.create_dataset("data", data=df.values, dtype="f4")

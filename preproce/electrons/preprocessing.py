@@ -161,7 +161,7 @@ def preprocessing(df, vars_dictionary):
     """
     dict_to_save = {}
 
-    df.drop(discarded, axis=1)
+    df = df.drop(discarded, axis=1)
         
     df = df[~df.isin([np.nan, np.inf, -np.inf]).any(axis="columns")]
 

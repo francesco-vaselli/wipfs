@@ -146,3 +146,34 @@ vars_dictionary = {
 #    "MElectron_vidNestedWPBitmapHEEP10": [["g", 0.1, None]],
 #    "MElectron_vidNestedWPBitmapHEEP11": [["g", 0.1, None]],
 }
+
+# Vars to be discarded
+
+discarded = [
+    "MElectron_cutBased",
+    "MElectron_cutBased_Fall17_V1",
+    "MElectron_cutBased_HEEP",
+    "MElectron_eCorr",
+    "MElectron_vidNestedWPBitmap0",
+    "MElectron_vidNestedWPBitmap1",
+    "MElectron_vidNestedWPBitmap2",
+    "MElectron_vidNestedWPBitmap3",
+    "MElectron_vidNestedWPBitmap4",
+    "MElectron_vidNestedWPBitmap5",
+    "MElectron_vidNestedWPBitmap6",
+    "MElectron_vidNestedWPBitmap7",
+    "MElectron_vidNestedWPBitmap8",
+    "MElectron_vidNestedWPBitmap9",
+    "MElectron_vidNestedWPBitmapHEEP0",
+    "MElectron_vidNestedWPBitmapHEEP1",
+    "MElectron_vidNestedWPBitmapHEEP2",
+    "MElectron_vidNestedWPBitmapHEEP3",
+    "MElectron_vidNestedWPBitmapHEEP4",
+    "MElectron_vidNestedWPBitmapHEEP5",
+    "MElectron_vidNestedWPBitmapHEEP6",
+    "MElectron_vidNestedWPBitmapHEEP7",
+    "MElectron_vidNestedWPBitmapHEEP8",
+    "MElectron_vidNestedWPBitmapHEEP9",
+    "MElectron_vidNestedWPBitmapHEEP10",
+    "MElectron_vidNestedWPBitmapHEEP11"
+]

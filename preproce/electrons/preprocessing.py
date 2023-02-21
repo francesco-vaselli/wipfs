@@ -10,7 +10,7 @@ import warnings
 
 warnings.filterwarnings("ignore")  # temporary for MatPlotLibDeprecationWarning bug
 
-from prep_actions import vars_dictionary  # operation dictionary
+from prep_actions import vars_dictionary, discarded  # operation dictionary
 
 np.random.seed(0)  # fixed seed for random smearing
 
@@ -160,6 +160,8 @@ def preprocessing(df, vars_dictionary):
     Preprocessing general function given any dataframe and its dictionary
     """
     dict_to_save = {}
+
+    del df[discarded]
     
     df = df[~df.isin([np.nan, np.inf, -np.inf]).any(axis="columns")]
 
@@ -197,14 +199,14 @@ if __name__ == "__main__":
         df = pd.concat([df, make_dataset(tree)], axis=0)
         df.reset_index(drop=True)
 
-    # df = preprocessing(df, vars_dictionary)
-
+    df = preprocessing(df, vars_dictionary)
+    
     print(df.columns)
-    file = h5py.File(f"MElectrons_pre.hdf5", "w")
+    file = h5py.File(f"MElectrons.hdf5", "w")
 
     dset = file.create_dataset("data", data=df.values, dtype="f4")
 
     file.close()
 
-    os.system("mv MElectrons_pre.hdf5 ../../training/electrons/")  
+    os.system("mv MElectrons.hdf5 ../../training/electrons/")  
 

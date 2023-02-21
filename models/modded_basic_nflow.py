@@ -561,7 +561,7 @@ def test_epoch(flow, test_loader, epoch, device=None):
     with torch.no_grad():
         flow.eval()
         test_loss = 0.0
-        for _, y, z in test_loader:
+        for z, y in test_loader:
 
             if device is not None:
                 z = z.to(device, non_blocking=True)

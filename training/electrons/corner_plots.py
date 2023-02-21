@@ -9,11 +9,12 @@ from matplotlib import lines as mlines
 from postprocessing import reco_columns, gen_columns
 
 
-def make_corner(reco, samples, labels, title, *args, **kwargs):
+def make_corner(reco, samples, labels, title, ranges=None, *args, **kwargs):
     blue_line = mlines.Line2D([], [], color="tab:blue", label="FullSim")
     red_line = mlines.Line2D([], [], color="tab:orange", label="FlashSim")
     fig = corner.corner(
         reco[labels],
+        range=ranges,
         labels=labels,
         color="tab:blue",
         levels=[0.5, 0.9, 0.99],
@@ -25,6 +26,7 @@ def make_corner(reco, samples, labels, title, *args, **kwargs):
     )
     corner.corner(
         samples[labels],
+        range=ranges,
         fig=fig,
         color="tab:orange",
         levels=[0.5, 0.9, 0.99],

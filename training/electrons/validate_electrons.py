@@ -12,6 +12,7 @@ import corner
 from scipy.stats import wasserstein_distance
 
 from postprocessing import postprocessing, gen_columns, reco_columns
+from post_actions import vars_dictionary
 from corner_plots import make_corner
 
 
@@ -71,9 +72,8 @@ def validate_electrons(
 
     # Postprocessing for both test and samples datasets
 
-    gen = postprocessing(gen)
-    reco = postprocessing(reco)
-    samples = postprocessing(samples)
+    reco = postprocessing(reco, vars_dictionary)
+    samples = postprocessing(samples, vars_dictionary)
 
     # Return to physical kinematic variables
 

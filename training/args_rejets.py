@@ -35,6 +35,7 @@ def add_args(parser):
     parser.add_argument('--bn_lag', type=float, default=0)
 
     # flow options
+    parser.add_argument('--residual_blocks', type=eval, default=True, choices=[True, False])
     parser.add_argument('--num_flow_steps', type=int, default=Z_DIM)
     parser.add_argument('--num_transform_blocks', type=int, default=10)
     parser.add_argument('--activation', type=str, default='relu')

@@ -26,6 +26,7 @@ from nflows.transforms.splines.quadratic import (
     quadratic_spline,
     unconstrained_quadratic_spline,
 )
+from nflows.transforms.autoregressive import MaskedAffineAutoregressiveTransform
 from nflows.transforms.splines import rational_quadratic
 from nflows.transforms.splines.rational_quadratic import (
     rational_quadratic_spline,
@@ -287,6 +288,7 @@ def create_base_transform(
     mask_type="block-binary",
     block_size=1,
     init_identity=True,
+    residual_blocks=False,
 ):
     """
     NOTE: we are now using block masking
@@ -385,7 +387,18 @@ def create_base_transform(
             use_batch_norm=batch_norm,
             init_identity=init_identity # modded version with init_identity
         )
-
+    elif: base_transform_type == "rq-affine":
+        return MaskedAffineAutoregressiveTransform(
+                features=param_dim,
+                use_residual_blocks=residual_blocks,
+                num_blocks=num_transform_blocks,
+                hidden_features=hidden_dim,
+                context_features=context_dim,
+                dropout_probability=dropout_probability,
+                use_batch_norm=batch_norm,
+                activation=activation_fn,
+                random_mask=False,
+            )
     else:
         raise ValueError
 

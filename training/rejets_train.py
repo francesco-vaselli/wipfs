@@ -68,8 +68,10 @@ def main():
             "block_size": args.block_size,  # useless param if we have alternating-binary mask
             "mask_type": args.mask_type,
             "init_identity": args.init_identity,
+            "residual_blocks": args.residual_blocks,
         },
         "transform_type": args.transform_type,
+
     }
 
     model = create_NDE_model(**flow_param_dict)

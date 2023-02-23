@@ -33,7 +33,7 @@ def unsmearing(df, column_name, interval):
     if interval != None:
         mask_condition = np.logical_and(val >= interval[0], val <= interval[1])
         loc = np.mean(val[mask_condition])
-        val[mask_condition] = np.ones_like(val[mask_condition]) * loc
+        val[mask_condition] = loc
     else:
         df[column_name] = np.rint(df[column_name].values)
     return df[column_name]

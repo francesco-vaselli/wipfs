@@ -18,9 +18,9 @@ def restore_range(column_name, scale_dict, df):
 
 
 def inverse_transform(df, column_name, function, p):
-    print(f"{column_name}\n___________________")
+
+    print(f"Applying {function} with parameters {p}...")
     df[column_name] = df[column_name].apply(lambda x: (function(x) - p[1]) / p[0])
-    print("__________________")
     return df[column_name]
 
 
@@ -30,6 +30,8 @@ def unsmearing(df, column_name, interval):
     in the selected interval, and then we just have to compute the sample mean
     in this range.
     """
+    print("Unsmearing")
+
     val = df[column_name].values
     if interval != None:
         mask_condition = np.logical_and(val >= interval[0], val <= interval[1])
@@ -51,6 +53,9 @@ def cut_unsmearing(df, column_name, cut, x1, x2):
 
 
 def process_column_var(column_name, operations, df):
+
+    print(f"Processing {column_name}...")
+
 
     for op in operations:
 

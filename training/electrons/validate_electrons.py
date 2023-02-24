@@ -1,3 +1,4 @@
+
 import os
 
 import torch
@@ -26,7 +27,6 @@ def validate_electrons(
     clf_loaders=None,
 ):
     model.eval()
-
     # Generate samples
     with torch.no_grad():
 
@@ -65,12 +65,9 @@ def validate_electrons(
     reco = postprocessing(reco, vars_dictionary)
     samples = postprocessing(samples, vars_dictionary)
 
-    # Return to physical kinematic variables
+    # New DataFrame containing FullSim-range saturated samples
 
-    for df in [reco, samples]:
-        df["MElectron_pt"] = df["MElectron_ptRatio"] * gen["MGenElectron_pt"]
-        df["MElectron_eta"] = df["MElectron_etaMinusGen"] + gen["MGenElectron_eta"]
-        df["MElectron_phi"] = df["MElectron_phiMinusGen"] + gen["MGenElectron_phi"]
+    saturated_samples = pd.DataFrame()
 
     # 1D FlashSim/FullSim comparison
 
@@ -86,12 +83,18 @@ def validate_electrons(
         )
 
         # Saturation based on FullSim range
-        x = np.where(samples[column] < np.min(rangeR), np.min(rangeR), samples[column])
-        x = np.where(x > np.max(rangeR), np.max(rangeR), x)
+        saturated_samples[column] = np.where(
+            samples[column] < np.min(rangeR), np.min(rangeR), samples[column]
+        )
+        saturated_samples[column] = np.where(
+            saturated_samples[column] > np.max(rangeR),
+            np.max(rangeR),
+            saturated_samples[column],
+        )
 
         # Samples histogram
         axs[0].hist(
-            x,
+            saturated_samples[column],
             histtype="step",
             lw=1,
             range=[np.min(rangeR), np.max(rangeR)],
@@ -106,12 +109,19 @@ def validate_electrons(
         axs[1].set_yscale("log")
         axs[1].hist(reco[column], histtype="step", lw=1, bins=100)
         axs[1].hist(
-            x, histtype="step", lw=1, range=[np.min(rangeR), np.max(rangeR)], bins=100
+            saturated_samples[column], histtype="step", lw=1, range=[np.min(rangeR), np.max(rangeR)], bins=100
         )
         writer.add_figure(f"{column}", fig, global_step=epoch)
-        writer.add_scalar(f"WS/{column}_wasserstein", ws, global_step=epoch)
+        writer.add_scalar(f"ws/{column}_wasserstein_distance", ws, global_step=epoch)
         plt.close()
-        del x
+
+
+    # Return to physical kinematic variables
+
+    for df in [reco, samples, saturated_samples]:
+        df["MElectron_pt"] = df["MElectron_ptRatio"] * gen["MGenElectron_pt"]
+        df["MElectron_eta"] = df["MElectron_etaMinusGen"] + gen["MGenElectron_eta"]
+        df["MElectron_phi"] = df["MElectron_phiMinusGen"] + gen["MGenElectron_phi"]
 
     # Corner plots:
 
@@ -131,7 +141,7 @@ def validate_electrons(
         "MElectron_pfRelIso03_chg",
     ]
 
-    fig = make_corner(reco, samples, labels, "Isolation")
+    fig = make_corner(reco, saturated_samples, labels, "Isolation")
     writer.add_figure("Isolation", fig, global_step=epoch)
 
     # Impact parameter (range)
@@ -158,16 +168,16 @@ def validate_electrons(
         (0, 0.05),
     ]
 
-    fig = make_corner(reco, samples, labels, "Impact parameter", ranges=ranges)
+    fig = make_corner(reco, saturated_samples, labels, "Impact parameter", ranges=ranges)
     writer.add_figure("Impact parameter", fig, global_step=epoch)
 
-    # Impact parameter comparison (range)
+    # Impact parameter comparison
 
     reco["MElectron_sqrt_xy_z"] = np.sqrt(
         (reco["MElectron_dxy"].values) ** 2 + (reco["MElectron_dz"].values) ** 2
     )
-    samples["MElectron_sqrt_xy_z"] = np.sqrt(
-        (samples["MElectron_dxy"].values) ** 2 + (samples["MElectron_dz"].values) ** 2
+    saturated_samples["MElectron_sqrt_xy_z"] = np.sqrt(
+        (saturated_samples["MElectron_dxy"].values) ** 2 + (saturated_samples["MElectron_dz"].values) ** 2
     )
 
     labels = ["MElectron_sqrt_xy_z", "MElectron_ip3d"]
@@ -175,7 +185,7 @@ def validate_electrons(
     ranges = [(0, 0.2), (0, 0.2)]
 
     fig = make_corner(
-        reco, samples, labels, r"Impact parameter vs \sqrt(dxy^2 + dz^2)", ranges=ranges
+        reco, saturated_samples, labels, r"Impact parameter vs \sqrt(dxy^2 + dz^2)", ranges=ranges
     )
     writer.add_figure(
         r"Impact parameter vs \sqrt(dxy^2 + dz^2)", fig, global_step=epoch
@@ -185,7 +195,7 @@ def validate_electrons(
 
     labels = ["MElectron_pt", "MElectron_eta", "MElectron_phi"]
 
-    fig = make_corner(reco, samples, labels, "Kinematics")
+    fig = make_corner(reco, saturated_samples, labels, "Kinematics")
     writer.add_figure("Kinematics", fig, global_step=epoch)
 
     # Supercluster
@@ -212,5 +222,5 @@ def validate_electrons(
         (-1, 1),
     ]
 
-    fig = make_corner(reco, samples, labels, "Supercluster", ranges=ranges)
+    fig = make_corner(reco, saturated_samples, labels, "Supercluster", ranges=ranges)
     writer.add_figure("Supercluster", fig, global_step=epoch)

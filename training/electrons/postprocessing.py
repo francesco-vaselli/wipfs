@@ -18,10 +18,11 @@ def restore_range(column_name, scale_dict, df):
 
 
 def inverse_transform(df, column_name, function, p):
-    
+    print(f"{column_name}\___________________")
     print(f"Pre {function}\n{df[column_name]}")
     df[column_name] = df[column_name].apply(lambda x: (function(x) - p[1]) / p[0])
     print(f"Post {function}\n{df[column_name]}")
+    print("__________________")
     return df[column_name]
 
 

@@ -319,6 +319,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
                 model_dir=save_dir,
                 optimizer=optimizer,
             )
+    print("done")    
 
 def main():
     args = get_args()

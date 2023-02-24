@@ -180,13 +180,13 @@ def validate_electrons(
     fig = make_corner(reco, saturated_samples, labels, "Impact parameter", ranges=ranges)
     writer.add_figure("Impact parameter", fig, global_step=epoch)
 
-    # Impact parameter comparison (range)
+    # Impact parameter comparison
 
     reco["MElectron_sqrt_xy_z"] = np.sqrt(
         (reco["MElectron_dxy"].values) ** 2 + (reco["MElectron_dz"].values) ** 2
     )
-    samples["MElectron_sqrt_xy_z"] = np.sqrt(
-        (samples["MElectron_dxy"].values) ** 2 + (samples["MElectron_dz"].values) ** 2
+    saturated_samples["MElectron_sqrt_xy_z"] = np.sqrt(
+        (saturated_samples["MElectron_dxy"].values) ** 2 + (saturated_samples["MElectron_dz"].values) ** 2
     )
 
     labels = ["MElectron_sqrt_xy_z", "MElectron_ip3d"]

@@ -21,23 +21,13 @@ def validate_electrons(
     model,
     epoch,
     writer,
-    save_dir,
     args,
     device,
     clf_loaders=None,
 ):
     model.eval()
 
-    # Make epoch wise save directory
-    if writer is not None and args.save_val_results:
-        save_dir = os.path.join(save_dir, ".", "figure", f"validation@epoch-{epoch}")
-        if not os.path.isdir(save_dir):
-            os.makedirs(save_dir)
-    else:
-        save_dir = None
-
     # Generate samples
-
     with torch.no_grad():
 
         gen = []
@@ -47,7 +37,7 @@ def validate_electrons(
         for bid, data in enumerate(test_loader):
 
             z, y = data[0], data[1]
-            inputs_y = y.to(device)
+            inputs_y = y.cuda(device)
 
             z_sampled = model.sample(
                 num_samples=1, context=inputs_y.view(-1, args.y_dim)
@@ -119,6 +109,7 @@ def validate_electrons(
             x, histtype="step", lw=1, range=[np.min(rangeR), np.max(rangeR)], bins=100
         )
         writer.add_figure(f"{column}", fig, global_step=epoch)
+        writer.add_scalar(f"WS/{column}_wasserstein", ws, global_step=epoch)
         plt.close()
         del x
 

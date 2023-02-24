@@ -35,6 +35,7 @@ from nflows.transforms import splines
 from torch.nn.functional import softplus
 
 from modded_coupling import PiecewiseCouplingTransformM
+from modded_base_flow import FlowM
 
 
 
@@ -467,7 +468,7 @@ def create_NDE_model(
     transform = create_transform(
         num_flow_steps, input_dim, context_dim, base_transform_kwargs, transform_type
     )
-    flow = flows.Flow(transform, distribution)
+    flow = FlowM(transform, distribution)
 
     # Store hyperparameters. This is for reconstructing model when loading from
     # saved file.
@@ -683,7 +684,7 @@ def load_model(device, model_dir=None, filename=None):
         )
 
     p = Path(model_dir)
-    checkpoint = torch.load(p / filename, map_location=device)
+    checkpoint = torch.load(p / filename, map_location="cpu")
 
     model_hyperparams = checkpoint["model_hyperparams"]
     train_history = checkpoint["train_history"]
@@ -692,7 +693,7 @@ def load_model(device, model_dir=None, filename=None):
     # Load model
     model = create_NDE_model(**model_hyperparams)
     model.load_state_dict(checkpoint["model_state_dict"])
-    model.to(device)
+    # model.to(device)
 
     # Remember that you must call model.eval() to set dropout and batch normalization layers to evaluation mode before running inference.
     # Failing to do this will yield inconsistent inference results.

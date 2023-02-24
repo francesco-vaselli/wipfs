@@ -19,7 +19,7 @@ def restore_range(column_name, scale_dict, df):
 
 def inverse_transform(df, column_name, function, p):
 
-    if column_name == "MElectron_pfRelIso03_all":
+    if column_name == "MElectron_dr03EcalRecHitSumEt":
         print("SONO DENTRO")
 
     print(f"Applying {function} with parameters {p}...")
@@ -72,6 +72,7 @@ def process_column_var(column_name, operations, df):
             df[column_name] = cut_unsmearing(df, column_name, cut, *vals)
 
         if op[0] == "i":
+            print(f"Inverting {column_name}")
             function = op[1]
             p = op[2]
             df[column_name] = inverse_transform(df, column_name, function, p)

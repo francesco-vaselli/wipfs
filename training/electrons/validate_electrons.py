@@ -97,7 +97,7 @@ def validate_electrons(
 
         # Saturation based on FullSim range
         x = np.where(samples[column] < np.min(rangeR), np.min(rangeR), samples[column])
-        x = np.where(samples[column] > np.max(rangeR), np.max(rangeR), samples[column])
+        x = np.where(x > np.max(rangeR), np.max(rangeR), x)
 
         # Samples histogram
         axs[0].hist(

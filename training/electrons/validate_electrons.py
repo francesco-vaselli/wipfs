@@ -75,12 +75,7 @@ def validate_electrons(
     reco = postprocessing(reco, vars_dictionary)
     samples = postprocessing(samples, vars_dictionary)
 
-    # Return to physical kinematic variables
-
-    for df in [reco, samples]:
-        df["MElectron_pt"] = df["MElectron_ptRatio"] * gen["MGenElectron_pt"]
-        df["MElectron_eta"] = df["MElectron_etaMinusGen"] + gen["MGenElectron_eta"]
-        df["MElectron_phi"] = df["MElectron_phiMinusGen"] + gen["MGenElectron_phi"]
+    # New DataFrame containing FullSim-range saturated samples
 
     saturated_samples = pd.DataFrame()
 
@@ -128,6 +123,14 @@ def validate_electrons(
         )
         writer.add_figure(f"{column}", fig, global_step=epoch)
         plt.close()
+
+
+    # Return to physical kinematic variables
+
+    for df in [reco, samples, saturated_samples]:
+        df["MElectron_pt"] = df["MElectron_ptRatio"] * gen["MGenElectron_pt"]
+        df["MElectron_eta"] = df["MElectron_etaMinusGen"] + gen["MGenElectron_eta"]
+        df["MElectron_phi"] = df["MElectron_phiMinusGen"] + gen["MGenElectron_phi"]
 
     # Corner plots:
 

@@ -64,7 +64,8 @@ vars_dictionary = {
 #    "MElectron_cutBased_Fall17_V1": [["d", 0.1, None]],
 #    "MElectron_cutBased_HEEP": [["d", 0.1, None]],
     "MElectron_deltaEtaSC": [],
-    "MElectron_dr03EcalRecHitSumEt": [["d", [-np.inf, -2]], ["i", np.exp, [1, 1e-3]]],
+    "MElectron_dr03EcalRecHitSumEt": [["d", [-np.inf, -2]]],
+    "MElectron_dr03EcalRecHitSumEt": [["i", np.exp, [1, 1e-3]]],
     "MElectron_dr03HcalDepth1TowerSumEt": [
         ["d", [-np.inf, -2]],
         ["i", np.exp, [1, 1e-3]]

@@ -32,8 +32,12 @@ def unsmearing(df, column_name, interval):
     val = df[column_name].values
     if interval != None:
         mask_condition = np.logical_and(val >= interval[0], val <= interval[1])
-        loc = np.mean(val[mask_condition])
-        val[mask_condition] = loc
+
+        # Assuming that the value to be unsmeared is always np.log(1e-3),
+        # which corresponds to an int value of 0 after a np.log(x + 1e-3)
+        # transformation
+
+        val[mask_condition] = np.log(1e-3) 
     else:
         df[column_name] = np.rint(df[column_name].values)
     return df[column_name]

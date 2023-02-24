@@ -51,7 +51,6 @@ def cut_unsmearing(df, column_name, cut, x1, x2):
 
 def process_column_var(column_name, operations, df):
 
-    print(operations)
     for op in operations:
 
         if op[0] == "d":
@@ -64,7 +63,6 @@ def process_column_var(column_name, operations, df):
             df[column_name] = cut_unsmearing(df, column_name, cut, *vals)
 
         elif op[0] == "i":
-            print(f"Inverting {column_name}")
             function = op[1]
             p = op[2]
             df[column_name] = inverse_transform(df, column_name, function, p)

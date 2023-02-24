@@ -124,11 +124,10 @@ def validate_electrons(
         axs[1].set_yscale("log")
         axs[1].hist(reco[column], histtype="step", lw=1, bins=100)
         axs[1].hist(
-            x, histtype="step", lw=1, range=[np.min(rangeR), np.max(rangeR)], bins=100
+            saturated_samples[column], histtype="step", lw=1, range=[np.min(rangeR), np.max(rangeR)], bins=100
         )
         writer.add_figure(f"{column}", fig, global_step=epoch)
         plt.close()
-        del x
 
     # Corner plots:
 

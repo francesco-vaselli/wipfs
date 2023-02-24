@@ -66,12 +66,12 @@ def process_column_var(column_name, operations, df):
             mask_condition = op[1]
             df[column_name] = unsmearing(df, column_name, mask_condition)
 
-        if op[0] == "c":
+        elif op[0] == "c":
             cut = op[1]
             vals = op[2]
             df[column_name] = cut_unsmearing(df, column_name, cut, *vals)
 
-        if op[0] == "i":
+        elif op[0] == "i":
             print(f"Inverting {column_name}")
             function = op[1]
             p = op[2]

@@ -134,17 +134,17 @@ def process_column_var(column_name, operations, df):
             interval = op[1]
             df[column_name] = saturation(df, column_name, interval)
 
-        if op[0] == "g":
+        elif op[0] == "g":
             sigma = op[1]
             mask_condition = op[2]
             df[column_name] = gaus_smearing(df, column_name, sigma, mask_condition)
 
-        if op[0] == "u":
+        elif op[0] == "u":
             half_width = op[1]
             mask_condition = op[2]
             df[column_name] = unif_smearing(df, column_name, half_width, mask_condition)
 
-        if op[0] == "t":
+        elif op[0] == "t":
             function = op[1]
             p = op[2]
             df[column_name] = transform(df, column_name, function, p)

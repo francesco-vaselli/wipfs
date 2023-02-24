@@ -82,6 +82,8 @@ def validate_electrons(
         df["MElectron_eta"] = df["MElectron_etaMinusGen"] + gen["MGenElectron_eta"]
         df["MElectron_phi"] = df["MElectron_phiMinusGen"] + gen["MGenElectron_phi"]
 
+    saturated_samples = pd.DataFrame()
+
     # 1D FlashSim/FullSim comparison
 
     for column in reco_columns:
@@ -96,12 +98,18 @@ def validate_electrons(
         )
 
         # Saturation based on FullSim range
-        x = np.where(samples[column] < np.min(rangeR), np.min(rangeR), samples[column])
-        x = np.where(x > np.max(rangeR), np.max(rangeR), x)
+        saturated_samples[column] = np.where(
+            samples[column] < np.min(rangeR), np.min(rangeR), samples[column]
+        )
+        saturated_samples[column] = np.where(
+            saturated_samples[column] > np.max(rangeR),
+            np.max(rangeR),
+            saturated_samples[column],
+        )
 
         # Samples histogram
         axs[0].hist(
-            x,
+            saturated_samples[column],
             histtype="step",
             lw=1,
             range=[np.min(rangeR), np.max(rangeR)],
@@ -140,7 +148,7 @@ def validate_electrons(
         "MElectron_pfRelIso03_chg",
     ]
 
-    fig = make_corner(reco, samples, labels, "Isolation")
+    fig = make_corner(reco, saturated_samples, labels, "Isolation")
     writer.add_figure("Isolation", fig, global_step=epoch)
 
     # Impact parameter (range)
@@ -167,7 +175,7 @@ def validate_electrons(
         (0, 0.05),
     ]
 
-    fig = make_corner(reco, samples, labels, "Impact parameter", ranges=ranges)
+    fig = make_corner(reco, saturated_samples, labels, "Impact parameter", ranges=ranges)
     writer.add_figure("Impact parameter", fig, global_step=epoch)
 
     # Impact parameter comparison (range)
@@ -184,7 +192,7 @@ def validate_electrons(
     ranges = [(0, 0.2), (0, 0.2)]
 
     fig = make_corner(
-        reco, samples, labels, r"Impact parameter vs \sqrt(dxy^2 + dz^2)", ranges=ranges
+        reco, saturated_samples, labels, r"Impact parameter vs \sqrt(dxy^2 + dz^2)", ranges=ranges
     )
     writer.add_figure(
         r"Impact parameter vs \sqrt(dxy^2 + dz^2)", fig, global_step=epoch
@@ -194,7 +202,7 @@ def validate_electrons(
 
     labels = ["MElectron_pt", "MElectron_eta", "MElectron_phi"]
 
-    fig = make_corner(reco, samples, labels, "Kinematics")
+    fig = make_corner(reco, saturated_samples, labels, "Kinematics")
     writer.add_figure("Kinematics", fig, global_step=epoch)
 
     # Supercluster
@@ -221,5 +229,5 @@ def validate_electrons(
         (-1, 1),
     ]
 
-    fig = make_corner(reco, samples, labels, "Supercluster", ranges=ranges)
+    fig = make_corner(reco, saturated_samples, labels, "Supercluster", ranges=ranges)
     writer.add_figure("Supercluster", fig, global_step=epoch)

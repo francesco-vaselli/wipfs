@@ -59,7 +59,7 @@ def process_column_var(column_name, operations, df):
 
     print(f"Processing {column_name}...")
 
-
+    print(operations)
     for op in operations:
 
         if op[0] == "d":

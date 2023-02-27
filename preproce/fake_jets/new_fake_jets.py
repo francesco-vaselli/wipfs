@@ -70,10 +70,10 @@ if __name__ == '__main__':
 
     print(dfgl)
     print(dfft)
-    out_idx = dfft.index.get_level_values(0)
-    print(len(out_idx))
+    out_idx = dfft.index.to_series().nunique()
+    print(out_idx)
     inn_idx = dfft.index.get_level_values(1)
-    dfft = dfft.reset_index(drop=True).reindex(pd.MultiIndex.from_arrays([np.arange(len(out_idx)), inn_idx]))
+    dfft = dfft.reset_index(drop=True).reindex(pd.MultiIndex.from_arrays([np.arange(out_idx), inn_idx]))
     print(dfft)
     num_fakes = dfft.reset_index(level=1).index.value_counts(sort=False).reindex(np.arange(len(dfgl)), fill_value=0).values
     # fill missing fakes with 0s. seems to be cutting excess fakes per event

@@ -70,7 +70,6 @@ if __name__ == '__main__':
 
     print(dfgl)
     print(dfft)
-    .reset_index(level=1)
     out_idx = dfft.index.get_level_values(0)
     inn_idx = dfft.index.get_level_values(1)
     dfft = dfft.reindex(pd.MultiIndex.from_arrays([np.arange(len(out_idx)), inn_idx]))

@@ -66,12 +66,12 @@ if __name__ == '__main__':
         dfgl = pd.concat([dfgl, df1], axis=0)
         dfft = pd.concat([dfft, df2], axis=0)
         dfgl = dfgl.reset_index(drop=True)
-        dfft = dfft.reset_index(drop=True)
+        # dfft = dfft.reset_index(drop=True)
 
     print(dfgl)
     print(dfft)
     # .reset_index(level=1)
-    num_fakes = dfft.index.value_counts(sort=False).reindex(np.arange(len(dfgl)), fill_value=0).values
+    num_fakes = dfft.reset_index(level=1).index.value_counts(sort=False).reindex(np.arange(len(dfgl)), fill_value=0).values
     # fill missing fakes with 0s. seems to be cutting excess fakes per event
     dfft = dfft.reindex(pd.MultiIndex.from_product([np.arange(len(dfgl)), np.arange(10)]), fill_value=0) 
 

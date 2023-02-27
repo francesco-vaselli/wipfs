@@ -19,7 +19,7 @@ if __name__ == '__main__':
             "~/wipfs/extract/fake_jets/extracted_files/FJets6.root:FJets",
         ]
     
-    tree = uproot.open(f"~/wipfs/extract/fake_jets/extracted_files/FJets1.root:FJets", num_workers=20)
+    tree = uproot.open(root_files[0], num_workers=20)
     # define pandas df for fast manipulation
     dfgl = tree.arrays(
         [
@@ -64,17 +64,17 @@ if __name__ == '__main__':
         ).astype("float32")
 
         dfgl = pd.concat([dfgl, df1], axis=0)
-        dfft = pd.concat([dfft, df2], axis=0)
+        dfft = pd.concat([dfft, df2], axis=0, ignore_index=True)
         dfgl = dfgl.reset_index(drop=True)
         # dfft = dfft.reset_index(drop=True)
 
     print(dfgl)
     print(dfft)
     # .reset_index(level=1)
-    out_idx = dfft.index.get_level_values(0)
-    inn_idx = dfft.index.get_level_values(1)
-    dfft = dfft.reindex(pd.MultiIndex.from_product([np.arange(len(out_idx)), inn_idx]))
-    print(dfft)
+    # out_idx = dfft.index.get_level_values(0)
+    # inn_idx = dfft.index.get_level_values(1)
+    # dfft = dfft.reindex(pd.MultiIndex.from_product([np.arange(len(out_idx)), inn_idx]))
+    # print(dfft)
     num_fakes = dfft.reset_index(level=1).index.value_counts(sort=False).reindex(np.arange(len(dfgl)), fill_value=0).values
     # fill missing fakes with 0s. seems to be cutting excess fakes per event
     dfft = dfft.reindex(pd.MultiIndex.from_product([np.arange(len(dfgl)), np.arange(10)]), fill_value=0) 

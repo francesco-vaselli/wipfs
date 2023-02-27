@@ -70,8 +70,8 @@ if __name__ == '__main__':
 
     print(dfgl)
     print(dfft)
-
-    num_fakes = dfft.reset_index(level=1).index.value_counts(sort=False).reindex(np.arange(len(dfgl)), fill_value=0).values
+    # .reset_index(level=1)
+    num_fakes = dfft.index.value_counts(sort=False).reindex(np.arange(len(dfgl)), fill_value=0).values
     # fill missing fakes with 0s. seems to be cutting excess fakes per event
     dfft = dfft.reindex(pd.MultiIndex.from_product([np.arange(len(dfgl)), np.arange(10)]), fill_value=0) 
 

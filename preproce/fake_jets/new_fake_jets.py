@@ -74,7 +74,7 @@ if __name__ == '__main__':
     dfft = dfft.reset_index(level=0).sort_index()
     num_fakes = dfft.reset_index(level=1).index.value_counts(sort=False).reindex(np.arange(len(dfgl)), fill_value=0).values
     # fill missing fakes with 0s. seems to be cutting excess fakes per event
-    dfft = dfft.reset_index(levelreindex(pd.MultiIndex.from_product([np.arange(len(dfgl)), np.arange(10)]), fill_value=0) 
+    dfft = dfft.reindex(pd.MultiIndex.from_product([np.arange(len(dfgl)), np.arange(10)]), fill_value=0) 
 
     # get all fake in one event on the same row
     # NOTE: we now have all pts, then all etas, then all phis

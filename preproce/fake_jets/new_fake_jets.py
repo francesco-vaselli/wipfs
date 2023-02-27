@@ -4,6 +4,7 @@ import uproot
 import awkward as ak
 import h5py
 import sys
+import os
 sys.path.insert(0, os.path.join("../..", "utils"))
 
 from fake_utils import mod_sum_pt, vec_sum_pt

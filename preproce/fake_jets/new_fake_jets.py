@@ -64,7 +64,7 @@ if __name__ == '__main__':
         ).astype("float32")
 
         dfgl = pd.concat([dfgl, df1], axis=0)
-        dfft = pd.concat([dfft, df2], axis=0, ignore_index=True)
+        dfft = pd.concat([dfft, df2], axis=0).sort_index(axis=0)
         dfgl = dfgl.reset_index(drop=True)
         # dfft = dfft.reset_index(drop=True)
 

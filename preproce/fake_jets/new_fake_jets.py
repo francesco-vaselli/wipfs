@@ -71,7 +71,7 @@ if __name__ == '__main__':
     print(dfgl)
     print(dfft)
     out_idx = dfft.index.get_level_values(0)
-    print(len(out_idx)))
+    print(len(out_idx))
     inn_idx = dfft.index.get_level_values(1)
     dfft = dfft.reset_index(drop=True).reindex(pd.MultiIndex.from_arrays([np.arange(len(out_idx)), inn_idx]))
     print(dfft)

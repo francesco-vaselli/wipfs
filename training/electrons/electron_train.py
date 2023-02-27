@@ -132,11 +132,11 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
 
     lr = args.lr
     optimizer = torch.optim.Adam(
-    model.parameters(),
-    lr=lr,
-    betas=(args.beta1, args.beta2),
-    weight_decay=args.weight_decay,
-)
+        model.parameters(),
+        lr=lr,
+        betas=(args.beta1, args.beta2),
+        weight_decay=args.weight_decay,
+    )
 
     dirpath = os.path.dirname(__file__)
 
@@ -246,9 +246,11 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
                     )
                 )
 
-        train_loss = train_loss.item() / len(train_loader.dataset)
-        train_log_p = train_log_p.item() / len(train_loader.dataset)
-        train_log_det = train_log_det.item() / len(train_loader.dataset)
+        train_loss = (train_loss.item() / len(train_loader.dataset)) * args.world_size
+        train_log_p = (train_log_p.item() / len(train_loader.dataset)) * args.world_size
+        train_log_det = (
+            train_log_det.item() / len(train_loader.dataset)
+        ) * args.world_size
         if not args.distributed or (args.rank % ngpus_per_node == 0):
             writer.add_scalar("train/loss", train_loss, epoch)
             writer.add_scalar("train/log_p", train_log_p, epoch)
@@ -300,26 +302,29 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         if epoch % args.val_freq == 0:
             if not args.distributed or (args.rank % ngpus_per_node == 0):
                 if val_func is not None:
-                    val_func(test_loader,
-                                model,
-                                epoch,
-                                writer,
-                                args,
-                                args.gpu,)
+                    val_func(
+                        test_loader,
+                        model,
+                        epoch,
+                        writer,
+                        args,
+                        args.gpu,
+                    )
         # save checkpoints
         if not args.distributed or (args.rank % ngpus_per_node == 0):
             if (epoch + 1) % args.save_freq == 0:
                 save_model(
-                epoch,
-                model,
-                scheduler,
-                train_history,
-                test_history,
-                name="model",
-                model_dir=save_dir,
-                optimizer=optimizer,
-            )
-    print("done")    
+                    epoch,
+                    model,
+                    scheduler,
+                    train_history,
+                    test_history,
+                    name="model",
+                    model_dir=save_dir,
+                    optimizer=optimizer,
+                )
+    print("done")
+
 
 def main():
     args = get_args()
@@ -341,7 +346,11 @@ def main():
     ngpus_per_node = torch.cuda.device_count()
     if args.distributed:
         args.world_size = ngpus_per_node * args.world_size
-        mp.spawn(trainer, nprocs=ngpus_per_node, args=(save_dir, ngpus_per_node, args, val_func))
+        mp.spawn(
+            trainer,
+            nprocs=ngpus_per_node,
+            args=(save_dir, ngpus_per_node, args, val_func),
+        )
     else:
         trainer(args.gpu, save_dir, ngpus_per_node, args, val_func)
 

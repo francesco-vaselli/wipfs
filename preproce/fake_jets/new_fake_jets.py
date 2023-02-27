@@ -3,11 +3,43 @@ import numpy as np
 import uproot
 import awkward as ak
 import h5py
-import sys
-import os
-sys.path.insert(0, os.path.join("../..", "utils"))
 
-from fake_utils import mod_sum_pt, vec_sum_pt
+
+def mod_sum_pt(pts):
+    """module sum of pts
+
+    Args:
+        pts (np.array): pts array shape [n events, 10 fake jets], 0 for empty jets
+    Returns:
+        spt: sum of pts [n events]
+    """
+    spt = np.sum(pts, axis=1)
+    spt.flatten()
+
+    return spt
+
+
+def vec_sum_pt(pts, phis):
+    """vector sum of pts
+
+    Args:
+        pts (np.array): pts array shape [n events, 10 fake jets], 0 for empty jets
+        phis (np.array): phis array shape [n events, 10 fake jets], 0 for empty jets
+
+    Returns:
+        spt: vector sum of pts [n events]
+        angle: angle of the vector sum of pts [n events]
+    """
+    px = np.sum(pts * np.cos(phis), axis=1)
+    py = np.sum(pts * np.sin(phis), axis=1)
+
+    spt = np.sqrt(px**2 + py**2)
+    spt.flatten()
+
+    angle = np.arctan2(py, px)
+    angle.flatten()
+
+    return spt, angle
 
 STOP = None
 

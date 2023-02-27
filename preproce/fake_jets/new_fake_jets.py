@@ -41,7 +41,7 @@ def single_file_preprocess(filename : str):
     print(dfft)
 
     df = pd.concat([dfft, dfgl, pd.DataFrame(num_fakes, columns=['num_fakes'])], axis=1)
-    df = df[(df.T != 0).any()]
+    df = df[(df.iloc[:, :30].T != 0).any()]
     # print(df)
 
     # TODO: add Ht, phi calculation?

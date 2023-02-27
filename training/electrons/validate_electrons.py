@@ -1,4 +1,3 @@
-
 import os
 
 import torch
@@ -15,6 +14,7 @@ from scipy.stats import wasserstein_distance
 from postprocessing import postprocessing, gen_columns, reco_columns
 from post_actions import vars_dictionary
 from corner_plots import make_corner
+from conditioning_plot import conditioning_plot
 
 
 def validate_electrons(
@@ -109,12 +109,15 @@ def validate_electrons(
         axs[1].set_yscale("log")
         axs[1].hist(reco[column], histtype="step", lw=1, bins=100)
         axs[1].hist(
-            saturated_samples[column], histtype="step", lw=1, range=[np.min(rangeR), np.max(rangeR)], bins=100
+            saturated_samples[column],
+            histtype="step",
+            lw=1,
+            range=[np.min(rangeR), np.max(rangeR)],
+            bins=100,
         )
         writer.add_figure(f"{column}", fig, global_step=epoch)
         writer.add_scalar(f"ws/{column}_wasserstein_distance", ws, global_step=epoch)
         plt.close()
-
 
     # Return to physical kinematic variables
 
@@ -168,7 +171,9 @@ def validate_electrons(
         (0, 0.05),
     ]
 
-    fig = make_corner(reco, saturated_samples, labels, "Impact parameter", ranges=ranges)
+    fig = make_corner(
+        reco, saturated_samples, labels, "Impact parameter", ranges=ranges
+    )
     writer.add_figure("Impact parameter", fig, global_step=epoch)
 
     # Impact parameter comparison
@@ -177,7 +182,8 @@ def validate_electrons(
         (reco["MElectron_dxy"].values) ** 2 + (reco["MElectron_dz"].values) ** 2
     )
     saturated_samples["MElectron_sqrt_xy_z"] = np.sqrt(
-        (saturated_samples["MElectron_dxy"].values) ** 2 + (saturated_samples["MElectron_dz"].values) ** 2
+        (saturated_samples["MElectron_dxy"].values) ** 2
+        + (saturated_samples["MElectron_dz"].values) ** 2
     )
 
     labels = ["MElectron_sqrt_xy_z", "MElectron_ip3d"]
@@ -185,7 +191,11 @@ def validate_electrons(
     ranges = [(0, 0.2), (0, 0.2)]
 
     fig = make_corner(
-        reco, saturated_samples, labels, r"Impact parameter vs \sqrt(dxy^2 + dz^2)", ranges=ranges
+        reco,
+        saturated_samples,
+        labels,
+        r"Impact parameter vs \sqrt(dxy^2 + dz^2)",
+        ranges=ranges,
     )
     writer.add_figure(
         r"Impact parameter vs \sqrt(dxy^2 + dz^2)", fig, global_step=epoch
@@ -224,3 +234,53 @@ def validate_electrons(
 
     fig = make_corner(reco, saturated_samples, labels, "Supercluster", ranges=ranges)
     writer.add_figure("Supercluster", fig, global_step=epoch)
+
+    # Conditioning: ip3 and sip3d
+    # MGenElectron_statusFlag*
+
+    flags = [f"MGenElectron_statusFlag{i}" for i in (0, 1, 7)]
+
+    for flag in flags:
+        # ip3d
+        fig = conditioning_plot(
+            reco, samples, gen, "MElectron_ip3d", flag, range=[0, 30], bins=100
+        )
+        writer.add_figure(
+            f"Conditioning/MElectron_ip3d vs. {flag}", fig, global_step=epoch
+        )
+        # sip3d
+        fig = conditioning_plot(
+            reco, samples, gen, "MElectron_sip3d", flag, range=[0, 30], bins=100
+        )
+        writer.add_figure(
+            f"Conditioning/MElectron_sip3d vs. {flag}", fig, global_step=epoch
+        )
+
+    # ClosestJet and b-encoded flavour
+
+    # ip3d
+    fig = conditioning_plot(
+        reco,
+        samples,
+        gen,
+        "MElectron_ip3d",
+        "ClosestJet_EncodedPartonFlavour_b",
+        bins=100,
+        range=[0, 30],
+    )
+    writer.add_figure(
+        f"Conditioning/MElectron_ip3d vs. ClosestJet_EncodedPartonFlavour_b", fig, global_step=epoch
+    )  
+    # sip3d
+    fig = conditioning_plot(
+        reco,
+        samples,
+        gen,
+        "MElectron_sip3d",
+        "ClosestJet_EncodedPartonFlavour_b",
+        bins=100,
+        range=[0, 30],
+    )
+    writer.add_figure(
+        f"Conditioning/MElectron_sip3d vs. ClosestJet_EncodedPartonFlavour_b", fig, global_step=epoch
+    )  

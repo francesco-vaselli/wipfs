@@ -4,6 +4,9 @@ import uproot
 import awkward as ak
 import h5py
 import sys
+sys.path.insert(0, os.path.join("../..", "utils"))
+
+from fake_utils import mod_sum_pt, vec_sum_pt
 
 STOP = None
 
@@ -41,10 +44,24 @@ def single_file_preprocess(filename : str):
     print(dfft)
 
     df = pd.concat([dfft, dfgl, pd.DataFrame(num_fakes, columns=['num_fakes'])], axis=1)
-    df = df[(df.iloc[:, :30].T != 0).any()]
+    df = df[(df.iloc[:, :10].T != 0).any()]
     # print(df)
 
     # TODO: add Ht, phi calculation?
+    pts = df.iloc[:, :10].values
+    phis = df.iloc[:, 20:30].values
+
+    Ht = mod_sum_pt(pts)
+    pt, angle = vec_sum_pt(pts, phis)
+
+    # saturate mod pT
+    Ht = np.where(Ht > 200, 200, Ht)
+    # saturate pT
+    pt = np.where(pt > 200, 200, pt)
+
+    df["Ht"] = Ht
+    df["pt"] = pt
+    df["angle"] = angle
 
     df["num_fakes"] = df["num_fakes"].apply(
         lambda x: x + np.random.uniform(low=-0.5, high=0.5) # if x > 0 else 0 WE SHOULDN'T HAVE ANY 0s
@@ -69,10 +86,10 @@ if __name__ == '__main__':
         df = pd.concat([df, df1], axis=0)
         df = df.reset_index(drop=True)
 
-    
+    print(df)
 
-    # save_file = h5py.File(f"../../training/datasets/fake_jets{file_num}.hdf5", "w")
+    save_file = h5py.File(f"../../training/datasets/full_fake.hdf5", "w")
 
-    # dset = save_file.create_dataset("data", data=df.values, dtype="f4")
+    dset = save_file.create_dataset("data", data=df.values, dtype="f4")
 
-    # save_file.close()
+    save_file.close()

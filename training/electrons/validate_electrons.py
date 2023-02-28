@@ -238,7 +238,7 @@ def validate_electrons(
     # Conditioning: ip3 and sip3d
     # MGenElectron_statusFlag*
 
-    flags = [f"MGenElectron_statusFlag{i}" for i in (0, 1, 7)]
+    flags = [f"MGenElectron_statusFlag{i}" for i in (0, 2, 7)]
 
     for flag in flags:
         # ip3d

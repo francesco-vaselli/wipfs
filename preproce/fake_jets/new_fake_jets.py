@@ -80,7 +80,7 @@ def single_file_preprocess(filename : str):
     df = df[(df.iloc[:, :10].T != 0).any()]
     # print(df)
 
-    # TODO: add Ht, phi calculation?
+    # Ht, phi calculation
     pts = df.iloc[:, :10].values
     phis = df.iloc[:, 20:30].values
 

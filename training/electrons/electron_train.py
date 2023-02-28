@@ -193,8 +193,6 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
     train_history = []
     test_history = []
 
-    
-
     if args.distributed:
         print("[Rank %d] World size : %d" % (args.rank, dist.get_world_size()))
 
@@ -205,30 +203,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
 
         if writer is not None:
             writer.add_scalar("lr/optimizer", scheduler.get_last_lr(), epoch)
-        
-        if epoch % args.val_freq == 0:
-            if not args.distributed or (args.rank % ngpus_per_node == 0):
-                if val_func is not None:
-                    val_func(
-                        test_loader,
-                        model,
-                        epoch,
-                        writer,
-                        args,
-                        args.gpu,
-                    )
-        if not args.distributed or (args.rank % ngpus_per_node == 0):
-            if (epoch + 1) % args.save_freq == 0:
-                save_model(
-                    epoch,
-                    model,
-                    scheduler,
-                    train_history,
-                    test_history,
-                    name="model",
-                    model_dir=save_dir,
-                    optimizer=optimizer,
-                )    
+
         # train for one epoch
         train_loss = 0.0
         train_log_p = 0.0

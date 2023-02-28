@@ -37,7 +37,7 @@ def add_args(parser):
     parser.add_argument('--num_steps_maf', type=int, default=6)
     parser.add_argument('--num_steps_arqs', type=int, default=20)
     parser.add_argument('--num_transform_blocks_maf', type=int, default=2)
-    parser.add_argument('--num_transform_blocks_arqs', type=int, default=2)
+    parser.add_argument('--num_transform_blocks_arqs', type=int, default=4)
     parser.add_argument('--activation', type=str, default='relu')
     parser.add_argument('--dropout_probability_maf', type=float, default=0.0)
     parser.add_argument('--dropout_probability_arqs', type=float, default=0.0)

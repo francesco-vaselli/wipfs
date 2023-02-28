@@ -148,11 +148,11 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
     dirpath = os.path.dirname(__file__)
 
     tr_dataset = MyDataset(
-        [os.path.join(dirpath, "datasets", "Ajets_and_muons1+.hdf5")],
+        [os.path.join(dirpath, "..", "datasets", "Ajets_and_muons1+.hdf5")],
         limit=args.train_limit,
     )
     te_dataset = MyDataset(
-        [os.path.join(dirpath, "datasets", "Ajets_and_muons7+.hdf5")],
+        [os.path.join(dirpath, "..", "datasets", "Ajets_and_muons7+.hdf5")],
         limit=args.test_limit,
     )
 

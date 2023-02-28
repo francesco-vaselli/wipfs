@@ -134,6 +134,8 @@ dmypy.json
 /training/saves/
 /training/runs/
 /training/checkpoints/
+/training/electrons/checkpoints/
+/training/electrons/runs/
 
 # Electrons preprocessing figures
 

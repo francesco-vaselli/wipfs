@@ -12,7 +12,9 @@ def conditioning_plot(reco, samples, gen, target_col, condition_col, *args, **kw
     # Mask (does it change the effective values of dataframes?)
 
     full = full[conditioning]
+    full = full[~np.isnan(full)]
     flash = flash[conditioning]
+    flash = flash[~np.isnan(flash)]
 
     fig = plt.figure()
     plt.hist(full, histtype="step", label="FullSim", ls="--", *args, **kwargs)

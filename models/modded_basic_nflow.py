@@ -76,7 +76,7 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
               made.final_layer.bias,
               np.log(np.exp(1 - self._epsilon) - 1),
           )
-        super(MaskedAffineAutoregressiveTransform, self).__init__(made)
+        super(MaskedAffineAutoregressiveTransformM, self).__init__(made)
 
     def _output_dim_multiplier(self):
         return 2

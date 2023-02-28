@@ -33,7 +33,7 @@ class MyDataset(Dataset):
         return len(self.y_train)
 
     def __getitem__(self, idx):
-        return self.x_train[idx], self.y_train[idx], self.x_train[idx]
+        return self.x_train[idx], self.y_train[idx]
 
 
 class FakesDataset(Dataset):

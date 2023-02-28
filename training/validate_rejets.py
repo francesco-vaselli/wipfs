@@ -45,7 +45,7 @@ def validate_rejets(
         for bid, data in enumerate(test_loader):
 
             _, y, z = data[0], data[1], data[2]
-            inputs_y = y.to(device)
+            inputs_y = y.cuda(device)
 
             z_sampled = model.sample(
                     num_samples=1, context=inputs_y.view(-1, args.y_dim)
@@ -123,6 +123,8 @@ def validate_rejets(
         ax2.hist(samples[:, i], bins=100,  histtype='step', lw=1,
                 range=[rangeR.min(), rangeR.max()])
         writer.add_figure(f"{names[i]}", fig, global_step=epoch)
+        plt.savefig(f"{save_dir}/{names[i]}.png")
+                    
     plt.close()
 
     # Corner plot
@@ -137,6 +139,7 @@ def validate_rejets(
     plt.legend(fontsize=24, frameon=False, handles=[blue_line,red_line], bbox_to_anchor=(0., 1.0, 1., 4.0), loc='upper right')
     plt.suptitle('Jet tagging distributions correlations', fontsize=20)
     writer.add_figure("Jet tagging correlations", fig, global_step=epoch)
+    plt.savefig(f"{save_dir}/Jet_tagging_correlations.png")
     plt.close()
 
     blue_line = mlines.Line2D([], [], color='tab:blue', label='FullSim')
@@ -148,6 +151,7 @@ def validate_rejets(
     plt.legend(fontsize=16, frameon=False, handles=[blue_line,red_line], bbox_to_anchor=(0., 1.0, 1., 1.0), loc='upper right')
     plt.suptitle('qgl and nConstituens correlations', fontsize=16)
     writer.add_figure('qgl and nConstituens correlations', fig, global_step=epoch)
+    plt.savefig(f"{save_dir}/qgl_nConstituens_correlations.png")
     plt.close()
 
     blue_line = mlines.Line2D([], [], color='tab:blue', label='FullSim')
@@ -160,6 +164,7 @@ def validate_rejets(
     plt.suptitle(r'p$_T$ and mass correlations', fontsize=16
                 )
     writer.add_figure(r'p$_T$ and mass correlations', fig, global_step=epoch)
+    plt.savefig(f"{save_dir}/pt_mass_correlations.png")
     plt.close()
 
     limited_pt = reco[:, 12]
@@ -178,6 +183,7 @@ def validate_rejets(
     plt.suptitle(r'GenJet_p$_T$ and p$_T$ correlations', fontsize=16
                 )
     writer.add_figure(r'GenJet_p$_T$ and p$_T$ correlations', fig, global_step=epoch)
+    plt.savefig(f"{save_dir}/GenJet_pt_pt_correlations.png")
     plt.close()    
 
     # b-tagging FOM
@@ -255,4 +261,5 @@ def validate_rejets(
     plt.title("Receiver operating characteristic", fontsize=16)
     plt.legend(fontsize=16, frameon=False,loc="best")
     writer.add_figure("ROC", fig, global_step=epoch)
+    plt.savefig(f"{save_dir}/ROC.png")
     plt.close()

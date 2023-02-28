@@ -7,7 +7,7 @@ def conditioning_plot(reco, samples, gen, target_col, condition_col, *args, **kw
 
     full = reco[target_col].values
     flash = samples[target_col].values
-    conditioning = gen[condition_col].values
+    conditioning = gen[condition_col].values.astype(int)
 
     # Mask (does it change the effective values of dataframes?)
 

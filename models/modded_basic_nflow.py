@@ -587,7 +587,7 @@ def create_mixture_flow_model(
     transform = []
     for _ in range(base_kwargs["num_steps_maf"]):
         transform.append(
-            MaskedAffineAutoregressiveTransform(
+            MaskedAffineAutoregressiveTransformM(
                 features=input_dim,
                 use_residual_blocks=base_kwargs["use_residual_blocks_maf"],
                 num_blocks=base_kwargs["num_transform_blocks_maf"],

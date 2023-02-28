@@ -7,12 +7,13 @@ def conditioning_plot(reco, samples, gen, target_col, condition_col, *args, **kw
 
     full = reco[target_col].values
     flash = samples[target_col].values
-    conditioning = gen[condition_col].values.astype(int)
+    conditioning = gen[condition_col].values.astype(bool)
 
     # Mask (does it change the effective values of dataframes?)
 
     full = full[conditioning]
     flash = flash[conditioning]
+    print(full)
 
     fig = plt.figure()
     plt.hist(full, histtype="step", label="FullSim", ls="--", *args, **kwargs)
@@ -28,7 +29,7 @@ if __name__ == "__main__":
 
     np.random.seed(0)
 
-    N = 10000
+    N = 10
     x = np.random.rand(N)
     x = pd.DataFrame(data=x, columns=["a"])
 

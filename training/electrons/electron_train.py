@@ -299,7 +299,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         scheduler.step()
         train_history.append(train_loss)
         test_history.append(test_loss)
-        if epoch % args.val_freq == 0:
+        if epoch % 50 == 0:
             if not args.distributed or (args.rank % ngpus_per_node == 0):
                 if val_func is not None:
                     val_func(

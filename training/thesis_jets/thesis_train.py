@@ -77,7 +77,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
             "use_residual_blocks_arqs": args.use_residual_blocks_arqs,
             "batch_norm_maf": args.batch_norm_maf,
             "batch_norm_arqs": args.batch_norm_arqs,
-            "num_bins": args.num_bins,
+            "num_bins_arqs": args.num_bins,
             "tail_bound_arqs": args.tail_bound,
             "hidden_dim_maf": args.hidden_dim_maf,
             "hidden_dim_arqs": args.hidden_dim_arqs,

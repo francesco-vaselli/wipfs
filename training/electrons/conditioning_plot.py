@@ -13,7 +13,6 @@ def conditioning_plot(reco, samples, gen, target_col, condition_col, *args, **kw
 
     full = full[conditioning]
     flash = flash[conditioning]
-    print(full)
 
     fig = plt.figure()
     plt.hist(full, histtype="step", label="FullSim", ls="--", *args, **kwargs)

@@ -84,7 +84,7 @@ def postprocessing(df, vars_dictionary):
         df[column_name] = restore_range(column_name, scale_dict, df)
         df[column_name] = process_column_var(column_name, operation, df)
 
-    df = df[~df.isin([np.nan, np.inf, -np.inf]).any(axis="columns")]
+    # df = df[~df.isin([np.nan, np.inf, -np.inf]).any(axis="columns")]
 
     return df
 

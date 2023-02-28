@@ -514,7 +514,7 @@ def create_mixture_flow_model(
             MaskedAffineAutoregressiveTransform(
                 features=input_dim,
                 use_residual_blocks=base_kwargs["use_residual_blocks_maf"],
-                num_blocks=base_kwargs["num_blocks_maf"],
+                num_blocks=base_kwargs["num_transform_blocks_maf"],
                 hidden_features=base_kwargs["hidden_dim_maf"],
                 context_features=context_dim,
                 dropout_probability=base_kwargs["dropout_probability_maf"],
@@ -530,7 +530,7 @@ def create_mixture_flow_model(
                 tails="linear",
                 use_residual_blocks=base_kwargs["use_residual_blocks_arqs"],
                 hidden_features=base_kwargs["hidden_dim_arqs"],
-                num_blocks=base_kwargs["num_blocks_arqs"],
+                num_blocks=base_kwargs["num_transform_blocks_arqs"],
                 tail_bound=base_kwargs["tail_bound_arqs"],
                 num_bins=base_kwargs["num_bins_arqs"],
                 context_features=context_dim,

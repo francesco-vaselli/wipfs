@@ -41,6 +41,82 @@ from modded_coupling import PiecewiseCouplingTransformM
 from modded_base_flow import FlowM
 
 
+class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
+    def __init__(
+        self,
+        features,
+        hidden_features,
+        context_features=None,
+        num_blocks=2,
+        use_residual_blocks=True,
+        random_mask=False,
+        activation=F.relu,
+        dropout_probability=0.0,
+        use_batch_norm=False,
+        init_identity = True
+    ):
+        self.features = features
+        made = made_module.MADE(
+            features=features,
+            hidden_features=hidden_features,
+            context_features=context_features,
+            num_blocks=num_blocks,
+            output_multiplier=self._output_dim_multiplier(),
+            use_residual_blocks=use_residual_blocks,
+            random_mask=random_mask,
+            activation=activation,
+            dropout_probability=dropout_probability,
+            use_batch_norm=use_batch_norm,
+        )
+        self._epsilon = 1e-3
+        
+        if init_identity:
+          torch.nn.init.constant_(made.final_layer.weight, 0.0)
+          torch.nn.init.constant_(
+              made.final_layer.bias,
+              np.log(np.exp(1 - self._epsilon) - 1),
+          )
+        super(MaskedAffineAutoregressiveTransform, self).__init__(made)
+
+    def _output_dim_multiplier(self):
+        return 2
+
+    def _elementwise_forward(self, inputs, autoregressive_params):
+        unconstrained_scale, shift = self._unconstrained_scale_and_shift(
+            autoregressive_params
+        )
+        # scale = torch.sigmoid(unconstrained_scale + 2.0) + self._epsilon
+        scale = F.softplus(unconstrained_scale) + self._epsilon
+        log_scale = torch.log(scale)
+        outputs = scale * inputs + shift
+        logabsdet = torchutils.sum_except_batch(log_scale, num_batch_dims=1)
+        return outputs, logabsdet
+
+    def _elementwise_inverse(self, inputs, autoregressive_params):
+        unconstrained_scale, shift = self._unconstrained_scale_and_shift(
+            autoregressive_params
+        )
+        # scale = torch.sigmoid(unconstrained_scale + 2.0) + self._epsilon
+        scale = F.softplus(unconstrained_scale) + self._epsilon
+        log_scale = torch.log(scale)
+        outputs = (inputs - shift) / scale
+        logabsdet = -torchutils.sum_except_batch(log_scale, num_batch_dims=1)
+        return outputs, logabsdet
+
+    def _unconstrained_scale_and_shift(self, autoregressive_params):
+        # split_idx = autoregressive_params.size(1) // 2
+        # unconstrained_scale = autoregressive_params[..., :split_idx]
+        # shift = autoregressive_params[..., split_idx:]
+        # return unconstrained_scale, shift
+        autoregressive_params = autoregressive_params.view(
+            -1, self.features, self._output_dim_multiplier()
+        )
+        unconstrained_scale = autoregressive_params[..., 0]
+        shift = autoregressive_params[..., 1]
+        return unconstrained_scale, shift
+
+
+
 
 class MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(AutoregressiveTransform):
     def __init__(

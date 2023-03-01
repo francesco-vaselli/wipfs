@@ -290,8 +290,8 @@ def validate_electrons(
         gen,
         "MElectron_ip3d",
         "ClosestJet_EncodedPartonFlavour_b",
-        bins=100,
         range=[0, 30],
+        bins=100
     )
     plt.savefig(f"{save_dir}/MElectron_ip3d_ClosestJet_EncodedPartonFlavour_b.png", format="png")
     writer.add_figure(
@@ -306,8 +306,8 @@ def validate_electrons(
         gen,
         "MElectron_sip3d",
         "ClosestJet_EncodedPartonFlavour_b",
-        bins=100,
         range=[0, 30],
+        bins=100
     )
     plt.savefig(f"{save_dir}/MElectron_sip3d_ClosestJet_EncodedPartonFlavour_b.png", format="png")
     writer.add_figure(

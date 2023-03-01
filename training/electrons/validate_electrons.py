@@ -278,7 +278,8 @@ def validate_electrons(
             f"Conditioning/MElectron_sip3d vs. {flag}", fig, global_step=epoch
         )
         plt.savefig(f"{save_dir}/MElectron_sip3d_{flag}.png", format="png")
-        
+        plt.close()
+       
 
     # ClosestJet and b-encoded flavour
 
@@ -296,7 +297,8 @@ def validate_electrons(
         f"Conditioning/MElectron_ip3d vs. ClosestJet_EncodedPartonFlavour_b", fig, global_step=epoch
     )  
     plt.savefig(f"{save_dir}/MElectron_ip3d_ClosestJet_EncodedPartonFlavour_b.png", format="png")
-    
+    plt.close()
+   
     # sip3d
     fig = conditioning_plot(
         reco,
@@ -311,5 +313,6 @@ def validate_electrons(
         f"Conditioning/MElectron_sip3d vs. ClosestJet_EncodedPartonFlavour_b", fig, global_step=epoch
     )  
     plt.savefig(f"{save_dir}/MElectron_sip3d_ClosestJet_EncodedPartonFlavour_b.png", format="png")
+    plt.close()
 
 

@@ -21,7 +21,6 @@ def conditioning_plot(reco, samples, gen, target_col, condition_col, *args, **kw
     plt.hist(flash, histtype="step", label="FlashSim", *args, **kwargs)
     plt.legend()
     plt.title(f"{target_col}/{condition_col}")
-    plt.close()
 
     return fig
 

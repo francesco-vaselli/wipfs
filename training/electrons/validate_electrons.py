@@ -264,7 +264,7 @@ def validate_electrons(
     for flag in flags:
         # ip3d
         fig = conditioning_plot(
-            reco, samples, gen, "MElectron_ip3d", flag, rangeR=[0, .5], bins=100
+            reco, samples, gen, "MElectron_ip3d", flag, rangeR=[0, .1], bins=100
         )
         plt.savefig(f"{save_dir}/MElectron_ip3d_{flag}.png", format="png")
         writer.add_figure(
@@ -290,7 +290,7 @@ def validate_electrons(
         gen,
         "MElectron_ip3d",
         "ClosestJet_EncodedPartonFlavour_b",
-        rangeR=[0, .5],
+        rangeR=[0, .1],
         bins=100
     )
     plt.savefig(f"{save_dir}/MElectron_ip3d_ClosestJet_EncodedPartonFlavour_b.png", format="png")

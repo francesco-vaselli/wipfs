@@ -28,7 +28,7 @@ def validate_rejets(
 
 
     # Make epoch wise save directory
-    if writer is not None and args.save_val_results:
+    if writer is not None:
         save_dir = os.path.join(save_dir, f"./figures/validation@epoch-{epoch}")
         if not os.path.isdir(save_dir):
             os.makedirs(save_dir)
@@ -42,9 +42,8 @@ def validate_rejets(
         reco = []
         samples = []
 
-        for bid, data in enumerate(test_loader):
+        for bid, (z, y) in enumerate(test_loader):
 
-            _, y, z = data[0], data[1], data[2]
             inputs_y = y.cuda(device)
 
             z_sampled = model.sample(

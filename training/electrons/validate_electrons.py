@@ -27,7 +27,7 @@ def validate_electrons(
     clf_loaders=None,
 ):
     
-    if writer is not None and args.save_val_results:
+    if writer is not None:
         save_dir = os.path.join(save_dir, f"./figures/validation@epoch-{epoch}")
         if not os.path.isdir(save_dir):
             os.makedirs(save_dir)

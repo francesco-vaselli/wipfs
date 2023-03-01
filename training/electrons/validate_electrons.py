@@ -27,7 +27,7 @@ def validate_electrons(
     device,
     clf_loaders=None,
 ):
-    
+
     if writer is not None:
         save_dir = os.path.join(save_dir, f"./figures/validation@epoch-{epoch}")
         if not os.path.isdir(save_dir):
@@ -125,8 +125,74 @@ def validate_electrons(
             range=[np.min(rangeR), np.max(rangeR)],
             bins=100,
         )
-        writer.add_figure(f"{column}", fig, global_step=epoch)
+        writer.add_figure(f"1D_Distributions/{column}", fig, global_step=epoch)
         writer.add_scalar(f"ws/{column}_wasserstein_distance", ws, global_step=epoch)
+        plt.close()
+
+    # Zoom-in for high ws distributions
+
+    incriminated = [
+        ["MElectron_dr03HcalDepth1TowerSumEt", [0, 10]],
+        ["MElectron_dr03TkSumPt", [0, 10]],
+        ["MElectron_dr03TkSumPtHEEP", [0, 10]],
+        ["MElectron_dr03EcalRecHitSumEt", [0, 10]],
+        ["MElectron_dxyErr", [0, 0.1]],
+        ["MElectron_dzErr", [0, 0.2]],
+        ["MElectron_energyErr", [0, 5]],
+        ["MElectron_hoe", [0, 0.4]],
+        ["MElectron_ip3d", [0, 0.1]],
+        ["MElectron_jetPtRelv2", [0, 10]],
+        ["MElectron_jetRelIso", [0, 2]],
+        ["MElectron_miniPFRelIso_all", [0, 1]],
+        ["MElectron_miniPFRelIso_chg", [0, 1]],
+        ["MElectron_pfRelIso03_all", [0, 0.5]],
+        ["MElectron_pfRelIso03_chg", [0, 0.5]],
+        ["MElectron_sieie", [0.005, 0.02]],
+        ["MElectron_sip3d", [0, 10]],
+    ]
+    for elm in incriminated:
+        column = elm[0]
+        rangeR = elm[1]
+        inf = rangeR[0]
+        sup = rangeR[1]
+
+        full = reco[column].values
+        full = np.where(full > sup, sup, full)
+        full = np.where(full < inf, inf, full)
+
+        flash = samples[column].values
+        flash = np.where(flash > sup, sup, flash)
+        flash = np.where(flash < inf, inf, flash)
+
+        ws = wasserstein_distance(full, flash)
+
+        fig, axs = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
+        fig.suptitle(f"{column} comparison")
+
+        axs[0].hist(
+            full, histtype="step", lw=1, bins=100, range=rangeR, label="FullSim"
+        )
+        axs[0].hist(
+            flash,
+            histtype="step",
+            lw=1,
+            range=rangeR,
+            bins=100,
+            label=f"FlashSim, ws={round(ws, 4)}",
+        )
+
+        axs[0].legend(frameon=False, loc="upper right")
+
+        axs[1].set_yscale("log")
+        axs[1].hist(full, histtype="step", range=rangeR, lw=1, bins=100)
+        axs[1].hist(
+            flash,
+            histtype="step",
+            lw=1,
+            range=rangeR,
+            bins=100,
+        )
+        writer.add_figure(f"Zoom_in_1D_Distributions/{column}", fig, global_step=epoch)
         plt.close()
 
     # Return to physical kinematic variables
@@ -136,7 +202,7 @@ def validate_electrons(
         df["MElectron_eta"] = df["MElectron_etaMinusGen"] + gen["MGenElectron_eta"]
         df["MElectron_phi"] = df["MElectron_phiMinusGen"] + gen["MGenElectron_phi"]
 
-# Conditioning
+    # Conditioning
 
     targets = ["MElectron_ip3d", "MElectron_sip3d", "MElectron_jetRelIso"]
 
@@ -153,10 +219,10 @@ def validate_electrons(
 
         inf = rangeR[0]
         sup = rangeR[1]
-        
+
         for cond, color in zip(conds, colors):
             mask = gen[cond].values.astype(bool)
-            full = reco[target].values            
+            full = reco[target].values
             full = full[mask]
             full = full[~np.isnan(full)]
             full = np.where(full > sup, sup, full)
@@ -168,12 +234,24 @@ def validate_electrons(
             flash = np.where(flash > sup, sup, flash)
             flash = np.where(flash < inf, inf, flash)
 
-            plt.hist(full, bins=100, range=rangeR, histtype="step", ls="--", color=color)
-            plt.hist(flash, bins=100, range=rangeR, histtype="step", label=f"{cond}", color=color)
+            plt.hist(
+                full, bins=100, range=rangeR, histtype="step", ls="--", color=color
+            )
+            plt.hist(
+                flash,
+                bins=100,
+                range=rangeR,
+                histtype="step",
+                label=f"{cond}",
+                color=color,
+            )
             del full, flash
-        
+
         plt.legend()
-        plt.savefig(f"{save_dir}/{target}_conditioning.png", format="png")
+        # plt.savefig(f"{save_dir}/{target}_conditioning.png", format="png")
+        writer.add_figure(
+            f"Conditioning/{target}_conditioning.png", fig, global_step=epoch
+        )
         plt.close()
 
     # Corner plots:
@@ -195,7 +273,7 @@ def validate_electrons(
     ]
 
     fig = make_corner(reco, saturated_samples, labels, "Isolation")
-    writer.add_figure("Isolation", fig, global_step=epoch)
+    writer.add_figure("Corner_plots/Isolation", fig, global_step=epoch)
 
     # Impact parameter (range)
 
@@ -224,7 +302,7 @@ def validate_electrons(
     fig = make_corner(
         reco, saturated_samples, labels, "Impact parameter", ranges=ranges
     )
-    writer.add_figure("Impact parameter", fig, global_step=epoch)
+    writer.add_figure("Corner_plots/Impact parameter", fig, global_step=epoch)
 
     # Impact parameter comparison
 
@@ -244,11 +322,11 @@ def validate_electrons(
         reco,
         saturated_samples,
         labels,
-        r"Impact parameter vs \sqrt(dxy^2 + dz^2)",
+        r"Corner_plots/Impact parameter vs \sqrt(dxy^2 + dz^2)",
         ranges=ranges,
     )
     writer.add_figure(
-        r"Impact parameter vs \sqrt(dxy^2 + dz^2)", fig, global_step=epoch
+        r"Corner_plots/Impact parameter vs \sqrt(dxy^2 + dz^2)", fig, global_step=epoch
     )
 
     # Kinematics
@@ -256,7 +334,7 @@ def validate_electrons(
     labels = ["MElectron_pt", "MElectron_eta", "MElectron_phi"]
 
     fig = make_corner(reco, saturated_samples, labels, "Kinematics")
-    writer.add_figure("Kinematics", fig, global_step=epoch)
+    writer.add_figure("Corner_plots/Kinematics", fig, global_step=epoch)
 
     # Supercluster
 
@@ -283,7 +361,4 @@ def validate_electrons(
     ]
 
     fig = make_corner(reco, saturated_samples, labels, "Supercluster", ranges=ranges)
-    writer.add_figure("Supercluster", fig, global_step=epoch)
-
-
-
+    writer.add_figure("Corner_plots/Supercluster", fig, global_step=epoch)

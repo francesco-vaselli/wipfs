@@ -141,6 +141,47 @@ def validate_electrons(
         df["MElectron_eta"] = df["MElectron_etaMinusGen"] + gen["MGenElectron_eta"]
         df["MElectron_phi"] = df["MElectron_phiMinusGen"] + gen["MGenElectron_phi"]
 
+# Conditioning
+
+    targets = ["MElectron_ip3d", "MElectron_sip3d", "MElectron_jetRelIso"]
+
+    ranges = [[0, 0.1], [0, 10], [0, 5]]
+
+    conds = [f"MGenElectron_statusFlag{i}" for i in (0, 2, 7)]
+    conds.append("ClosestJet_EncodedPartonFlavour_b")
+
+    colors = ["red", "green", "blue", "orange"]
+
+    for target, rangeR in zip(targets, ranges):
+
+        fig = plt.figure()
+
+        inf = rangeR[0]
+        sup = rangeR[1]
+        
+        full = reco[target].values
+
+        for cond, color in zip(conds, colors):
+            mask = gen[cond].values.astype(bool)
+
+            full = full[mask]
+            full = full[~np.isnan(full)]
+            full = np.where(full > sup, sup, full)
+            full = np.where(full < inf, inf, full)
+
+            flash = samples[target].values
+            flash = flash[mask]
+            flash = flash[~np.isnan(flash)]
+            flash = np.where(flash > sup, sup, flash)
+            flash = np.where(flash < inf, inf, flash)
+
+            plt.hist(full, bins=100, range=rangeR, histtype="step", ls="--", color=color)
+            plt.hist(flash, bins=100, range=rangeR, histtype="step", label=f"{cond}", color=color)
+        
+        plt.legend()
+        plt.savefig(f"{save_dir}/{target}_conditioning.png", format="png")
+        plt.close()
+
     # Corner plots:
 
     # Isolation
@@ -249,47 +290,6 @@ def validate_electrons(
 
     fig = make_corner(reco, saturated_samples, labels, "Supercluster", ranges=ranges)
     writer.add_figure("Supercluster", fig, global_step=epoch)
-       
-    # Conditioning
-
-    targets = ["MElectron_ip3d", "MElectron_sip3d", "MElectron_jetRelIso"]
-
-    ranges = [[0, 0.1], [0, 10], [0, 5]]
-
-    conds = [f"MGenElectron_statusFlag{i}" for i in (0, 2, 7)]
-    conds.append("ClosestJet_EncodedPartonFlavour_b")
-
-    colors = ["red", "green", "blue", "orange"]
-
-    for target, rangeR in zip(targets, ranges):
-
-        fig = plt.figure()
-
-        inf = rangeR[0]
-        sup = rangeR[1]
-        
-        full = reco[target].values
-
-        for cond, color in zip(conds, colors):
-            mask = gen[cond].values.astype(bool)
-
-            full = full[mask]
-            full = full[~np.isnan(full)]
-            full = np.where(full > sup, sup, full)
-            full = np.where(full < inf, inf, full)
-
-            flash = samples[target].values
-            flash = flash[mask]
-            flash = flash[~np.isnan(flash)]
-            flash = np.where(flash > sup, sup, flash)
-            flash = np.where(flash < inf, inf, flash)
-
-            plt.hist(full, bins=100, range=rangeR, histtype="step", ls="--", color=color)
-            plt.hist(flash, bins=100, range=rangeR, histtype="step", label=f"{cond}", color=color)
-        
-        plt.legend()
-        plt.savefig(f"{save_dir}/{target}_conditioning.png", format="png")
-        plt.close()
 
 
 

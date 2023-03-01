@@ -192,7 +192,7 @@ def validate_electrons(
             range=rangeR,
             bins=100,
         )
-        plt.savefig(f"{save_dir}/{column}_incriminated.png", format="png")
+        #plt.savefig(f"{save_dir}/{column}_incriminated.png", format="png")
         writer.add_figure(f"Zoom_in_1D_Distributions/{column}", fig, global_step=epoch)
         plt.close()
 

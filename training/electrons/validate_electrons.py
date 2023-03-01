@@ -62,11 +62,8 @@ def validate_electrons(
     # Making DataFrames
 
     gen = np.array(gen).reshape((-1, args.y_dim))
-    print(gen.shape)
     reco = np.array(reco).reshape((-1, args.zdim))
-    print(reco.shape)
     samples = np.array(samples).reshape((-1, args.zdim))
-    print(samples.shape)
 
     gen = pd.DataFrame(data=gen, columns=gen_columns)
     reco = pd.DataFrame(data=reco, columns=reco_columns)
@@ -75,10 +72,8 @@ def validate_electrons(
     # Postprocessing for both test and samples datasets
 
     reco = postprocessing(reco, vars_dictionary)
-    print(reco.shape)
 
     samples = postprocessing(samples, vars_dictionary)
-    print(samples.shape)
 
     # New DataFrame containing FullSim-range saturated samples
 
@@ -159,14 +154,10 @@ def validate_electrons(
         inf = rangeR[0]
         sup = rangeR[1]
         
-        full = reco[target].values
-        print(full.size)
-
         for cond, color in zip(conds, colors):
             mask = gen[cond].values.astype(bool)
-            print(mask.size)
+            full = reco[target].values            
             full = full[mask]
-            print(full.size)
             full = full[~np.isnan(full)]
             full = np.where(full > sup, sup, full)
             full = np.where(full < inf, inf, full)
@@ -179,6 +170,7 @@ def validate_electrons(
 
             plt.hist(full, bins=100, range=rangeR, histtype="step", ls="--", color=color)
             plt.hist(flash, bins=100, range=rangeR, histtype="step", label=f"{cond}", color=color)
+            del full, flash
         
         plt.legend()
         plt.savefig(f"{save_dir}/{target}_conditioning.png", format="png")

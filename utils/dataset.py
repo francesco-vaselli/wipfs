@@ -98,6 +98,7 @@ class NewFakesDataset(Dataset):
         ) 
         self.y_train = torch.tensor(y, dtype=torch.float32)
         z[:, [1, 2]] = z[:, [1, 2]] / 200.0 # divide ht and pt by 200
+        z[:, [0]] = z[:, [0]] / 10 # divide njet by 10
         self.z_train = torch.tensor(z, dtype=torch.float32)
 
     @property

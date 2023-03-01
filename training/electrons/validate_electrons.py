@@ -261,6 +261,8 @@ def validate_electrons(
 
         inf = rangeR[0]
         sup = rangeR[1]
+        
+        full = reco[target].values
 
         for cond, color in zip(conds, colors):
             mask = gen[cond].values.astype(bool)
@@ -269,6 +271,8 @@ def validate_electrons(
             full = full[~np.isnan(full)]
             full = np.where(full > sup, sup, full)
             full = np.where(full < inf, inf, full)
+            
+            flash = samples[target].values
             flash = flash[mask]
             flash = flash[~np.isnan(flash)]
             flash = np.where(flash > sup, sup, flash)

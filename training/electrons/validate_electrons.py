@@ -26,6 +26,14 @@ def validate_electrons(
     device,
     clf_loaders=None,
 ):
+    
+    if writer is not None and args.save_val_results:
+        save_dir = os.path.join(save_dir, f"./figures/validation@epoch-{epoch}")
+        if not os.path.isdir(save_dir):
+            os.makedirs(save_dir)
+    else:
+        save_dir = None
+
     model.eval()
     # Generate samples
     with torch.no_grad():
@@ -236,9 +244,21 @@ def validate_electrons(
     writer.add_figure("Supercluster", fig, global_step=epoch)
 
     # Conditioning: ip3 and sip3d
-    # MGenElectron_statusFlag*
+
+    targets = ["MElectron_ip3d", "MElectron_sip3d", "MElectron_miniPFRelIso_all"]
+
+    conds = [f"MGenElectron_statusFlag{i}" for i in (0, 2, 7)]
+    conds.append("ClosestJet_EncodedPartonFlavour_b")
 
     flags = [f"MGenElectron_statusFlag{i}" for i in (0, 2, 7)]
+
+    """
+    for target in targets:
+        for cond in conds:
+            fig = conditioning_plot(reco, samples, gen, target, cond, range=[0, 30])
+            writer.add_figure(f"Conditioning/{target}|{conds}", fig, global_step=epoch)
+            plt.savefig(f"{save_dir}/{column}.png", format="png")
+    """         
 
     for flag in flags:
         # ip3d
@@ -284,3 +304,4 @@ def validate_electrons(
     writer.add_figure(
         f"Conditioning/MElectron_sip3d vs. ClosestJet_EncodedPartonFlavour_b", fig, global_step=epoch
     )  
+

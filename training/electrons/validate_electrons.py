@@ -160,11 +160,13 @@ def validate_electrons(
         sup = rangeR[1]
         
         full = reco[target].values
+        print(full.size)
 
         for cond, color in zip(conds, colors):
             mask = gen[cond].values.astype(bool)
-
+            print(mask.size)
             full = full[mask]
+            print(full.size)
             full = full[~np.isnan(full)]
             full = np.where(full > sup, sup, full)
             full = np.where(full < inf, inf, full)

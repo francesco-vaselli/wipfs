@@ -75,7 +75,10 @@ def validate_electrons(
     # Postprocessing for both test and samples datasets
 
     reco = postprocessing(reco, vars_dictionary)
+    print(reco.shape)
+
     samples = postprocessing(samples, vars_dictionary)
+    print(samples.shape)
 
     # New DataFrame containing FullSim-range saturated samples
 

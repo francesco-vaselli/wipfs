@@ -243,76 +243,43 @@ def validate_electrons(
 
     fig = make_corner(reco, saturated_samples, labels, "Supercluster", ranges=ranges)
     writer.add_figure("Supercluster", fig, global_step=epoch)
+       
+    # Conditioning
 
-    # Conditioning: ip3 and sip3d
+    targets = ["MElectron_ip3d", "MElectron_sip3d", "MElectron_jetRelIso"]
 
-    targets = ["MElectron_ip3d", "MElectron_sip3d", "MElectron_miniPFRelIso_all"]
+    ranges = [[0, 0.1], [0, 10], [0, 5]]
 
     conds = [f"MGenElectron_statusFlag{i}" for i in (0, 2, 7)]
     conds.append("ClosestJet_EncodedPartonFlavour_b")
 
-    flags = [f"MGenElectron_statusFlag{i}" for i in (0, 2, 7)]
+    colors = ["red", "green", "blue", "orange"]
 
-    """
-    for target in targets:
-        for cond in conds:
-            fig = conditioning_plot(reco, samples, gen, target, cond, range=[0, 30])
-            writer.add_figure(f"Conditioning/{target}|{conds}", fig, global_step=epoch)
-            plt.savefig(f"{save_dir}/{column}.png", format="png")
-    """         
+    for target, rangeR in zip(targets, ranges):
 
-    for flag in flags:
-        # ip3d
-        fig = conditioning_plot(
-            reco, samples, gen, "MElectron_ip3d", flag, rangeR=[0, .1], bins=100
-        )
-        plt.savefig(f"{save_dir}/MElectron_ip3d_{flag}.png", format="png")
-        writer.add_figure(
-            f"Conditioning/MElectron_ip3d vs. {flag}", fig, global_step=epoch
-        )
-        # sip3d
-        fig = conditioning_plot(
-            reco, samples, gen, "MElectron_sip3d", flag, rangeR=[0, 30], bins=100
-        )
-        plt.savefig(f"{save_dir}/MElectron_sip3d_{flag}.png", format="png")
-        writer.add_figure(
-            f"Conditioning/MElectron_sip3d vs. {flag}", fig, global_step=epoch
-        )
+        fig = plt.figure()
+
+        inf = rangeR[0]
+        sup = rangeR[1]
+
+        for cond, color in zip(conds, colors):
+            mask = gen[cond].values.astype(bool)
+
+            full = full[mask]
+            full = full[~np.isnan(full)]
+            full = np.where(full > sup, sup, full)
+            full = np.where(full < inf, inf, full)
+            flash = flash[mask]
+            flash = flash[~np.isnan(flash)]
+            flash = np.where(flash > sup, sup, flash)
+            flash = np.where(flash < inf, inf, flash)
+
+            plt.hist(full, bins=100, range=rangeR, histtype="step", ls="--", color=color)
+            plt.hist(flash, bins=100, range=rangeR, histtype="step", label=f"{cond}", color=color)
+        
+        plt.legend()
+        plt.savefig(f"{save_dir}/{target}_conditioning.png", format="png")
         plt.close()
-       
 
-    # ClosestJet and b-encoded flavour
-
-    # ip3d
-    fig = conditioning_plot(
-        reco,
-        samples,
-        gen,
-        "MElectron_ip3d",
-        "ClosestJet_EncodedPartonFlavour_b",
-        rangeR=[0, .1],
-        bins=100
-    )
-    plt.savefig(f"{save_dir}/MElectron_ip3d_ClosestJet_EncodedPartonFlavour_b.png", format="png")
-    writer.add_figure(
-        f"Conditioning/MElectron_ip3d vs. ClosestJet_EncodedPartonFlavour_b", fig, global_step=epoch
-    )  
-    plt.close()
-   
-    # sip3d
-    fig = conditioning_plot(
-        reco,
-        samples,
-        gen,
-        "MElectron_sip3d",
-        "ClosestJet_EncodedPartonFlavour_b",
-        rangeR=[0, 30],
-        bins=100
-    )
-    plt.savefig(f"{save_dir}/MElectron_sip3d_ClosestJet_EncodedPartonFlavour_b.png", format="png")
-    writer.add_figure(
-        f"Conditioning/MElectron_sip3d vs. ClosestJet_EncodedPartonFlavour_b", fig, global_step=epoch
-    )  
-    plt.close()
 
 

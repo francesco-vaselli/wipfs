@@ -62,8 +62,11 @@ def validate_electrons(
     # Making DataFrames
 
     gen = np.array(gen).reshape((-1, args.y_dim))
+    print(gen.shape)
     reco = np.array(reco).reshape((-1, args.zdim))
+    print(reco.shape)
     samples = np.array(samples).reshape((-1, args.zdim))
+    print(samples.shape)
 
     gen = pd.DataFrame(data=gen, columns=gen_columns)
     reco = pd.DataFrame(data=reco, columns=reco_columns)
@@ -271,7 +274,7 @@ def validate_electrons(
             full = full[~np.isnan(full)]
             full = np.where(full > sup, sup, full)
             full = np.where(full < inf, inf, full)
-            
+
             flash = samples[target].values
             flash = flash[mask]
             flash = flash[~np.isnan(flash)]

@@ -212,6 +212,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
                         model,
                         epoch,
                         writer,
+                        save_dir,
                         args,
                         args.gpu,
                     )

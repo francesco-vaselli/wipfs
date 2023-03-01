@@ -88,16 +88,16 @@ class NewFakesDataset(Dataset):
         self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
         self._archives = None
 
-        y = self.archives[0]["data"][start:limit, x_dim : (x_dim + y_dim)]
-        x = self.archives[0]["data"][start:limit, 0:x_dim]
+        y = self.archives[0]["data"][start:start+limit, x_dim : (x_dim + y_dim)]
+        x = self.archives[0]["data"][start:start+limit, 0:x_dim]
         z = self.archives[0]["data"][
-            start:limit, (y_dim + x_dim) : (y_dim + x_dim + z_dim)
+            start:start+limit, (y_dim + x_dim) : (y_dim + x_dim + z_dim)
         ]
         self.x_train = torch.tensor(
             x, dtype=torch.float32
-        )  # .view(-1, 1, x_dim) no reshape because no conv1d
+        ) 
         self.y_train = torch.tensor(y, dtype=torch.float32)
-        z[:, [1, 2, 3]] = z[:, [1, 2, 3]] / 200.0
+        z[:, [1, 2]] = z[:, [1, 2]] / 200.0 # divide ht and pt by 200
         self.z_train = torch.tensor(z, dtype=torch.float32)
 
     @property

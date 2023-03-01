@@ -274,10 +274,10 @@ def validate_electrons(
         fig = conditioning_plot(
             reco, samples, gen, "MElectron_sip3d", flag, range=[0, 30], bins=100
         )
+        plt.savefig(f"{save_dir}/MElectron_sip3d_{flag}.png", format="png")
         writer.add_figure(
             f"Conditioning/MElectron_sip3d vs. {flag}", fig, global_step=epoch
         )
-        plt.savefig(f"{save_dir}/MElectron_sip3d_{flag}.png", format="png")
         plt.close()
        
 
@@ -293,10 +293,10 @@ def validate_electrons(
         bins=100,
         range=[0, 30],
     )
+    plt.savefig(f"{save_dir}/MElectron_ip3d_ClosestJet_EncodedPartonFlavour_b.png", format="png")
     writer.add_figure(
         f"Conditioning/MElectron_ip3d vs. ClosestJet_EncodedPartonFlavour_b", fig, global_step=epoch
     )  
-    plt.savefig(f"{save_dir}/MElectron_ip3d_ClosestJet_EncodedPartonFlavour_b.png", format="png")
     plt.close()
    
     # sip3d
@@ -309,10 +309,10 @@ def validate_electrons(
         bins=100,
         range=[0, 30],
     )
+    plt.savefig(f"{save_dir}/MElectron_sip3d_ClosestJet_EncodedPartonFlavour_b.png", format="png")
     writer.add_figure(
         f"Conditioning/MElectron_sip3d vs. ClosestJet_EncodedPartonFlavour_b", fig, global_step=epoch
     )  
-    plt.savefig(f"{save_dir}/MElectron_sip3d_ClosestJet_EncodedPartonFlavour_b.png", format="png")
     plt.close()
 
 

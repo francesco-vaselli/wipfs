@@ -3,7 +3,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 
 
-def conditioning_plot(reco, samples, gen, target_col, condition_col, *args, **kwargs):
+def conditioning_plot(reco, samples, gen, target_col, condition_col, rangeR, *args, **kwargs):
 
     full = reco[target_col].values
     flash = samples[target_col].values
@@ -13,12 +13,14 @@ def conditioning_plot(reco, samples, gen, target_col, condition_col, *args, **kw
 
     full = full[conditioning]
     full = full[~np.isnan(full)]
+    full = np.where(full > rangeR[1], rangeR[1], full)
     flash = flash[conditioning]
     flash = flash[~np.isnan(flash)]
+    flash = np.where(flash > rangeR[1], rangeR[1], flash)
 
     fig = plt.figure()
-    plt.hist(full, histtype="step", label="FullSim", ls="--", *args, **kwargs)
-    plt.hist(flash, histtype="step", label="FlashSim", *args, **kwargs)
+    plt.hist(full, histtype="step", label="FullSim", ls="--", range=rangeR, *args, **kwargs)
+    plt.hist(flash, histtype="step", label="FlashSim",  range=rangeR, *args, **kwargs)
     plt.legend()
     plt.title(f"{target_col}/{condition_col}")
 

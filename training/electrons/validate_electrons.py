@@ -22,6 +22,7 @@ def validate_electrons(
     model,
     epoch,
     writer,
+    save_dir,
     args,
     device,
     clf_loaders=None,

@@ -317,7 +317,7 @@ def validate_electrons(
         del full, flash
 
         axs[0].legend()
-        plt.savefig(f"{save_dir}/{target}_conditioning.png", format="png")
+        # plt.savefig(f"{save_dir}/{target}_conditioning.png", format="png")
         writer.add_figure(
             f"Conditioning/{target}_conditioning.png", fig, global_step=epoch
         )
@@ -447,7 +447,7 @@ def validate_electrons(
         del full, flash
 
         axs[0].legend()
-        plt.savefig(f"{save_dir}/{target}_conditioning_normalized.png", format="png")
+        # plt.savefig(f"{save_dir}/{target}_conditioning_normalized.png", format="png")
         writer.add_figure(
             f"Conditioning/{target}_conditioning_normalized.png", fig, global_step=epoch
         )

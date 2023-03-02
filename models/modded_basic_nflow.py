@@ -913,7 +913,7 @@ def load_mixture_model(device, model_dir=None, filename=None):
     if len(checkpoint["optimizer_state_dict"]["param_groups"]) > 1:
         flow_lr = checkpoint["last_lr"]
     elif checkpoint["last_lr"] is not None:
-        flow_lr = checkpoint["last_lr"]
+        flow_lr = checkpoint["last_lr"][0]
     else:
         flow_lr = None
 

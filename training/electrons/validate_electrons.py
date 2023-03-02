@@ -192,7 +192,7 @@ def validate_electrons(
             range=rangeR,
             bins=100,
         )
-        #plt.savefig(f"{save_dir}/{column}_incriminated.png", format="png")
+        # plt.savefig(f"{save_dir}/{column}_incriminated.png", format="png")
         writer.add_figure(f"Zoom_in_1D_Distributions/{column}", fig, global_step=epoch)
         plt.close()
 
@@ -211,17 +211,31 @@ def validate_electrons(
 
     conds = [f"MGenElectron_statusFlag{i}" for i in (0, 2, 7)]
     conds.append("ClosestJet_EncodedPartonFlavour_b")
+    conds.append("ClosestJet_EncodedPartonFlavour_g")
+    conds.append("ClosestJet_EncodedPartonFlavour_light")
 
-    colors = ["red", "green", "blue", "orange"]
+    names = [
+        "isPrompt",
+        "isTauDecayProduct",
+        "isHardProcess",
+        "ClosestJet_partonFlavour_is_b",
+    ]
+
+    colors = ["tab:red", "tab:green", "tab:blue", "tab:orange"]
 
     for target, rangeR in zip(targets, ranges):
 
-        fig = plt.figure()
+        fig, axs = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
+
+        axs[0].set_xlabel(f"{target}")
+        axs[1].set_xlabel(f"{target}")
+
+        axs[1].set_yscale("log")
 
         inf = rangeR[0]
         sup = rangeR[1]
 
-        for cond, color in zip(conds, colors):
+        for cond, color, name in zip(conds, colors, names):
             mask = gen[cond].values.astype(bool)
             full = reco[target].values
             full = full[mask]
@@ -235,23 +249,207 @@ def validate_electrons(
             flash = np.where(flash > sup, sup, flash)
             flash = np.where(flash < inf, inf, flash)
 
-            plt.hist(
-                full, bins=100, range=rangeR, histtype="step", ls="--", color=color
+            axs[0].hist(
+                full, bins=50, range=rangeR, histtype="step", ls="--", color=color
             )
-            plt.hist(
+            axs[0].hist(
                 flash,
-                bins=100,
+                bins=50,
                 range=rangeR,
                 histtype="step",
-                label=f"{cond}",
+                label=f"{name}",
                 color=color,
             )
+
+            axs[1].hist(
+                full, bins=50, range=rangeR, histtype="step", ls="--", color=color
+            )
+            axs[1].hist(
+                flash,
+                bins=50,
+                range=rangeR,
+                histtype="step",
+                label=f"{name}",
+                color=color,
+            )
+
             del full, flash
 
-        plt.legend()
-        # plt.savefig(f"{save_dir}/{target}_conditioning.png", format="png")
+        mask = (
+            gen["ClosestJet_EncodedPartonFlavour_g"].values
+            + gen["ClosestJet_EncodedPartonFlavour_light"].values
+        ).astype(bool)
+        full = reco[target].values
+        full = full[mask]
+        full = full[~np.isnan(full)]
+        full = np.where(full > sup, sup, full)
+        full = np.where(full < inf, inf, full)
+
+        flash = samples[target].values
+        flash = flash[mask]
+        flash = flash[~np.isnan(flash)]
+        flash = np.where(flash > sup, sup, flash)
+        flash = np.where(flash < inf, inf, flash)
+
+        axs[0].hist(
+            full, bins=50, range=rangeR, histtype="step", ls="--", color="tab:purple"
+        )
+        axs[0].hist(
+            flash,
+            bins=50,
+            range=rangeR,
+            histtype="step",
+            label="ClosestJet_partonFlavour_is_guds",
+            color="tab:purple",
+        )
+
+        axs[1].hist(
+            full, bins=50, range=rangeR, histtype="step", ls="--", color="tab:purple"
+        )
+        axs[1].hist(
+            flash,
+            bins=50,
+            range=rangeR,
+            histtype="step",
+            label="ClosestJet_partonFlavour_is_guds",
+            color="tab:purple",
+        )
+        del full, flash
+
+        axs[0].legend()
+        plt.savefig(f"{save_dir}/{target}_conditioning.png", format="png")
         writer.add_figure(
             f"Conditioning/{target}_conditioning.png", fig, global_step=epoch
+        )
+        plt.close()
+
+    # Normalized version
+
+    for target, rangeR in zip(targets, ranges):
+
+        fig, axs = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
+
+        axs[0].set_xlabel(f"{target}")
+        axs[1].set_xlabel(f"{target}")
+
+        axs[1].set_yscale("log")
+
+        inf = rangeR[0]
+        sup = rangeR[1]
+
+        for cond, color, name in zip(conds, colors, names):
+            mask = gen[cond].values.astype(bool)
+            full = reco[target].values
+            full = full[mask]
+            full = full[~np.isnan(full)]
+            full = np.where(full > sup, sup, full)
+            full = np.where(full < inf, inf, full)
+
+            flash = samples[target].values
+            flash = flash[mask]
+            flash = flash[~np.isnan(flash)]
+            flash = np.where(flash > sup, sup, flash)
+            flash = np.where(flash < inf, inf, flash)
+
+            axs[0].hist(
+                full,
+                bins=50,
+                range=rangeR,
+                histtype="step",
+                ls="--",
+                color=color,
+                density=True,
+            )
+            axs[0].hist(
+                flash,
+                bins=50,
+                range=rangeR,
+                histtype="step",
+                label=f"{name}",
+                color=color,
+                density=True,
+            )
+
+            axs[1].hist(
+                full,
+                bins=50,
+                range=rangeR,
+                histtype="step",
+                ls="--",
+                color=color,
+                density=True,
+            )
+            axs[1].hist(
+                flash,
+                bins=50,
+                range=rangeR,
+                histtype="step",
+                label=f"{name}",
+                color=color,
+                density=True,
+            )
+
+            del full, flash
+
+        mask = (
+            gen["ClosestJet_EncodedPartonFlavour_g"].values
+            + gen["ClosestJet_EncodedPartonFlavour_light"].values
+        ).astype(bool)
+        full = reco[target].values
+        full = full[mask]
+        full = full[~np.isnan(full)]
+        full = np.where(full > sup, sup, full)
+        full = np.where(full < inf, inf, full)
+
+        flash = samples[target].values
+        flash = flash[mask]
+        flash = flash[~np.isnan(flash)]
+        flash = np.where(flash > sup, sup, flash)
+        flash = np.where(flash < inf, inf, flash)
+
+        axs[0].hist(
+            full,
+            bins=50,
+            range=rangeR,
+            histtype="step",
+            ls="--",
+            color="tab:purple",
+            density=True,
+        )
+        axs[0].hist(
+            flash,
+            bins=50,
+            range=rangeR,
+            histtype="step",
+            label="ClosestJet_partonFlavour_is_guds",
+            color="tab:purple",
+            density=True,
+        )
+
+        axs[1].hist(
+            full,
+            bins=50,
+            range=rangeR,
+            histtype="step",
+            ls="--",
+            color="tab:purple",
+            density=True,
+        )
+        axs[1].hist(
+            flash,
+            bins=50,
+            range=rangeR,
+            histtype="step",
+            label="ClosestJet_partonFlavour_is_guds",
+            color="tab:purple",
+            density=True,
+        )
+        del full, flash
+
+        axs[0].legend()
+        plt.savefig(f"{save_dir}/{target}_conditioning_normalized.png", format="png")
+        writer.add_figure(
+            f"Conditioning/{target}_conditioning_normalized.png", fig, global_step=epoch
         )
         plt.close()
 

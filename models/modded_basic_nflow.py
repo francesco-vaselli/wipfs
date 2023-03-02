@@ -871,3 +871,55 @@ def load_model(device, model_dir=None, filename=None):
         train_history,
         test_history,
     )
+
+
+def load_mixture_model(device, model_dir=None, filename=None):
+    """Load a saved model.
+    Args:
+        filename:       File name
+    """
+
+    if model_dir is None:
+        raise NameError(
+            "Model directory must be specified."
+            " Store in attribute PosteriorModel.model_dir"
+        )
+
+    p = Path(model_dir)
+    checkpoint = torch.load(p / filename, map_location="cpu")
+
+    model_hyperparams = checkpoint["model_hyperparams"]
+    train_history = checkpoint["train_history"]
+    test_history = checkpoint["test_history"]
+
+    # Load model
+    model = create_mixture_flow_model(**model_hyperparams)
+    model.load_state_dict(checkpoint["model_state_dict"])
+    # model.to(device)
+
+    # Remember that you must call model.eval() to set dropout and batch normalization layers to evaluation mode before running inference.
+    # Failing to do this will yield inconsistent inference results.
+    model.eval()
+
+    # Load optimizer
+    scheduler_present_in_checkpoint = "scheduler_state_dict" in checkpoint.keys()
+
+    # If the optimizer has more than 1 param_group, then we built it with
+    # flow_lr different from lr
+    if len(checkpoint["optimizer_state_dict"]["param_groups"]) > 1:
+        flow_lr = checkpoint["last_lr"]
+    else:
+        flow_lr = None
+
+    # Set the epoch to the correct value. This is needed to resume
+    # training.
+    epoch = checkpoint["epoch"]
+
+    return (
+        model,
+        scheduler_present_in_checkpoint,
+        flow_lr,
+        epoch,
+        train_history,
+        test_history,
+    )

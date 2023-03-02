@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.join("..", "..", "models"))
 sys.path.insert(0, "..")
 
 from dataset import MyDataset
-from modded_basic_nflow import create_mixture_flow_model, load_model, save_model
+from modded_basic_nflow import create_mixture_flow_model, load_model, save_model, load_mixture_model
 
 from args import get_args
 from validate_rejets import validate_rejets
@@ -103,7 +103,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
             save_dir, "checkpoint-latest.pt"
         )  # use the latest checkpoint
     if args.resume_checkpoint is not None and args.resume == True:
-        model, _, args.lr, start_epoch, _, _ = load_model(
+        model, _, args.lr, start_epoch, _, _ = load_mixture_model(
             model,
             model_dir=save_dir,
             filename="checkpoint-latest.pt",

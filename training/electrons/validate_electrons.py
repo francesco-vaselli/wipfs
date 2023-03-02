@@ -211,8 +211,7 @@ def validate_electrons(
 
     conds = [f"MGenElectron_statusFlag{i}" for i in (0, 2, 7)]
     conds.append("ClosestJet_EncodedPartonFlavour_b")
-    conds.append("ClosestJet_EncodedPartonFlavour_g")
-    conds.append("ClosestJet_EncodedPartonFlavour_light")
+
 
     names = [
         "isPrompt",
@@ -276,7 +275,7 @@ def validate_electrons(
             del full, flash
 
         mask = (
-            gen["ClosestJet_EncodedPartonFlavour_g"].values
+            gen["ClosestJet_EncodedPartonFlavour_gluon"].values
             + gen["ClosestJet_EncodedPartonFlavour_light"].values
         ).astype(bool)
         full = reco[target].values
@@ -392,7 +391,7 @@ def validate_electrons(
             del full, flash
 
         mask = (
-            gen["ClosestJet_EncodedPartonFlavour_g"].values
+            gen["ClosestJet_EncodedPartonFlavour_gluon"].values
             + gen["ClosestJet_EncodedPartonFlavour_light"].values
         ).astype(bool)
         full = reco[target].values

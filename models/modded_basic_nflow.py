@@ -889,6 +889,7 @@ def load_mixture_model(device, model_dir=None, filename=None):
     checkpoint = torch.load(p / filename, map_location="cpu")
 
     model_hyperparams = checkpoint["model_hyperparams"]
+    # added because of a bug in the old create_mixture_flow_model function
     if checkpoint["model_hyperparams"]["base_transform_kwargs"] is not None:
         checkpoint["model_hyperparams"]["base_kwargs"] = checkpoint["model_hyperparams"]["base_transform_kwargs"]
         del checkpoint["model_hyperparams"]["base_transform_kwargs"]
@@ -910,6 +911,8 @@ def load_mixture_model(device, model_dir=None, filename=None):
     # If the optimizer has more than 1 param_group, then we built it with
     # flow_lr different from lr
     if len(checkpoint["optimizer_state_dict"]["param_groups"]) > 1:
+        flow_lr = checkpoint["last_lr"]
+    elif checkpoint["last_lr"] is not None:
         flow_lr = checkpoint["last_lr"]
     else:
         flow_lr = None

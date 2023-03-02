@@ -626,7 +626,7 @@ def create_mixture_flow_model(
     flow.model_hyperparams = {
         "input_dim": input_dim,
         "context_dim": context_dim,
-        "base_transform_kwargs": base_kwargs,
+        "base_kwargs": base_kwargs,
         "transform_type": transform_type,
     }
 

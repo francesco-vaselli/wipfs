@@ -77,6 +77,7 @@ def validate_fakes(
     for i in range(0, len(names)):
             test_values = full_sim[:, i].flatten()
             generated_sample = flash_sim[:, i].flatten()
+            ws = wasserstein_distance(test_values, generated_sample)
             print(generated_sample.shape)
             fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
 
@@ -107,7 +108,7 @@ def validate_fakes(
                     histtype="step",
                     lw=1,
                     range=[rangeR.min(), rangeR.max()],
-                    label=f"FlashSim",
+                    label=f"FlashSim, ws={round(ws, 4)}",
                 )
             else:
                 ax1.hist(
@@ -116,7 +117,7 @@ def validate_fakes(
                     histtype="step",
                     lw=1,
                     range=[rangeR.min(), rangeR.max()],
-                    label=f"FlashSim",
+                    label=f"FlashSim, ws={round(ws, 4)}",
                 )
             fig.suptitle(f"Comparison of {names[i]} @ epoch {epoch}", fontsize=16)
             ax1.legend(frameon=False, loc="upper right")
@@ -148,6 +149,7 @@ def validate_fakes(
             # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
             # plt.savefig(os.path.join(save_dir, f"comparison_{names[i]}.png"))
             writer.add_figure(f"comparison_{names[i]}", fig, global_step=epoch)
+            writer.add_scalar(f"ws/{names[i]}_wasserstein_distance", ws, global_step=epoch)
             plt.close()
 
             
@@ -164,6 +166,8 @@ def validate_fakes(
     )
     ax1.set_xlabel("PU_n_true_int")
     ax1.set_ylabel("N_true_fakes_full")
+    x_min, x_max = ax1.get_xlim()
+    y_min, y_max = ax1.get_ylim()
     ax2.hist2d(
         PU_n_true_int,
         N_true_fakes_flash,
@@ -171,11 +175,11 @@ def validate_fakes(
         #     np.arange(left_of_first_bin, right_of_last_bin + d, d),
         #     np.arange(left_of_first_bin2, right_of_last_bin2 + d2, d2),
         # ],
-        range=[[0, 100], [0, 1.1]],
+        range=[[x_min, x_max], [y_min, y_max]],
         cmap="Reds",
         label="FlashSim Latent",
     )
-    ax2.set_ylim([0, 1.1])
+    ax2.set_ylim(ax1.get_ylim())
     ax2.set_xlabel("PU_n_true_int")
     ax2.set_ylabel("N_true_fakes_latent")
 

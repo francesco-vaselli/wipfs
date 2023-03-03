@@ -62,8 +62,8 @@ def validate_fakes(
     flash_sim = np.array(samples).reshape((-1, args.z_dim))
 
     # Samples postprocessing 
-    flash_sim[:, [1, 2]] = flash_sim[:, [1, 2]] * 200
-    full_sim[:, [1, 2]] = full_sim[:, [1, 2]] * 200
+    # flash_sim[:, [1, 2]] = flash_sim[:, [1, 2]] * 200
+    # full_sim[:, [1, 2]] = full_sim[:, [1, 2]] * 200
     flash_sim[:, :10] = flash_sim[:, 4:14] * 200
     full_sim[:, :10] = full_sim[:, 4:14] * 200
 
@@ -72,16 +72,23 @@ def validate_fakes(
     N_true_fakes_full = full_sim[:, 0]
     N_true_fakes_flash = flash_sim[:, 0]
 
-    names0 = ["N", "Ht", "Pt", "phi"]
+    names0 = ["N"]
     names1 = np.array([[f"pt{i}", f"eta{i}", f"phi{i}"]  for i in range(0, 10)]).flatten()
+    n_ids = np.array([[i, i, i]  for i in range(1, 11)]).flatten()
     names = np.hstack((names0, names1))
 
 
     bins_N = np.arange(-0.1, 1.1, step=0.1) - 0.05
+    N_sel = np.rint(N_true_fakes_flash*10).astype(int)
+
 
     for i in range(0, len(names)):
-            test_values = full_sim[:, i].flatten()
-            generated_sample = flash_sim[:, i].flatten()
+        if i > 0:
+            test_values = full_sim[:, i].flatten()[N_sel <= n_ids[i-1]]
+            generated_sample = flash_sim[:, i].flatten()[N_sel <= n_ids[i-1]]
+        else:
+            test_values = N_true_fakes_full.flatten()
+            generated_sample = N_true_fakes_flash.flatten()
             ws = wasserstein_distance(test_values, generated_sample)
             print(generated_sample.shape)
             fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)

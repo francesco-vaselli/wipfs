@@ -92,9 +92,9 @@ class NewFakesDataset(Dataset):
         x = self.archives[0]["data"][start:start+limit, 0:x_dim]
         x[:, :10] = x[:, :10] / 200.0 # divide pt by 200
         # fill missing fakes with nonphysical values
-        x[:, :10] = [i if i != 0 else np.random.normal(-1, 0.1) for i in x[:, :10].flatten()].reshape(-1, 10)
-        x[:, 10:20] = [i if i != 0 else np.random.normal(-7, 0.1) for i in x[:, 10:20].flatten()].reshape(-1, 10)
-        x[:, 20:30] = [i if i != 0 else np.random.normal(-7, 0.1) for i in x[:, 20:30].flatten()].reshape(-1, 10)
+        x[:, :10] = np.array([i if i != 0 else np.random.normal(-1, 0.1) for i in x[:, :10].flatten()]).reshape(-1, 10)
+        x[:, 10:20] = np.array([i if i != 0 else np.random.normal(-7, 0.1) for i in x[:, 10:20].flatten()]).reshape(-1, 10)
+        x[:, 20:30] = np.array([i if i != 0 else np.random.normal(-7, 0.1) for i in x[:, 20:30].flatten()]).reshape(-1, 10)
         idxs = np.vstack((np.arange(0, 10), np.arange(10, 20), np.arange(20, 30))).T.flatten() # rearrange as pt, eta, phi
         x = x[:, idxs]
         z = self.archives[0]["data"][

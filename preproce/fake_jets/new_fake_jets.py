@@ -102,7 +102,7 @@ def single_file_preprocess(filename : str):
     print(dfnm)
     df = pd.concat([df, dfnm], axis=0)
     print(df)
-    
+
     df["num_fakes"] = df["num_fakes"].apply(
         lambda x: x + np.random.uniform(low=-0.5, high=0.5) # if x > 0 else 0 WE SHOULDN'T HAVE ANY 0s
     )
@@ -128,7 +128,7 @@ if __name__ == '__main__':
 
     print(df)
 
-    save_file = h5py.File(f"../../training/datasets/full_fake.hdf5", "w")
+    save_file = h5py.File(f"../../training/datasets/full_fake_with_mask.hdf5", "w")
 
     dset = save_file.create_dataset("data", data=df.values, dtype="f4")
 

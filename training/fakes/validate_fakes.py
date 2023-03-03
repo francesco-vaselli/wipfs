@@ -79,7 +79,7 @@ def validate_fakes(
 
     bins_N = np.arange(-0.1, 1.1, step=0.1) - 0.05
 
-    for i in range(0, names):
+    for i in range(0, len(names)):
             test_values = full_sim[:, i].flatten()
             generated_sample = flash_sim[:, i].flatten()
             ws = wasserstein_distance(test_values, generated_sample)

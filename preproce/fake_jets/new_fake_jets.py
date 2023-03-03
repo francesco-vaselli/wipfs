@@ -101,7 +101,8 @@ def single_file_preprocess(filename : str):
     print(df["num_fakes"].values.shape)
     # create a mask of shape [len(df), 10*3] which is 1 for the first num_fakes*3 and 0 for the rest
     mask = np.zeros((len(df), 10*3))
-    mask[:, np.repeat(df["num_fakes"].values, 3)] = 1
+    for i in range(1, 11):
+        mask[df["num_fakes"].values <= i, :(i)*3] = 1
     # mask = mask.astype("float32")
     print(mask)
     # NMasks = np.hstack((np.ones(df["num_fakes"].values*3), np.zeros((10-df["num_fakes"].values)*3)))

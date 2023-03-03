@@ -90,16 +90,23 @@ class NewFakesDataset(Dataset):
 
         y = self.archives[0]["data"][start:start+limit, x_dim : (x_dim + y_dim)]
         x = self.archives[0]["data"][start:start+limit, 0:x_dim]
+        x[:, :10] = x[:, :10] / 200.0 # divide pt by 200
+        # fill missing fakes with nonphysical values
+        x[:, :10] = [i if i != 0 else np.random.normal(-1, 0.1) for i in x[:, :10]]
+        x[:, 10:20] = [i if i != 0 else np.random.normal(-7, 0.1) for i in x[:, 10:20]]
+        x[:, 20:30] = [i if i != 0 else np.random.normal(-7, 0.1) for i in x[:, 20:30]]
+        idxs = np.vstack((np.arange(0, 10), np.arange(10, 20), np.arange(20, 30))).T.flatten() # rearrange as pt, eta, phi
+        x = x[:, idxs]
         z = self.archives[0]["data"][
-            start:start+limit, (y_dim + x_dim) : (y_dim + x_dim + z_dim)
+            start:start+limit, (y_dim + x_dim) : (y_dim + z_dim) # assuming z_dim = 34
         ]
-        self.x_train = torch.tensor(
-            x, dtype=torch.float32
-        ) 
-        self.y_train = torch.tensor(y, dtype=torch.float32)
         z[:, [1, 2]] = z[:, [1, 2]] / 200.0 # divide ht and pt by 200
         z[:, [0]] = z[:, [0]] / 10 # divide njet by 10
-        self.z_train = torch.tensor(z, dtype=torch.float32)
+        self.x_train = torch.tensor(
+            torch.cat(z, x), dtype=torch.float32
+        ) 
+        self.y_train = torch.tensor(y, dtype=torch.float32)
+        # self.z_train = torch.tensor(z, dtype=torch.float32)
 
     @property
     def archives(self):
@@ -111,7 +118,7 @@ class NewFakesDataset(Dataset):
         return len(self.y_train)
 
     def __getitem__(self, idx):
-        return self.x_train[idx], self.y_train[idx], self.z_train[idx]
+        return self.x_train[idx], self.y_train[idx], self.x_train[idx]
 
 
 class NewVarsDataset(Dataset):

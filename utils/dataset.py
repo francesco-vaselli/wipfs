@@ -104,7 +104,7 @@ class NewFakesDataset(Dataset):
         z[:, [1, 2]] = z[:, [1, 2]] / 200.0 # divide ht and pt by 200
         z[:, [0]] = z[:, [0]] / 10 # divide njet by 10
         self.x_train = torch.tensor(
-            torch.cat(z, x), dtype=torch.float32
+            np.hstack((z, x)), dtype=torch.float32
         ) 
         self.y_train = torch.tensor(y, dtype=torch.float32)
         # self.z_train = torch.tensor(z, dtype=torch.float32)

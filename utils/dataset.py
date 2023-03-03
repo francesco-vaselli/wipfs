@@ -100,6 +100,7 @@ class NewFakesDataset(Dataset):
         z = self.archives[0]["data"][
             start:start+limit, (y_dim + x_dim) : (y_dim + z_dim) # assuming z_dim = 34
         ]
+        print(z.shape)
         z[:, [1, 2]] = z[:, [1, 2]] / 200.0 # divide ht and pt by 200
         z[:, [0]] = z[:, [0]] / 10 # divide njet by 10
         self.x_train = torch.tensor(

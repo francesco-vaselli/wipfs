@@ -52,29 +52,34 @@ def validate_fakes(
             z_sampled = z_sampled.cpu().detach().numpy()
             inputs_y = inputs_y.cpu().detach().numpy()
             z = z.cpu().detach().numpy()
-            z_sampled = z_sampled.reshape(-1, args.zdim)
+            z_sampled = z_sampled.reshape(-1, args.z_dim)
             gen.append(inputs_y)
             reco.append(z)
             samples.append(z_sampled)
 
     gen = np.array(gen).reshape((-1, args.y_dim))
-    full_sim = np.array(reco).reshape((-1, args.zdim))
-    flash_sim = np.array(samples).reshape((-1, args.zdim))
+    full_sim = np.array(reco).reshape((-1, args.z_dim))
+    flash_sim = np.array(samples).reshape((-1, args.z_dim))
 
     # Samples postprocessing 
     flash_sim[:, [1, 2]] = flash_sim[:, [1, 2]] * 200
     full_sim[:, [1, 2]] = full_sim[:, [1, 2]] * 200
+    flash_sim[:, :10] = flash_sim[:, 4:14] * 200
+    full_sim[:, :10] = full_sim[:, 4:14] * 200
 
     # Plots
     PU_n_true_int = gen[:, 2]
     N_true_fakes_full = full_sim[:, 0]
     N_true_fakes_flash = flash_sim[:, 0]
 
-    names = ["N", "Ht", "Pt", "phi"]
+    names0 = ["N", "Ht", "Pt", "phi"]
+    names1 = np.array([[f"pt{i}", f"eta{i}", f"phi{i}"]  for i in range(0, 10)]).flatten()
+    names = np.hstack((names0, names1))
+
 
     bins_N = np.arange(-0.1, 1.1, step=0.1) - 0.05
 
-    for i in range(0, len(names)):
+    for i in range(0, names):
             test_values = full_sim[:, i].flatten()
             generated_sample = flash_sim[:, i].flatten()
             ws = wasserstein_distance(test_values, generated_sample)

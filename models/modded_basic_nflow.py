@@ -597,7 +597,7 @@ def create_mixture_flow_model(
                 use_batch_norm=base_kwargs["batch_norm_maf"],
             )
         )
-        transform.append(create_random_transform(param_dim=input_dim))
+        # transform.append(create_random_transform(param_dim=input_dim))
 
     for _ in range(base_kwargs["num_steps_arqs"]):
         transform.append(
@@ -614,7 +614,7 @@ def create_mixture_flow_model(
                 use_batch_norm=base_kwargs["batch_norm_arqs"],
             )
         )
-        transform.append(create_random_transform(param_dim=input_dim))
+        # transform.append(create_random_transform(param_dim=input_dim))
 
     transform_fnal = CompositeTransform(transform)
 

@@ -1,3 +1,33 @@
+
+auto clean_genjet_mask(ROOT::VecOps::RVec<float> &jet_pt,
+                       ROOT::VecOps::RVec<float> &jet_eta,
+                       ROOT::VecOps::RVec<float> &jet_phi,
+                       ROOT::VecOps::RVec<float> &lep_pt,
+                       ROOT::VecOps::RVec<float> &lep_eta,
+                       ROOT::VecOps::RVec<float> &lep_phi) {
+
+  auto lep_size = lep_pt.size();
+  auto jet_size = jet_pt.size();
+
+  ROOT::VecOps::RVec<int> clean_jet_mask;
+  clean_jet_mask.reserve(jet_size);
+
+  for (size_t i = 0; i < jet_size; i++) {
+    clean_jet_mask.push_back(1);
+    for (size_t j = 0; j < lep_size; j++) {
+      auto dpt = jet_pt[i] - lep_pt[j];
+      auto deta = jet_eta[i] - lep_eta[j];
+      auto dphi = TVector2::Phi_mpi_pi(jet_phi[i] - lep_phi[j]);
+      auto dr = TMath::Sqrt(deta * deta + dphi * dphi);
+
+      if ((dr <= 0.01) && ((dpt / lep_pt[j]) <= 0.001)) {
+        clean_jet_mask[i] = 0;
+      }
+    }
+  }
+  return clean_jet_mask;
+}
+
 auto DeltaPhi(ROOT::VecOps::RVec<float> &Phi1,
               ROOT::VecOps::RVec<float> &Phi2) {
   /* Calculates the DeltaPhi between two RVecs
@@ -24,8 +54,8 @@ auto closest_jet_dr(ROOT::VecOps::RVec<float> &etaj,
   ROOT::VecOps::RVec<float> distances;
   distances.reserve(size_outer);
   for (size_t i = 0; i < size_outer; i++) {
-    distances.emplace_back(0.5);
-    float closest = 0.4;
+    distances.emplace_back(10);
+    float closest = 10;
     for (size_t j = 0; j < size_inner; j++) {
       Double_t deta = etae[i] - etaj[j];
       Double_t dphi = TVector2::Phi_mpi_pi(phie[i] - phij[j]);
@@ -34,7 +64,7 @@ auto closest_jet_dr(ROOT::VecOps::RVec<float> &etaj,
         closest = dr;
       }
     }
-    if (closest < 0.4) {
+    if (closest < 10) {
       distances[i] = closest;
     }
   }
@@ -391,42 +421,63 @@ auto mother_genpart_dphi(ROOT::VecOps::RVec<int> &mother_idx,
 void extraction() {
 
   ROOT::EnableImplicitMT();
+
   /*
-  /store/mc/RunIISummer20UL18NanoAODv2/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v15_L1v1-v1/230000/0088F3A1-0457-AB4D-836B-AC3022A0E34F.root
-  /store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/00000/28FE3773-9C94-5E42-B6FB-64C997636881.root
-  /store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/00000/89142AF0-003E-5549-A6C9-5C0A3FA912A4.root
-  /store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/10000/C600FF22-6CBA-6E4B-8FCF-192910F79D84.root
-  /store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/10000/E1688267-29A9-D049-8B5F-FE4910D3A262.root
-  /store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/20000/3A2B272C-E0EB-1748-A658-E5B58BBCFCBF.root
-  /store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/20000/40E28BE3-1A22-9D40-A482-2BAA3E9ABC24.root
-  */
+/store/mc/RunIISummer20UL18NanoAODv2/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v15_L1v1-v1/230000/0088F3A1-0457-AB4D-836B-AC3022A0E34F.root
+/store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/00000/28FE3773-9C94-5E42-B6FB-64C997636881.root
+/store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/00000/89142AF0-003E-5549-A6C9-5C0A3FA912A4.root
+/store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/10000/C600FF22-6CBA-6E4B-8FCF-192910F79D84.root
+/store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/10000/E1688267-29A9-D049-8B5F-FE4910D3A262.root
+/store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/20000/3A2B272C-E0EB-1748-A658-E5B58BBCFCBF.root
+/store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/20000/40E28BE3-1A22-9D40-A482-2BAA3E9ABC24.root
+*/
 
-  TFile *f = TFile::Open("root://cmsxrootd.fnal.gov///store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/20000/40E28BE3-1A22-9D40-A482-2BAA3E9ABC24.root");
-
+  TFile *f = TFile::Open(
+      "root://cmsxrootd.fnal.gov///store/mc/RunIISummer20UL16NanoAOD/"
+      "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/"
+      "106X_mcRun2_asymptotic_v13-v1/20000/"
+      "40E28BE3-1A22-9D40-A482-2BAA3E9ABC24.root");
   ROOT::RDataFrame d("Events", f);
 
-  auto d_matched =
-      d.Define("MGenPartIdx", "Electron_genPartIdx[Electron_genPartIdx >= 0]")
+  auto pre =
+      d.Define("GenElectronMask", "abs(GenPart_pdgId) == 11")
+          .Define("GenElectron_pt", "GenPart_pt[GenElectronMask]")
+          .Define("GenElectron_eta", "GenPart_eta[GenElectronMask]")
+          .Define("GenElectron_phi", "GenPart_phi[GenElectronMask]")
+          .Define("GenMuonMask", "abs(GenPart_pdgId) == 13")
+          .Define("GenMuon_pt", "GenPart_pt[GenMuonMask]")
+          .Define("GenMuon_eta", "GenPart_eta[GenMuonMask]")
+          .Define("GenMuon_phi", "GenPart_phi[GenMuonMask]")
+          .Define("CleanGenJet_mask_ele", clean_genjet_mask,
+                  {"GenJet_pt", "GenJet_eta", "GenJet_phi", "GenElectron_pt",
+                   "GenElectron_eta", "GenElectron_phi"})
+          .Define("CleanGenJet_mask_muon", clean_genjet_mask,
+                  {"GenJet_pt", "GenJet_eta", "GenJet_phi", "GenMuon_pt",
+                   "GenMuon_eta", "GenMuon_phi"})
+          .Define("CleanGenJetMask",
+                  "CleanGenJet_mask_ele && CleanGenJet_mask_muon")
+          .Define("CleanGenJet_pt", "GenJet_pt[CleanGenJetMask]")
+          .Define("CleanGenJet_eta", "GenJet_eta[CleanGenJetMask]")
+          .Define("CleanGenJet_phi", "GenJet_phi[CleanGenJetMask]")
+          .Define("CleanGenJet_mass", "GenJet_mass[CleanGenJetMask]")
+          .Define("CleanGenJet_hadronFlavour_uchar",
+                  "GenJet_hadronFlavour[CleanGenJetMask]")
+          .Define("CleanGenJet_hadronFlavour",
+                  "static_cast<ROOT::VecOps::RVec<int>>(CleanGenJet_"
+                  "hadronFlavour_uchar)")
+          .Define("CleanGenJet_partonFlavour",
+                  "GenJet_partonFlavour[CleanGenJetMask]");
+
+  auto matched =
+      pre.Define("MGenPartIdx", "Electron_genPartIdx[Electron_genPartIdx >= 0]")
           .Define("MGenPart_pdgId", "Take(GenPart_pdgId, MGenPartIdx)")
-          .Define("MGenElectronMask", "abs(MGenPart_pdgId) == 11")
-          .Define("MGenElectronIdx", "MGenPartIdx[MGenElectronMask]")
+          .Define("MGenElectorMask", "abs(MGenPart_pdgId) == 11")
+          .Define("MGenElectronIdx", "MGenPartIdx[MGenElectorMask]")
+          .Define("MGenElectron_pt", "Take(GenPart_pt, MGenElectronIdx)")
           .Define("MGenElectron_eta", "Take(GenPart_eta, MGenElectronIdx)")
           .Define("MGenElectron_phi", "Take(GenPart_phi, MGenElectronIdx)")
-          .Define("MGenElectron_pt", "Take(GenPart_pt, MGenElectronIdx)")
           .Define("MGenElectron_pdgId", "Take(GenPart_pdgId, MGenElectronIdx)")
           .Define("MGenElectron_charge", charge, {"MGenElectron_pdgId"})
-          .Define("MGenPartMother_pdgId", mother_genpart_pdgId,
-                  {"GenPart_genPartIdxMother", "GenPart_pdgId",
-                   "MGenElectron_pdgId"})
-          .Define("MGenPartMother_pt", mother_genpart_pt,
-                  {"GenPart_genPartIdxMother", "GenPart_pdgId", "GenPart_pt",
-                   "MGenElectron_pt"})
-          .Define("MGenPartMother_deta", mother_genpart_deta,
-                  {"GenPart_genPartIdxMother", "GenPart_pdgId", "GenPart_eta",
-                   "MGenElectron_eta"})
-          .Define("MGenPartMother_dphi", mother_genpart_dphi,
-                  {"GenPart_genPartIdxMother", "GenPart_pdgId", "GenPart_phi",
-                   "MGenElectron_phi"})
           .Define("MGenElectron_statusFlags",
                   "Take(GenPart_statusFlags, MGenElectronIdx)")
           .Define("MGenElectron_statusFlag0",
@@ -520,20 +571,20 @@ void extraction() {
                   },
                   {"MGenElectron_statusFlags"})
           .Define("ClosestJet_dr", closest_jet_dr,
-                  {"GenJet_eta", "GenJet_phi", "MGenElectron_eta",
-                   "MGenElectron_phi"})
-          .Define("ClosestJet_deta", closest_jet_deta,
-                  {"GenJet_eta", "GenJet_phi", "MGenElectron_eta",
+                  {"CleanGenJet_eta", "CleanGenJet_phi", "MGenElectron_eta",
                    "MGenElectron_phi"})
           .Define("ClosestJet_dphi", closest_jet_dphi,
-                  {"GenJet_eta", "GenJet_phi", "MGenElectron_eta",
+                  {"CleanGenJet_eta", "CleanGenJet_phi", "MGenElectron_eta",
+                   "MGenElectron_phi"})
+          .Define("ClosestJet_deta", closest_jet_deta,
+                  {"CleanGenJet_eta", "CleanGenJet_phi", "MGenElectron_eta",
                    "MGenElectron_phi"})
           .Define("ClosestJet_pt", closest_jet_pt,
-                  {"GenJet_eta", "GenJet_phi", "MGenElectron_eta",
-                   "MGenElectron_phi", "GenJet_pt"})
+                  {"CleanGenJet_eta", "CleanGenJet_phi", "MGenElectron_eta",
+                   "MGenElectron_phi", "CleanGenJet_pt"})
           .Define("ClosestJet_mass", closest_jet_mass,
-                  {"GenJet_eta", "GenJet_phi", "MGenElectron_eta",
-                   "MGenElectron_phi", "GenJet_mass"})
+                  {"CleanGenJet_eta", "CleanGenJet_phi", "MGenElectron_eta",
+                   "MGenElectron_phi", "CleanGenJet_mass"})
           .Define("ClosestJet_EncodedPartonFlavour_light",
                   [](ROOT::VecOps::RVec<float> &etaj,
                      ROOT::VecOps::RVec<float> &phij,
@@ -544,8 +595,8 @@ void extraction() {
                     return closest_jet_flavour_encoder(etaj, phij, etae, phie,
                                                        fj, flavours);
                   },
-                  {"GenJet_eta", "GenJet_phi", "MGenElectron_eta",
-                   "MGenElectron_phi", "GenJet_partonFlavour"})
+                  {"CleanGenJet_eta", "CleanGenJet_phi", "MGenElectron_eta",
+                   "MGenElectron_phi", "CleanGenJet_partonFlavour"})
           .Define("ClosestJet_EncodedPartonFlavour_gluon",
                   [](ROOT::VecOps::RVec<float> &etaj,
                      ROOT::VecOps::RVec<float> &phij,
@@ -556,8 +607,8 @@ void extraction() {
                     return closest_jet_flavour_encoder(etaj, phij, etae, phie,
                                                        fj, flavours);
                   },
-                  {"GenJet_eta", "GenJet_phi", "MGenElectron_eta",
-                   "MGenElectron_phi", "GenJet_partonFlavour"})
+                  {"CleanGenJet_eta", "CleanGenJet_phi", "MGenElectron_eta",
+                   "MGenElectron_phi", "CleanGenJet_partonFlavour"})
           .Define("ClosestJet_EncodedPartonFlavour_c",
                   [](ROOT::VecOps::RVec<float> &etaj,
                      ROOT::VecOps::RVec<float> &phij,
@@ -568,8 +619,8 @@ void extraction() {
                     return closest_jet_flavour_encoder(etaj, phij, etae, phie,
                                                        fj, flavours);
                   },
-                  {"GenJet_eta", "GenJet_phi", "MGenElectron_eta",
-                   "MGenElectron_phi", "GenJet_partonFlavour"})
+                  {"CleanGenJet_eta", "CleanGenJet_phi", "MGenElectron_eta",
+                   "MGenElectron_phi", "CleanGenJet_partonFlavour"})
           .Define("ClosestJet_EncodedPartonFlavour_b",
                   [](ROOT::VecOps::RVec<float> &etaj,
                      ROOT::VecOps::RVec<float> &phij,
@@ -580,8 +631,8 @@ void extraction() {
                     return closest_jet_flavour_encoder(etaj, phij, etae, phie,
                                                        fj, flavours);
                   },
-                  {"GenJet_eta", "GenJet_phi", "MGenElectron_eta",
-                   "MGenElectron_phi", "GenJet_partonFlavour"})
+                  {"CleanGenJet_eta", "CleanGenJet_phi", "MGenElectron_eta",
+                   "MGenElectron_phi", "CleanGenJet_partonFlavour"})
           .Define("ClosestJet_EncodedPartonFlavour_undefined",
                   [](ROOT::VecOps::RVec<float> &etaj,
                      ROOT::VecOps::RVec<float> &phij,
@@ -592,8 +643,8 @@ void extraction() {
                     return closest_jet_flavour_encoder(etaj, phij, etae, phie,
                                                        fj, flavours);
                   },
-                  {"GenJet_eta", "GenJet_phi", "MGenElectron_eta",
-                   "MGenElectron_phi", "GenJet_partonFlavour"})
+                  {"CleanGenJet_eta", "CleanGenJet_phi", "MGenElectron_eta",
+                   "MGenElectron_phi", "CleanGenJet_partonFlavour"})
           .Define("ClosestJet_EncodedHadronFlavour_b",
                   [](ROOT::VecOps::RVec<float> &etaj,
                      ROOT::VecOps::RVec<float> &phij,
@@ -604,8 +655,8 @@ void extraction() {
                     return closest_jet_flavour_encoder(etaj, phij, etae, phie,
                                                        fj, flavours);
                   },
-                  {"GenJet_eta", "GenJet_phi", "MGenElectron_eta",
-                   "MGenElectron_phi", "GenJet_partonFlavour"})
+                  {"CleanGenJet_eta", "CleanGenJet_phi", "MGenElectron_eta",
+                   "MGenElectron_phi", "CleanGenJet_hadronFlavour"})
           .Define("ClosestJet_EncodedHadronFlavour_c",
                   [](ROOT::VecOps::RVec<float> &etaj,
                      ROOT::VecOps::RVec<float> &phij,
@@ -616,8 +667,8 @@ void extraction() {
                     return closest_jet_flavour_encoder(etaj, phij, etae, phie,
                                                        fj, flavours);
                   },
-                  {"GenJet_eta", "GenJet_phi", "MGenElectron_eta",
-                   "MGenElectron_phi", "GenJet_partonFlavour"})
+                  {"CleanGenJet_eta", "CleanGenJet_phi", "MGenElectron_eta",
+                   "MGenElectron_phi", "CleanGenJet_hadronFlavour"})
           .Define("ClosestJet_EncodedHadronFlavour_light",
                   [](ROOT::VecOps::RVec<float> &etaj,
                      ROOT::VecOps::RVec<float> &phij,
@@ -628,21 +679,13 @@ void extraction() {
                     return closest_jet_flavour_encoder(etaj, phij, etae, phie,
                                                        fj, flavours);
                   },
-                  {"GenJet_eta", "GenJet_phi", "MGenElectron_eta",
-                   "MGenElectron_phi", "GenJet_partonFlavour"})
+                  {"CleanGenJet_eta", "CleanGenJet_phi", "MGenElectron_eta",
+                   "MGenElectron_phi", "CleanGenJet_hadronFlavour"})
           .Define("Electron_genElectronIdx", genElectronIdx_maker,
                   {"Electron_genPartIdx", "GenPart_pdgId"})
           .Define("Electron_MGenElectronMask", "Electron_genElectronIdx >= 0")
-          .Define("MElectron_charge",
-                  "Electron_charge[Electron_MGenElectronMask]")
           .Define("MElectron_convVeto",
                   "Electron_convVeto[Electron_MGenElectronMask]")
-          .Define("MElectron_cutBased",
-                  "Electron_cutBased[Electron_MGenElectronMask]")
-          .Define("MElectron_cutBased_Fall17_V1",
-                  "Electron_cutBased_Fall17_V1[Electron_MGenElectronMask]")
-          .Define("MElectron_cutBased_HEEP",
-                  "Electron_cutBased_HEEP[Electron_MGenElectronMask]")
           .Define("MElectron_deltaEtaSC",
                   "Electron_deltaEtaSC[Electron_MGenElectronMask]")
           .Define("MElectron_dr03EcalRecHitSumEt",
@@ -660,8 +703,6 @@ void extraction() {
           .Define("MElectron_dz", "Electron_dz[Electron_MGenElectronMask]")
           .Define("MElectron_dzErr",
                   "Electron_dzErr[Electron_MGenElectronMask]")
-          //.Define("MElectron_eCorr",
-          //        "Electron_eCorr[Electron_MGenElectronMask]")
           .Define("MElectron_eInvMinusPInv",
                   "Electron_eInvMinusPInv[Electron_MGenElectronMask]")
           .Define("MElectron_energyErr",
@@ -733,143 +774,7 @@ void extraction() {
           .Define("MElectron_sip3d",
                   "Electron_sip3d[Electron_MGenElectronMask]")
           .Define("MElectron_tightCharge",
-                  "Electron_tightCharge[Electron_MGenElectronMask]")
-          .Define("MElectron_vidNestedWPBitmap",
-                  "Electron_vidNestedWPBitmap[Electron_MGenElectronMask]")
-          .Define("MElectron_vidNestedWPBitmap0",
-                  [](ROOT::VecOps::RVec<int> &ints) {
-                    int cut = 0;
-                    return BitwiseDecoder_3bit(ints, cut);
-                  },
-                  {"MElectron_vidNestedWPBitmap"})
-          .Define("MElectron_vidNestedWPBitmap1",
-                  [](ROOT::VecOps::RVec<int> &ints) {
-                    int cut = 1;
-                    return BitwiseDecoder_3bit(ints, cut);
-                  },
-                  {"MElectron_vidNestedWPBitmap"})
-          .Define("MElectron_vidNestedWPBitmap2",
-                  [](ROOT::VecOps::RVec<int> &ints) {
-                    int cut = 2;
-                    return BitwiseDecoder_3bit(ints, cut);
-                  },
-                  {"MElectron_vidNestedWPBitmap"})
-          .Define("MElectron_vidNestedWPBitmap3",
-                  [](ROOT::VecOps::RVec<int> &ints) {
-                    int cut = 3;
-                    return BitwiseDecoder_3bit(ints, cut);
-                  },
-                  {"MElectron_vidNestedWPBitmap"})
-          .Define("MElectron_vidNestedWPBitmap4",
-                  [](ROOT::VecOps::RVec<int> &ints) {
-                    int cut = 4;
-                    return BitwiseDecoder_3bit(ints, cut);
-                  },
-                  {"MElectron_vidNestedWPBitmap"})
-          .Define("MElectron_vidNestedWPBitmap5",
-                  [](ROOT::VecOps::RVec<int> &ints) {
-                    int cut = 5;
-                    return BitwiseDecoder_3bit(ints, cut);
-                  },
-                  {"MElectron_vidNestedWPBitmap"})
-          .Define("MElectron_vidNestedWPBitmap6",
-                  [](ROOT::VecOps::RVec<int> &ints) {
-                    int cut = 6;
-                    return BitwiseDecoder_3bit(ints, cut);
-                  },
-                  {"MElectron_vidNestedWPBitmap"})
-          .Define("MElectron_vidNestedWPBitmap7",
-                  [](ROOT::VecOps::RVec<int> &ints) {
-                    int cut = 7;
-                    return BitwiseDecoder_3bit(ints, cut);
-                  },
-                  {"MElectron_vidNestedWPBitmap"})
-          .Define("MElectron_vidNestedWPBitmap8",
-                  [](ROOT::VecOps::RVec<int> &ints) {
-                    int cut = 8;
-                    return BitwiseDecoder_3bit(ints, cut);
-                  },
-                  {"MElectron_vidNestedWPBitmap"})
-          .Define("MElectron_vidNestedWPBitmap9",
-                  [](ROOT::VecOps::RVec<int> &ints) {
-                    int cut = 9;
-                    return BitwiseDecoder_3bit(ints, cut);
-                  },
-                  {"MElectron_vidNestedWPBitmap"})
-          .Define("MElectron_vidNestedWPBitmapHEEP",
-                  "Electron_vidNestedWPBitmapHEEP[Electron_MGenElectronMask]")
-          .Define("MElectron_vidNestedWPBitmapHEEP0",
-                  [](ROOT::VecOps::RVec<int> &ints) {
-                    int bit = 0;
-                    return BitwiseDecoder(ints, bit);
-                  },
-                  {"MElectron_vidNestedWPBitmapHEEP"})
-          .Define("MElectron_vidNestedWPBitmapHEEP1",
-                  [](ROOT::VecOps::RVec<int> &ints) {
-                    int bit = 1;
-                    return BitwiseDecoder(ints, bit);
-                  },
-                  {"MElectron_vidNestedWPBitmapHEEP"})
-          .Define("MElectron_vidNestedWPBitmapHEEP2",
-                  [](ROOT::VecOps::RVec<int> &ints) {
-                    int bit = 2;
-                    return BitwiseDecoder(ints, bit);
-                  },
-                  {"MElectron_vidNestedWPBitmapHEEP"})
-          .Define("MElectron_vidNestedWPBitmapHEEP3",
-                  [](ROOT::VecOps::RVec<int> &ints) {
-                    int bit = 3;
-                    return BitwiseDecoder(ints, bit);
-                  },
-                  {"MElectron_vidNestedWPBitmapHEEP"})
-          .Define("MElectron_vidNestedWPBitmapHEEP4",
-                  [](ROOT::VecOps::RVec<int> &ints) {
-                    int bit = 4;
-                    return BitwiseDecoder(ints, bit);
-                  },
-                  {"MElectron_vidNestedWPBitmapHEEP"})
-          .Define("MElectron_vidNestedWPBitmapHEEP5",
-                  [](ROOT::VecOps::RVec<int> &ints) {
-                    int bit = 5;
-                    return BitwiseDecoder(ints, bit);
-                  },
-                  {"MElectron_vidNestedWPBitmapHEEP"})
-          .Define("MElectron_vidNestedWPBitmapHEEP6",
-                  [](ROOT::VecOps::RVec<int> &ints) {
-                    int bit = 6;
-                    return BitwiseDecoder(ints, bit);
-                  },
-                  {"MElectron_vidNestedWPBitmapHEEP"})
-          .Define("MElectron_vidNestedWPBitmapHEEP7",
-                  [](ROOT::VecOps::RVec<int> &ints) {
-                    int bit = 7;
-                    return BitwiseDecoder(ints, bit);
-                  },
-                  {"MElectron_vidNestedWPBitmapHEEP"})
-          .Define("MElectron_vidNestedWPBitmapHEEP8",
-                  [](ROOT::VecOps::RVec<int> &ints) {
-                    int bit = 8;
-                    return BitwiseDecoder(ints, bit);
-                  },
-                  {"MElectron_vidNestedWPBitmapHEEP"})
-          .Define("MElectron_vidNestedWPBitmapHEEP9",
-                  [](ROOT::VecOps::RVec<int> &ints) {
-                    int bit = 9;
-                    return BitwiseDecoder(ints, bit);
-                  },
-                  {"MElectron_vidNestedWPBitmapHEEP"})
-          .Define("MElectron_vidNestedWPBitmapHEEP10",
-                  [](ROOT::VecOps::RVec<int> &ints) {
-                    int bit = 10;
-                    return BitwiseDecoder(ints, bit);
-                  },
-                  {"MElectron_vidNestedWPBitmapHEEP"})
-          .Define("MElectron_vidNestedWPBitmapHEEP11",
-                  [](ROOT::VecOps::RVec<int> &ints) {
-                    int bit = 11;
-                    return BitwiseDecoder(ints, bit);
-                  },
-                  {"MElectron_vidNestedWPBitmapHEEP"});
+                  "Electron_tightCharge[Electron_MGenElectronMask]");
 
   vector<string> col_to_save = {"MGenElectron_eta",
                                 "MGenElectron_phi",
@@ -913,11 +818,7 @@ void extraction() {
                                 "Pileup_pudensity",
                                 "Pileup_sumEOOT",
                                 "Pileup_sumLOOT",
-                                "MElectron_charge",
                                 "MElectron_convVeto",
-                                "MElectron_cutBased",
-                                "MElectron_cutBased_Fall17_V1",
-                                "MElectron_cutBased_HEEP",
                                 "MElectron_deltaEtaSC",
                                 "MElectron_dr03EcalRecHitSumEt",
                                 "MElectron_dr03HcalDepth1TowerSumEt",
@@ -927,7 +828,6 @@ void extraction() {
                                 "MElectron_dxyErr",
                                 "MElectron_dz",
                                 "MElectron_dzErr",
-                                //"MElectron_eCorr",
                                 "MElectron_eInvMinusPInv",
                                 "MElectron_energyErr",
                                 "MElectron_etaMinusGen",
@@ -964,29 +864,7 @@ void extraction() {
                                 "MElectron_seedGain",
                                 "MElectron_sieie",
                                 "MElectron_sip3d",
-                                "MElectron_tightCharge",
-                                "MElectron_vidNestedWPBitmap0",
-                                "MElectron_vidNestedWPBitmap1",
-                                "MElectron_vidNestedWPBitmap2",
-                                "MElectron_vidNestedWPBitmap3",
-                                "MElectron_vidNestedWPBitmap4",
-                                "MElectron_vidNestedWPBitmap5",
-                                "MElectron_vidNestedWPBitmap6",
-                                "MElectron_vidNestedWPBitmap7",
-                                "MElectron_vidNestedWPBitmap8",
-                                "MElectron_vidNestedWPBitmap9",
-                                "MElectron_vidNestedWPBitmapHEEP0",
-                                "MElectron_vidNestedWPBitmapHEEP1",
-                                "MElectron_vidNestedWPBitmapHEEP2",
-                                "MElectron_vidNestedWPBitmapHEEP3",
-                                "MElectron_vidNestedWPBitmapHEEP4",
-                                "MElectron_vidNestedWPBitmapHEEP5",
-                                "MElectron_vidNestedWPBitmapHEEP6",
-                                "MElectron_vidNestedWPBitmapHEEP7",
-                                "MElectron_vidNestedWPBitmapHEEP8",
-                                "MElectron_vidNestedWPBitmapHEEP9",
-                                "MElectron_vidNestedWPBitmapHEEP10",
-                                "MElectron_vidNestedWPBitmapHEEP11"};
+                                "MElectron_tightCharge"};
 
-  d_matched.Snapshot("MElectrons", "MElectrons_v7.root", col_to_save);
+  // matched.Snapshot("MElectrons", "MElectrons_v7.root", col_to_save);
 }

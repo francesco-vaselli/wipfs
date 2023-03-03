@@ -150,14 +150,14 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
     tr_dataset = NewFakesDataset(
         x_dim=args.x_dim,
         y_dim=args.y_dim,
-        z_dim=args.zdim,
+        z_dim=args.z_dim,
         h5_paths = [os.path.join(dirpath, "..", "datasets", "full_fake.hdf5")],
         limit=args.train_limit,
     )
     te_dataset = NewFakesDataset(
         x_dim=args.x_dim,
         y_dim=args.y_dim,
-        z_dim=args.zdim,
+        z_dim=args.z_dim,
         h5_paths =[os.path.join(dirpath, "..", "datasets", "full_fake.hdf5")],
         start=args.train_limit,
         limit=args.test_limit,

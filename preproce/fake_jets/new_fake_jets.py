@@ -97,6 +97,8 @@ def single_file_preprocess(filename : str):
     df["angle"] = angle
 
     # add NMasks
+    ones = np.ones(df["num_fakes"].values*3)
+    print(ones.shape)
     NMasks = np.hstack((np.ones(df["num_fakes"].values*3), np.zeros((10-df["num_fakes"].values)*3)))
     dfnm = pd.DataFrame(NMasks, columns=["NMasks"]).T
     print(dfnm)

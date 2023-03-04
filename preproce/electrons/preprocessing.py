@@ -134,17 +134,17 @@ def process_column_var(column_name, operations, df):
             interval = op[1]
             df[column_name] = saturation(df, column_name, interval)
 
-        if op[0] == "g":
+        elif op[0] == "g":
             sigma = op[1]
             mask_condition = op[2]
             df[column_name] = gaus_smearing(df, column_name, sigma, mask_condition)
 
-        if op[0] == "u":
+        elif op[0] == "u":
             half_width = op[1]
             mask_condition = op[2]
             df[column_name] = unif_smearing(df, column_name, half_width, mask_condition)
 
-        if op[0] == "t":
+        elif op[0] == "t":
             function = op[1]
             p = op[2]
             df[column_name] = transform(df, column_name, function, p)
@@ -161,8 +161,10 @@ def preprocessing(df, vars_dictionary):
     """
     dict_to_save = {}
 
-    df = df.drop(discarded, axis=1)
-        
+    # df = df.drop(discarded, axis=1) Not needed anymore on the new dataset
+
+    print(f"Num. before processing: {df.shape}")
+
     df = df[~df.isin([np.nan, np.inf, -np.inf]).any(axis="columns")]
 
     for column_name, operation in vars_dictionary.items():
@@ -173,10 +175,12 @@ def preprocessing(df, vars_dictionary):
         df[column_name], scale = fix_range(column_name, df)
         dict_to_save[column_name] = float(scale)
         axs[1].hist(df[column_name], bins=30, histtype="step")
-        plt.savefig(f"figures/{column_name}.pdf", format="pdf")
+        plt.savefig(f"processed_figures/{column_name}.pdf", format="pdf")
         plt.close()  # produces MatplotlibDeprecationWarning. It is a bug (https://github.com/matplotlib/matplotlib/issues/23921)
 
     df = df[~df.isin([np.nan, np.inf, -np.inf]).any(axis="columns")]
+
+    print(f"Num. after processing: {df.shape}")
 
     f = open("scale_factors.json", "w")
     f.write(json.dumps(dict_to_save))
@@ -189,7 +193,7 @@ def preprocessing(df, vars_dictionary):
 
 if __name__ == "__main__":
     
-    root_files = [f"MElectrons_v{i}.root:MElectrons" for i in range(1, 8)]
+    root_files = [f"MElectrons_{i}.root:MElectrons" for i in range(0, 7)]
 
     tree = uproot.open(root_files[0], num_workers=20)
     df = make_dataset(tree)
@@ -202,7 +206,6 @@ if __name__ == "__main__":
     df = preprocessing(df, vars_dictionary)
     
     print(df.columns)
-    print(df.shape)
     file = h5py.File(f"MElectrons.hdf5", "w")
 
     dset = file.create_dataset("data", data=df.values, dtype="f4")

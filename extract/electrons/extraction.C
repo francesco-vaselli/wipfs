@@ -5,7 +5,7 @@ auto clean_genjet_mask(ROOT::VecOps::RVec<float> &jet_pt,
                        ROOT::VecOps::RVec<float> &lep_pt,
                        ROOT::VecOps::RVec<float> &lep_eta,
                        ROOT::VecOps::RVec<float> &lep_phi) {
-
+  /* Mask to remove GenElectrons  and GenMuons from the GenJet collection.*/
   auto lep_size = lep_pt.size();
   auto jet_size = jet_pt.size();
 
@@ -47,7 +47,7 @@ auto closest_jet_dr(ROOT::VecOps::RVec<float> &etaj,
                     ROOT::VecOps::RVec<float> &etae,
                     ROOT::VecOps::RVec<float> &phie) {
   /* Calculates the DeltaR from the closest Jet object,
-          if none present within 0.4, sets DR to 0.4
+          if none present within 10, sets DR to 10
   */
   auto size_outer = etae.size();
   auto size_inner = etaj.size();
@@ -78,7 +78,7 @@ auto closest_jet_mass(ROOT::VecOps::RVec<float> &etaj,
                       ROOT::VecOps::RVec<float> &massj) {
 
   /* Calculates the mass of the closest Jet object,
-          if none present within 0.4, sets DR to 0.4 and mass to 0 GeV
+          if none present within 10, sets mass to 0 GeV
   */
 
   auto size_outer = etae.size();
@@ -87,7 +87,7 @@ auto closest_jet_mass(ROOT::VecOps::RVec<float> &etaj,
   masses.reserve(size_outer);
   for (size_t i = 0; i < size_outer; i++) {
     masses.emplace_back(0.0);
-    float closest = 0.4;
+    float closest = 10;
     for (size_t j = 0; j < size_inner; j++) {
       Double_t deta = etae[i] - etaj[j];
       Double_t dphi = TVector2::Phi_mpi_pi(phie[i] - phij[j]);
@@ -108,7 +108,7 @@ auto closest_jet_pt(ROOT::VecOps::RVec<float> &etaj,
                     ROOT::VecOps::RVec<float> &ptj) {
 
   /* Calculates the pt of the closest Jet object,
-          if none present within 0.4, sets DR to 0.4 and pt to 0 GeV
+          if none present within 10, sets pt to 0 GeV
   */
 
   auto size_outer = etae.size();
@@ -117,7 +117,7 @@ auto closest_jet_pt(ROOT::VecOps::RVec<float> &etaj,
   pts.reserve(size_outer);
   for (size_t i = 0; i < size_outer; i++) {
     pts.emplace_back(0.0);
-    float closest = 0.4;
+    float closest = 10;
     for (size_t j = 0; j < size_inner; j++) {
       Double_t deta = etae[i] - etaj[j];
       Double_t dphi = TVector2::Phi_mpi_pi(phie[i] - phij[j]);
@@ -137,7 +137,7 @@ auto closest_jet_deta(ROOT::VecOps::RVec<float> &etaj,
                       ROOT::VecOps::RVec<float> &phie) {
 
   /* Calculates the DeltaEta of the closest Jet object,
-          if none present within 0.4, sets DR to 0.4 and DeltaEta to 0.5
+          if none present within 10, sets DeltaEta to 0.5
   */
 
   auto size_outer = etae.size();
@@ -145,8 +145,8 @@ auto closest_jet_deta(ROOT::VecOps::RVec<float> &etaj,
   ROOT::VecOps::RVec<float> detas;
   detas.reserve(size_outer);
   for (size_t i = 0; i < size_outer; i++) {
-    detas.emplace_back(0.5);
-    float closest = 0.4;
+    detas.emplace_back(4);
+    float closest = 10;
     for (size_t j = 0; j < size_inner; j++) {
       Double_t deta = etae[i] - etaj[j];
       Double_t dphi = TVector2::Phi_mpi_pi(phie[i] - phij[j]);
@@ -173,8 +173,8 @@ auto closest_jet_dphi(ROOT::VecOps::RVec<float> &etaj,
   ROOT::VecOps::RVec<float> dphis;
   dphis.reserve(size_outer);
   for (size_t i = 0; i < size_outer; i++) {
-    dphis.emplace_back(0.5);
-    float closest = 0.4;
+    dphis.emplace_back(4);
+    float closest = 10;
     for (size_t j = 0; j < size_inner; j++) {
       Double_t deta = etae[i] - etaj[j];
       Double_t dphi = TVector2::Phi_mpi_pi(phie[i] - phij[j]);
@@ -206,7 +206,7 @@ auto closest_jet_flavour_encoder(ROOT::VecOps::RVec<float> &etaj,
   fenc.reserve(size_outer);
   for (size_t i = 0; i < size_outer; i++) {
     fenc.emplace_back(0);
-    float closest = 0.4;
+    float closest = 10;
     for (size_t j = 0; j < size_inner; j++) {
       Double_t deta = etae[i] - etaj[j];
       Double_t dphi = TVector2::Phi_mpi_pi(phie[i] - phij[j]);
@@ -418,25 +418,13 @@ auto mother_genpart_dphi(ROOT::VecOps::RVec<int> &mother_idx,
   return mother_dphi;
 }
 
-void extraction() {
+void make_dataset(string sample_name, string dataset_name) {
+
+  cout << "Processing " << sample_name << " to " << dataset_name << "...";
 
   ROOT::EnableImplicitMT();
 
-  /*
-/store/mc/RunIISummer20UL18NanoAODv2/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v15_L1v1-v1/230000/0088F3A1-0457-AB4D-836B-AC3022A0E34F.root
-/store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/00000/28FE3773-9C94-5E42-B6FB-64C997636881.root
-/store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/00000/89142AF0-003E-5549-A6C9-5C0A3FA912A4.root
-/store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/10000/C600FF22-6CBA-6E4B-8FCF-192910F79D84.root
-/store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/10000/E1688267-29A9-D049-8B5F-FE4910D3A262.root
-/store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/20000/3A2B272C-E0EB-1748-A658-E5B58BBCFCBF.root
-/store/mc/RunIISummer20UL16NanoAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v13-v1/20000/40E28BE3-1A22-9D40-A482-2BAA3E9ABC24.root
-*/
-
-  TFile *f = TFile::Open(
-      "root://cmsxrootd.fnal.gov///store/mc/RunIISummer20UL16NanoAOD/"
-      "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/"
-      "106X_mcRun2_asymptotic_v13-v1/20000/"
-      "40E28BE3-1A22-9D40-A482-2BAA3E9ABC24.root");
+  TFile *f = TFile::Open(sample_name.c_str(), "READ");
   ROOT::RDataFrame d("Events", f);
 
   auto pre =
@@ -780,10 +768,6 @@ void extraction() {
                                 "MGenElectron_phi",
                                 "MGenElectron_pt",
                                 "MGenElectron_charge",
-                                "MGenPartMother_pdgId",
-                                "MGenPartMother_pt",
-                                "MGenPartMother_deta",
-                                "MGenPartMother_dphi",
                                 "MGenElectron_statusFlag0",
                                 "MGenElectron_statusFlag1",
                                 "MGenElectron_statusFlag2",
@@ -866,5 +850,55 @@ void extraction() {
                                 "MElectron_sip3d",
                                 "MElectron_tightCharge"};
 
-  // matched.Snapshot("MElectrons", "MElectrons_v7.root", col_to_save);
+  // matched.Histo1D("ClosestJet_dphi")->DrawCopy();
+  auto n_matched = matched.Histo1D("MElectron_ptRatio")->GetEntries();
+  auto reco_tot = matched.Histo1D("Electron_pt")->GetEntries();
+
+  cout << "matched: " << n_matched << endl;
+  cout << "reco_tot: " << reco_tot << endl;
+
+  matched.Snapshot("MElectrons", dataset_name.c_str(), col_to_save);
+  cout << "Done" << endl;
+}
+
+void extraction() {
+
+  vector<string>
+      samples =
+          {"root://cmsxrootd.fnal.gov///store/mc/RunIISummer20UL18NanoAODv2/"
+           "TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8/NANOAODSIM/"
+           "106X_upgrade2018_realistic_v15_L1v1-v1/230000/"
+           "0088F3A1-0457-AB4D-836B-AC3022A0E34F.root",
+           "root://cmsxrootd.fnal.gov///store/mc/RunIISummer20UL16NanoAOD/"
+           "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/"
+           "106X_mcRun2_asymptotic_v13-v1/00000/"
+           "28FE3773-9C94-5E42-B6FB-64C997636881.root",
+           "root://cmsxrootd.fnal.gov///store/mc/RunIISummer20UL16NanoAOD/"
+           "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/"
+           "106X_mcRun2_asymptotic_v13-v1/00000/"
+           "89142AF0-003E-5549-A6C9-5C0A3FA912A4.root",
+           "root://cmsxrootd.fnal.gov///store/mc/RunIISummer20UL16NanoAOD/"
+           "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/"
+           "106X_mcRun2_asymptotic_v13-v1/10000/"
+           "C600FF22-6CBA-6E4B-8FCF-192910F79D84.root",
+           "root://cmsxrootd.fnal.gov///store/mc/RunIISummer20UL16NanoAOD/"
+           "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/"
+           "106X_mcRun2_asymptotic_v13-v1/10000/"
+           "E1688267-29A9-D049-8B5F-FE4910D3A262.root",
+           "root://cmsxrootd.fnal.gov///store/mc/RunIISummer20UL16NanoAOD/"
+           "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/"
+           "106X_mcRun2_asymptotic_v13-v1/20000/"
+           "3A2B272C-E0EB-1748-A658-E5B58BBCFCBF.root",
+           "root://cmsxrootd.fnal.gov///store/mc/RunIISummer20UL16NanoAOD/"
+           "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/"
+           "106X_mcRun2_asymptotic_v13-v1/20000/"
+           "40E28BE3-1A22-9D40-A482-2BAA3E9ABC24.root"},
+
+      datasets = {"MElectrons_0.root", "MElectrons_1.root", "MElectrons_2.root",
+                  "MElectrons_3.root", "MElectrons_4.root", "MElectrons_5.root",
+                  "MElectrons_6.root"};
+
+  for (int i = 0; i < samples.size(); i++) {
+    make_dataset(samples[i], datasets[i]);
+  }
 }

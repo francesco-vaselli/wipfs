@@ -23,11 +23,13 @@ class NMaskedLinear(nn.Linear):
         autoregressive_features,
         random_mask,
         is_output,
+        NMask_degree,
         bias=True,
     ):
         super().__init__(
             in_features=len(in_degrees), out_features=out_features, bias=bias
         )
+        self.NMask_degree = NMask_degree
         mask, degrees = self._get_mask_and_degrees(
             in_degrees=in_degrees,
             out_features=out_features,
@@ -67,8 +69,8 @@ class NMaskedLinear(nn.Linear):
 
         return mask, out_degrees
 
-    def forward(self, x, NMask):
-        return F.linear(x, self.weight * (self.mask * NMask), self.bias)
+    def forward(self, x, context):
+        return F.linear(x, self.weight * (self.mask * context[:, -self.NMask_degree:]), self.bias)
 
 
 class NMaskedFeedforwardBlock(nn.Module):
@@ -81,6 +83,7 @@ class NMaskedFeedforwardBlock(nn.Module):
         self,
         in_degrees,
         autoregressive_features,
+        NMask_degree,
         context_features=None,
         random_mask=False,
         activation=F.relu,
@@ -103,6 +106,7 @@ class NMaskedFeedforwardBlock(nn.Module):
             autoregressive_features=autoregressive_features,
             random_mask=random_mask,
             is_output=False,
+            NMask_degree=NMask_degree,
         )
         self.degrees = self.linear.degrees
 
@@ -110,12 +114,12 @@ class NMaskedFeedforwardBlock(nn.Module):
         self.activation = activation
         self.dropout = nn.Dropout(p=dropout_probability)
 
-    def forward(self, inputs, NMask, context=None):
+    def forward(self, inputs, context=None):
         if self.batch_norm:
             temps = self.batch_norm(inputs)
         else:
             temps = inputs
-        temps = self.linear(temps, NMask)
+        temps = self.linear(temps, context)
         temps = self.activation(temps)
         outputs = self.dropout(temps)
         return outputs
@@ -128,6 +132,7 @@ class NMaskedResidualBlock(nn.Module):
         self,
         in_degrees,
         autoregressive_features,
+        NMask_degree,
         context_features=None,
         random_mask=False,
         activation=F.relu,
@@ -140,8 +145,8 @@ class NMaskedResidualBlock(nn.Module):
         super().__init__()
         features = len(in_degrees)
 
-        if context_features is not None:
-            self.context_layer = nn.Linear(context_features, features)
+        if context_features - NMask_degree > 0:
+            self.context_layer = nn.Linear(context_features - NMask_degree, features)
 
         # Batch norm.
         self.use_batch_norm = use_batch_norm
@@ -157,6 +162,7 @@ class NMaskedResidualBlock(nn.Module):
             autoregressive_features=autoregressive_features,
             random_mask=False,
             is_output=False,
+            NMask_degree=NMask_degree,
         )
         linear_1 = NMaskedLinear(
             in_degrees=linear_0.degrees,
@@ -164,6 +170,7 @@ class NMaskedResidualBlock(nn.Module):
             autoregressive_features=autoregressive_features,
             random_mask=False,
             is_output=False,
+            NMask_degree=NMask_degree,
         )
         self.linear_layers = nn.ModuleList([linear_0, linear_1])
         self.degrees = linear_1.degrees
@@ -182,19 +189,19 @@ class NMaskedResidualBlock(nn.Module):
             init.uniform_(self.linear_layers[-1].weight, a=-1e-3, b=1e-3)
             init.uniform_(self.linear_layers[-1].bias, a=-1e-3, b=1e-3)
 
-    def forward(self, inputs, NMask, context=None):
+    def forward(self, inputs, context=None):
         temps = inputs
         if self.use_batch_norm:
             temps = self.batch_norm_layers[0](temps)
         temps = self.activation(temps)
-        temps = self.linear_layers[0](temps, NMask)
+        temps = self.linear_layers[0](temps, context)
         if context is not None:
-            temps += self.context_layer(context)
+            temps += self.context_layer(context[:, :self.context_layer.in_features])
         if self.use_batch_norm:
             temps = self.batch_norm_layers[1](temps)
         temps = self.activation(temps)
         temps = self.dropout(temps)
-        temps = self.linear_layers[1](temps, NMask)
+        temps = self.linear_layers[1](temps, context)
         # if context is not None:
         #     temps = F.glu(torch.cat((temps, self.context_layer(context)), dim=1), dim=1)
         return inputs + temps
@@ -210,6 +217,7 @@ class NMaskedMADE(nn.Module):
         self,
         features,
         hidden_features,
+        NMask_degree,
         context_features=None,
         num_blocks=2,
         output_multiplier=1,
@@ -228,13 +236,14 @@ class NMaskedMADE(nn.Module):
             in_degrees=_get_input_degrees(features),
             out_features=hidden_features,
             autoregressive_features=features,
+            NMask_degree=NMask_degree,
             context_features=context_features,
             random_mask=random_mask,
             is_output=False,
         )
 
-        if context_features is not None:
-            self.context_layer = nn.Linear(context_features, hidden_features)
+        if context_features - NMask_degree > 0:
+            self.context_layer = nn.Linear(context_features - NMask_degree, hidden_features)
 
         self.use_residual_blocks = use_residual_blocks
         self.activation = activation
@@ -251,6 +260,7 @@ class NMaskedMADE(nn.Module):
                     in_degrees=prev_out_degrees,
                     autoregressive_features=features,
                     context_features=context_features,
+                    NMask_degree=NMask_degree,
                     random_mask=random_mask,
                     activation=activation,
                     dropout_probability=dropout_probability,
@@ -265,17 +275,18 @@ class NMaskedMADE(nn.Module):
             in_degrees=prev_out_degrees,
             out_features=features * output_multiplier,
             autoregressive_features=features,
+            NMask_degree=NMask_degree,
             random_mask=random_mask,
             is_output=True,
         )
 
-    def forward(self, inputs, NMask, context=None):
-        temps = self.initial_layer(inputs, NMask)
+    def forward(self, inputs, context=None):
+        temps = self.initial_layer(inputs, context)
         if context is not None:
-            temps += self.activation(self.context_layer(context))
+            temps += self.activation(self.context_layer(context[:, :self.context_layer.in_features]))
         if not self.use_residual_blocks:
             temps = self.activation(temps)
         for block in self.blocks:
-            temps = block(temps, NMask, context=context)
-        outputs = self.final_layer(temps, NMask)
+            temps = block(temps, context=context)
+        outputs = self.final_layer(temps, context)
         return outputs

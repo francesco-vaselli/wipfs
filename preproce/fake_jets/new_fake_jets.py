@@ -43,7 +43,7 @@ def vec_sum_pt(pts, phis):
 
 STOP = None
 
-def single_file_preprocess(filename : str):
+def single_file_preprocess(filename : str) -> pd.DataFrame:
     tree = uproot.open(filename, num_workers=20)
     # define pandas df for fast manipulation
     dfgl = tree.arrays(
@@ -100,13 +100,12 @@ def single_file_preprocess(filename : str):
     # add NMasks
     print(df["num_fakes"].values.shape)
     # create a mask of shape [len(df), 10*3] which is 1 for the first num_fakes*3 and 0 for the rest
-    mask = np.zeros((len(df), 10*3))
+    NMasks = np.zeros((len(df), 10*3))
     for i in range(1, 11):
-        mask[df["num_fakes"].values >= i, :(i)*3] = 1
-    # mask = mask.astype("float32")
-    print(mask, df["num_fakes"].values[100],mask[100], df["num_fakes"].values[107], mask[107] )
-    # NMasks = np.hstack((np.ones(df["num_fakes"].values*3), np.zeros((10-df["num_fakes"].values)*3)))
-    # dfnm = pd.DataFrame(NMasks, columns=["NMasks"]).T
+        NMasks[df["num_fakes"].values == i, :(i)*3] = 1
+    NMasks = NMasks.astype("float32")
+    #print(mask, df["num_fakes"].values[100],mask[100], df["num_fakes"].values[107], mask[107] )
+    dfnm = pd.DataFrame(NMasks)
     print(dfnm)
     df = pd.concat([df, dfnm], axis=0)
     print(df)

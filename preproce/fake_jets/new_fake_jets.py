@@ -79,6 +79,7 @@ def single_file_preprocess(filename : str) -> pd.DataFrame:
     df = pd.concat([dfft, dfgl, pd.DataFrame(num_fakes, columns=['num_fakes'])], axis=1)
     df = df[(df.iloc[:, :10].T != 0).any()]
     df = df[df["num_fakes"]<=10]
+    df = df.reset_index(drop=True)
     print(df)
 
     # Ht, phi calculation

@@ -110,10 +110,10 @@ def single_file_preprocess(filename : str) -> pd.DataFrame:
     print(dfnm)
     df = pd.concat([df, dfnm], axis=1)
     print(df)
-
-    df["num_fakes"] = df["num_fakes"].apply(
-        lambda x: x + np.random.uniform(low=-0.5, high=0.5) # if x > 0 else 0 WE SHOULDN'T HAVE ANY 0s
-    )
+    # NOTE: I am choosing not to smear N as it is now a conditionig variable
+    # df["num_fakes"] = df["num_fakes"].apply(
+    #     lambda x: x + np.random.uniform(low=-0.5, high=0.5) # if x > 0 else 0 WE SHOULDN'T HAVE ANY 0s
+    # )
     print(df)
 
     return df

@@ -107,7 +107,7 @@ def single_file_preprocess(filename : str) -> pd.DataFrame:
     #print(mask, df["num_fakes"].values[100],mask[100], df["num_fakes"].values[107], mask[107] )
     dfnm = pd.DataFrame(NMasks)
     print(dfnm)
-    df = pd.concat([df, dfnm], axis=0)
+    df = pd.concat([df, dfnm], axis=1)
     print(df)
 
     df["num_fakes"] = df["num_fakes"].apply(

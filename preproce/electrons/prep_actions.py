@@ -16,7 +16,7 @@ transformation: ["t", func, [a, b]]  # func(a * x + b)
 In the case of multiple operations, order follows the operation list indexing.
 """
 
-vars_dictionary = {
+context_dictionary = {
     "MGenElectron_eta": [],
     "MGenElectron_phi": [],
     "MGenElectron_pt": [],
@@ -59,6 +59,9 @@ vars_dictionary = {
     "Pileup_pudensity": [],
     "Pileup_sumEOOT": [],
     "Pileup_sumLOOT": [],
+}
+
+target_dictionary = {
     # "MElectron_charge": [["u", 1, None]],
     "MElectron_convVeto": [["u", 0.5, None]],
     #    "MElectron_cutBased": [["g", 0.1, None]],

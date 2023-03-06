@@ -12,10 +12,8 @@ import corner
 from scipy.stats import wasserstein_distance
 
 from postprocessing import postprocessing, gen_columns, reco_columns
-from post_actions import vars_dictionary
+from post_actions import target_dictionary, context_dictionary
 from corner_plots import make_corner
-from conditioning_plot import conditioning_plot
-
 
 def validate_electrons(
     test_loader,
@@ -69,11 +67,13 @@ def validate_electrons(
     reco = pd.DataFrame(data=reco, columns=reco_columns)
     samples = pd.DataFrame(data=samples, columns=reco_columns)
 
-    # Postprocessing for both test and samples datasets
+    # Postprocessing
 
-    reco = postprocessing(reco, vars_dictionary)
+    gen = postprocessing(gen, context_dictionary)
 
-    samples = postprocessing(samples, vars_dictionary)
+    reco = postprocessing(reco, target_dictionary)
+
+    samples = postprocessing(samples, target_dictionary)
 
     # New DataFrame containing FullSim-range saturated samples
 

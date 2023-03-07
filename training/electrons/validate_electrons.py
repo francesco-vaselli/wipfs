@@ -69,8 +69,6 @@ def validate_electrons(
 
     # Postprocessing
 
-    gen = postprocessing(gen, context_dictionary)
-
     reco = postprocessing(reco, target_dictionary)
 
     samples = postprocessing(samples, target_dictionary)

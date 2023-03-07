@@ -96,7 +96,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
             save_dir, "checkpoint-latest.pt"
         )  # use the latest checkpoint
     if args.resume_checkpoint is not None and args.resume == True:
-        model, _, _, start_epoch, _, _ = load_model(
+        model, _, args.lr, start_epoch, _, _ = load_model(
             model,
             model_dir=save_dir,
             filename="checkpoint-latest.pt",
@@ -141,14 +141,14 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
     dirpath = os.path.dirname(__file__)
 
     tr_dataset = ElectronDataset(
-        [os.path.join(dirpath, "MElectrons.hdf5")],
+        [os.path.join(dirpath, "MElectrons_1.hdf5")],
         x_dim=args.zdim,
         y_dim=args.y_dim,
         start=0,
         limit=args.train_limit,
     )
     te_dataset = ElectronDataset(
-        [os.path.join(dirpath, "MElectrons.hdf5")],
+        [os.path.join(dirpath, "MElectrons_1.hdf5")],
         x_dim=args.zdim,
         y_dim=args.y_dim,
         start=args.train_limit,
@@ -165,7 +165,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         batch_size=args.batch_size,
         num_workers=args.n_load_cores,
         pin_memory=True,
-        drop_last=True,
+        drop_last=False,
         shuffle=(train_sampler is None),
         sampler=train_sampler,
         worker_init_fn=init_np_seed
@@ -178,7 +178,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         shuffle=False,
         num_workers=0,
         pin_memory=True,
-        drop_last=True,
+        drop_last=False,
         worker_init_fn=init_np_seed,
     )
 
@@ -313,7 +313,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
                     )
         # save checkpoints
         if not args.distributed or (args.rank % ngpus_per_node == 0):
-            if (epoch + 1) % args.save_freq == 0:
+            if epoch % args.save_freq == 0:
                 save_model(
                     epoch,
                     model,

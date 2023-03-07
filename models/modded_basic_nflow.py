@@ -26,6 +26,9 @@ from nflows.transforms.splines.quadratic import (
     quadratic_spline,
     unconstrained_quadratic_spline,
 )
+from nflows.transforms.base import CompositeTransform
+from nflows.transforms.autoregressive import MaskedAffineAutoregressiveTransform
+from nflows import transforms
 from nflows.transforms.splines import rational_quadratic
 from nflows.transforms.splines.rational_quadratic import (
     rational_quadratic_spline,
@@ -36,6 +39,82 @@ from torch.nn.functional import softplus
 
 from modded_coupling import PiecewiseCouplingTransformM
 from modded_base_flow import FlowM
+
+
+class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
+    def __init__(
+        self,
+        features,
+        hidden_features,
+        context_features=None,
+        num_blocks=2,
+        use_residual_blocks=True,
+        random_mask=False,
+        activation=F.relu,
+        dropout_probability=0.0,
+        use_batch_norm=False,
+        init_identity = True
+    ):
+        self.features = features
+        made = made_module.MADE(
+            features=features,
+            hidden_features=hidden_features,
+            context_features=context_features,
+            num_blocks=num_blocks,
+            output_multiplier=self._output_dim_multiplier(),
+            use_residual_blocks=use_residual_blocks,
+            random_mask=random_mask,
+            activation=activation,
+            dropout_probability=dropout_probability,
+            use_batch_norm=use_batch_norm,
+        )
+        self._epsilon = 1e-3
+        
+        if init_identity:
+          torch.nn.init.constant_(made.final_layer.weight, 0.0)
+          torch.nn.init.constant_(
+              made.final_layer.bias,
+              np.log(np.exp(1 - self._epsilon) - 1),
+          )
+        super(MaskedAffineAutoregressiveTransformM, self).__init__(made)
+
+    def _output_dim_multiplier(self):
+        return 2
+
+    def _elementwise_forward(self, inputs, autoregressive_params):
+        unconstrained_scale, shift = self._unconstrained_scale_and_shift(
+            autoregressive_params
+        )
+        # scale = torch.sigmoid(unconstrained_scale + 2.0) + self._epsilon
+        scale = F.softplus(unconstrained_scale) + self._epsilon
+        log_scale = torch.log(scale)
+        outputs = scale * inputs + shift
+        logabsdet = torchutils.sum_except_batch(log_scale, num_batch_dims=1)
+        return outputs, logabsdet
+
+    def _elementwise_inverse(self, inputs, autoregressive_params):
+        unconstrained_scale, shift = self._unconstrained_scale_and_shift(
+            autoregressive_params
+        )
+        # scale = torch.sigmoid(unconstrained_scale + 2.0) + self._epsilon
+        scale = F.softplus(unconstrained_scale) + self._epsilon
+        log_scale = torch.log(scale)
+        outputs = (inputs - shift) / scale
+        logabsdet = -torchutils.sum_except_batch(log_scale, num_batch_dims=1)
+        return outputs, logabsdet
+
+    def _unconstrained_scale_and_shift(self, autoregressive_params):
+        # split_idx = autoregressive_params.size(1) // 2
+        # unconstrained_scale = autoregressive_params[..., :split_idx]
+        # shift = autoregressive_params[..., split_idx:]
+        # return unconstrained_scale, shift
+        autoregressive_params = autoregressive_params.view(
+            -1, self.features, self._output_dim_multiplier()
+        )
+        unconstrained_scale = autoregressive_params[..., 0]
+        shift = autoregressive_params[..., 1]
+        return unconstrained_scale, shift
+
 
 
 
@@ -484,6 +563,76 @@ def create_NDE_model(
     return flow
 
 
+def create_mixture_flow_model(
+    input_dim, context_dim, base_kwargs, transform_type
+):
+    """Build NSF (neural spline flow) model. This uses the nsf module
+    available at https://github.com/bayesiains/nsf.
+    This models the posterior distribution p(x|y).
+    The model consists of
+        * a base distribution (StandardNormal, dim(x))
+        * a sequence of transforms, each conditioned on y
+    Arguments:
+        input_dim {int} -- dimensionality of x
+        context_dim {int} -- dimensionality of y
+        num_flow_steps {int} -- number of sequential transforms
+        base_transform_kwargs {dict} -- hyperparameters for transform steps: should put num_transform_blocks=10,
+                          activation='elu',
+                          batch_norm=True
+    Returns:
+        Flow -- the model
+    """
+
+    distribution = distributions.StandardNormal((input_dim,))
+    transform = []
+    for _ in range(base_kwargs["num_steps_maf"]):
+        transform.append(
+            MaskedAffineAutoregressiveTransformM(
+                features=input_dim,
+                use_residual_blocks=base_kwargs["use_residual_blocks_maf"],
+                num_blocks=base_kwargs["num_transform_blocks_maf"],
+                hidden_features=base_kwargs["hidden_dim_maf"],
+                context_features=context_dim,
+                dropout_probability=base_kwargs["dropout_probability_maf"],
+                use_batch_norm=base_kwargs["batch_norm_maf"],
+            )
+        )
+        transform.append(create_random_transform(param_dim=input_dim))
+
+    for _ in range(base_kwargs["num_steps_arqs"]):
+        transform.append(
+            MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(
+                features=input_dim,
+                tails="linear",
+                use_residual_blocks=base_kwargs["use_residual_blocks_arqs"],
+                hidden_features=base_kwargs["hidden_dim_arqs"],
+                num_blocks=base_kwargs["num_transform_blocks_arqs"],
+                tail_bound=base_kwargs["tail_bound_arqs"],
+                num_bins=base_kwargs["num_bins_arqs"],
+                context_features=context_dim,
+                dropout_probability=base_kwargs["dropout_probability_arqs"],
+                use_batch_norm=base_kwargs["batch_norm_arqs"],
+            )
+        )
+        transform.append(create_random_transform(param_dim=input_dim))
+
+    transform_fnal = CompositeTransform(transform)
+
+    flow = FlowM(transform_fnal, distribution)
+
+    # Store hyperparameters. This is for reconstructing model when loading from
+    # saved file.
+
+    flow.model_hyperparams = {
+        "input_dim": input_dim,
+        "context_dim": context_dim,
+        "base_kwargs": base_kwargs,
+        "transform_type": transform_type,
+    }
+
+    return flow
+
+
 def train_epoch(
     flow,
     train_loader,
@@ -666,6 +815,7 @@ def save_model(epoch, model, scheduler, train_history, test_history, name, model
 
     if scheduler is not None:
         dict["scheduler_state_dict"] = scheduler.state_dict()
+        dict["last_lr"] = scheduler.get_last_lr()
 
     torch.save(dict, p / filename)
     torch.save(dict, p / resume_filename)
@@ -705,7 +855,65 @@ def load_model(device, model_dir=None, filename=None):
     # If the optimizer has more than 1 param_group, then we built it with
     # flow_lr different from lr
     if len(checkpoint["optimizer_state_dict"]["param_groups"]) > 1:
-        flow_lr = checkpoint["optimizer_state_dict"]["param_groups"][-1]["initial_lr"]
+        flow_lr = checkpoint["last_lr"]
+    else:
+        flow_lr = None
+
+    # Set the epoch to the correct value. This is needed to resume
+    # training.
+    epoch = checkpoint["epoch"]
+
+    return (
+        model,
+        scheduler_present_in_checkpoint,
+        flow_lr,
+        epoch,
+        train_history,
+        test_history,
+    )
+
+
+def load_mixture_model(device, model_dir=None, filename=None):
+    """Load a saved model.
+    Args:
+        filename:       File name
+    """
+
+    if model_dir is None:
+        raise NameError(
+            "Model directory must be specified."
+            " Store in attribute PosteriorModel.model_dir"
+        )
+
+    p = Path(model_dir)
+    checkpoint = torch.load(p / filename, map_location="cpu")
+
+    model_hyperparams = checkpoint["model_hyperparams"]
+    # added because of a bug in the old create_mixture_flow_model function
+    if checkpoint["model_hyperparams"]["base_transform_kwargs"] is not None:
+        checkpoint["model_hyperparams"]["base_kwargs"] = checkpoint["model_hyperparams"]["base_transform_kwargs"]
+        del checkpoint["model_hyperparams"]["base_transform_kwargs"]
+    train_history = checkpoint["train_history"]
+    test_history = checkpoint["test_history"]
+
+    # Load model
+    model = create_mixture_flow_model(**model_hyperparams)
+    model.load_state_dict(checkpoint["model_state_dict"])
+    # model.to(device)
+
+    # Remember that you must call model.eval() to set dropout and batch normalization layers to evaluation mode before running inference.
+    # Failing to do this will yield inconsistent inference results.
+    model.eval()
+
+    # Load optimizer
+    scheduler_present_in_checkpoint = "scheduler_state_dict" in checkpoint.keys()
+
+    # If the optimizer has more than 1 param_group, then we built it with
+    # flow_lr different from lr
+    if len(checkpoint["optimizer_state_dict"]["param_groups"]) > 1:
+        flow_lr = checkpoint["last_lr"]
+    elif checkpoint["last_lr"] is not None:
+        flow_lr = checkpoint["last_lr"][0]
     else:
         flow_lr = None
 

@@ -5,7 +5,7 @@ import h5py
 
 from matplotlib import pyplot as plt
 
-from post_actions import vars_dictionary
+from post_actions import target_dictionary
 
 
 def restore_range(column_name, scale_dict, df):
@@ -213,7 +213,7 @@ if __name__ == "__main__":
     df = pd.DataFrame(data=f.get("data"), columns=gen_columns+reco_columns)
     f.close()
 
-    df = postprocessing_test(df, vars_dictionary)
+    df = postprocessing_test(df, target_dictionary)
 
     file = h5py.File(f"MElectrons_post.hdf5", "w")
     dset = file.create_dataset("data", data=df.values, dtype="f4")

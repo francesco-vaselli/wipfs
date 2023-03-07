@@ -2,6 +2,8 @@
     "python.formatting.provider": "black",
     "files.associations": {
         "gen_jet_graph.C": "cpp",
-        "extraction.C": "cpp"
+        "extraction.C": "cpp",
+        "counter.C": "cpp",
+        "preliminar.C": "cpp"
     }
 }

@@ -70,7 +70,7 @@ class NMaskedLinear(nn.Linear):
         return mask, out_degrees
 
     def forward(self, x, context):
-        return F.linear(x, self.weight * (self.mask * context[:, -self.NMask_degree:]), self.bias)
+        return F.linear(x, self.weight * (self.mask * context[:, -self.NMask_degree:]), self.bias) # context mask should be reshaped?
 
 
 class NMaskedFeedforwardBlock(nn.Module):

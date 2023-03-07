@@ -73,6 +73,65 @@ class FakesDataset(Dataset):
         return self.x_train[idx], self.y_train[idx], self.N_train[idx]
 
 
+class AllFakesDataset(Dataset):
+    """Very simple Dataset for reading hdf5 data for fakes
+        divides each row into 3 parts: reco (x), gen (y), N of fakes (N)
+    Args:
+        Dataset (Pytorch Dataset): Pytorch Dataset class
+    """
+
+    def __init__(self, h5_paths, x_dim, y_dim, z_dim, start=0, limit=-1):
+
+        # we must fix a convention for parametrizing slices
+
+        self.h5_paths = h5_paths
+        self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
+        self._archives = None
+
+        y = self.archives[0]["data"][
+            start : start + limit,
+            [
+                np.hstack(
+                    (
+                        np.arange(start=x_dim, stop=(x_dim + y_dim)),
+                        np.arange(
+                            start=(x_dim + y_dim + z_dim),
+                            stop=(x_dim + y_dim + z_dim + x_dim),
+                        ),
+                    )
+                )
+            ],
+        ]
+        x = self.archives[0]["data"][start : start + limit, 0:x_dim]
+        x[:, :10] = x[:, :10] / 200.0  # divide pt by 200
+        idxs = np.vstack(
+            (np.arange(0, 10), np.arange(10, 20), np.arange(20, 30))
+        ).T.flatten()  # rearrange as pt, eta, phi
+        x = x[:, idxs]
+        z = self.archives[0]["data"][
+            start : start + limit,
+            (y_dim + x_dim) : (y_dim + z_dim),  # assuming z_dim = 34
+        ]
+        print(z.shape)
+        # z[:, [1, 2]] = z[:, [1, 2]] / 200.0 # divide ht and pt by 200
+        z[:, [0]] = z[:, [0]] / 10  # divide njet by 10
+        self.x_train = torch.tensor(np.hstack((z, x)), dtype=torch.float32)
+        self.y_train = torch.tensor(y, dtype=torch.float32)
+        # self.z_train = torch.tensor(z, dtype=torch.float32)
+
+    @property
+    def archives(self):
+        if self._archives is None:  # lazy loading here!
+            self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
+        return self._archives
+
+    def __len__(self):
+        return len(self.y_train)
+
+    def __getitem__(self, idx):
+        return self.x_train[idx], self.y_train[idx], self.x_train[idx]
+
+
 class NewFakesDataset(Dataset):
     """Very simple Dataset for reading hdf5 data for fakes
         divides each row into 3 parts: reco (x), gen (y), N of fakes (N)
@@ -88,24 +147,25 @@ class NewFakesDataset(Dataset):
         self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
         self._archives = None
 
-        y = self.archives[0]["data"][start:start+limit, x_dim : (x_dim + y_dim)]
-        x = self.archives[0]["data"][start:start+limit, 0:x_dim]
-        x[:, :10] = x[:, :10] / 200.0 # divide pt by 200
+        y = self.archives[0]["data"][start : start + limit, x_dim : (x_dim + y_dim)]
+        x = self.archives[0]["data"][start : start + limit, 0:x_dim]
+        x[:, :10] = x[:, :10] / 200.0  # divide pt by 200
         # fill missing fakes with nonphysical values
         # x[:, :10] = np.array([i if i != 0 else np.random.normal(-1, 0.1) for i in x[:, :10].flatten()]).reshape(-1, 10)
         # x[:, 10:20] = np.array([i if i != 0 else np.random.normal(-7, 0.1) for i in x[:, 10:20].flatten()]).reshape(-1, 10)
         # x[:, 20:30] = np.array([i if i != 0 else np.random.normal(-7, 0.1) for i in x[:, 20:30].flatten()]).reshape(-1, 10)
-        idxs = np.vstack((np.arange(0, 10), np.arange(10, 20), np.arange(20, 30))).T.flatten() # rearrange as pt, eta, phi
+        idxs = np.vstack(
+            (np.arange(0, 10), np.arange(10, 20), np.arange(20, 30))
+        ).T.flatten()  # rearrange as pt, eta, phi
         x = x[:, idxs]
         z = self.archives[0]["data"][
-            start:start+limit, (y_dim + x_dim) : (y_dim + z_dim) # assuming z_dim = 34
+            start : start + limit,
+            (y_dim + x_dim) : (y_dim + z_dim),  # assuming z_dim = 34
         ]
         print(z.shape)
         # z[:, [1, 2]] = z[:, [1, 2]] / 200.0 # divide ht and pt by 200
-        z[:, [0]] = z[:, [0]] / 10 # divide njet by 10
-        self.x_train = torch.tensor(
-            np.hstack((z, x)), dtype=torch.float32
-        ) 
+        z[:, [0]] = z[:, [0]] / 10  # divide njet by 10
+        self.x_train = torch.tensor(np.hstack((z, x)), dtype=torch.float32)
         self.y_train = torch.tensor(y, dtype=torch.float32)
         # self.z_train = torch.tensor(z, dtype=torch.float32)
 
@@ -132,7 +192,7 @@ class NewVarsDataset(Dataset):
     def __init__(self, h5_paths, x_dim, y_dim, z_dim, start=0, limit=-1):
 
         # we must fix a convention for parametrizing slices
-        z_dim = z_dim+1 # this is done to preprocess the last two variables into one
+        z_dim = z_dim + 1  # this is done to preprocess the last two variables into one
         self.h5_paths = h5_paths
         self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
         self._archives = None
@@ -233,7 +293,7 @@ class noNFakesDataset(Dataset):
         z[:, [1, 2, 3]] = z[:, [1, 2, 3]] / 200.0
         y = y[z[:, 1] > 0]
         z = z[z[:, 1] > 0]
-        z3 = z[:, [1, 2, 3]] 
+        z3 = z[:, [1, 2, 3]]
         # print(f"y shape: {y.shape}, z shape: {z.shape}")
         self.y_train = torch.tensor(y, dtype=torch.float32)
         self.z_train = torch.tensor(z3, dtype=torch.float32)
@@ -261,8 +321,8 @@ class OneDFakesDataset(Dataset):
     def __init__(self, h5_paths, x_dim, y_dim, z_dim, start=0, limit=-1):
 
         # we must fix a convention for parametrizing slices
-        y_dim = y_dim+5
-        z_dim = z_dim+3 # this is done to preprocess the last two variables into one
+        y_dim = y_dim + 5
+        z_dim = z_dim + 3  # this is done to preprocess the last two variables into one
         self.h5_paths = h5_paths
         self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
         self._archives = None
@@ -414,7 +474,7 @@ class SimpleMuonsDataset(Dataset):
 
 
 class ElectronDataset(Dataset):
-    """Dataset for Electron training 
+    """Dataset for Electron training
 
     Args:
         Dataset (Dataset): _description_
@@ -428,8 +488,8 @@ class ElectronDataset(Dataset):
         self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
         self._archives = None
 
-        y = self.archives[0]["data"][start:(start + limit), 0:y_dim]
-        x = self.archives[0]["data"][start:(start + limit), y_dim : (y_dim + x_dim)]
+        y = self.archives[0]["data"][start : (start + limit), 0:y_dim]
+        x = self.archives[0]["data"][start : (start + limit), y_dim : (y_dim + x_dim)]
         self.x_train = torch.tensor(x, dtype=torch.float32)  # .to(device)
         self.y_train = torch.tensor(y, dtype=torch.float32)  # .to(device)
 
@@ -551,4 +611,3 @@ class H5FakesDataset(Dataset):
             return self.limit
         else:
             return self.strides[-1]
-            

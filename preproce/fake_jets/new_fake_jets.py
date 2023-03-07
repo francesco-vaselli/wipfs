@@ -78,6 +78,10 @@ def single_file_preprocess(filename : str) -> pd.DataFrame:
 
     df = pd.concat([dfft, dfgl, pd.DataFrame(num_fakes, columns=['num_fakes'])], axis=1)
     df = df[(df.iloc[:, :10].T != 0).any()]
+    # saturate all pts to 200 GeV, then rescale by 200
+    df.iloc[:, :10] = df.iloc[:, :10].clip(upper=200)
+    df.iloc[:, :10] = df.iloc[:, :10] / 200
+    # drop all entries which have n_fakes > 10
     df = df[df["num_fakes"]<=10]
     df = df.reset_index(drop=True)
     print(df)

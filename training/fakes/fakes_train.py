@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.join("..", "..", "models"))
 sys.path.insert(0, "..")
 
 from dataset import MyDataset, NewFakesDataset # x, y, z ordered
-from modded_basic_nflow import create_mixture_flow_model, load_model, save_model
+from modded_basic_nflow import create_mixture_flow_model, load_model, save_model, create_NDE_model
 
 from args import get_args
 from validate_fakes import validate_fakes
@@ -63,7 +63,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
 
     # define model, we got maf and arqs parts
     flow_param_dict = {
-        "input_dim": args.z_dim,
+        "input_dim": args.x_dim,
         "context_dim": args.y_dim,
         "base_kwargs": {
             "num_steps_maf": args.num_steps_maf,

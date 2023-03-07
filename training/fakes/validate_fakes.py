@@ -64,150 +64,69 @@ def validate_fakes(
     # Samples postprocessing 
     # flash_sim[:, [1, 2]] = flash_sim[:, [1, 2]] * 200
     # full_sim[:, [1, 2]] = full_sim[:, [1, 2]] * 200
-    flash_sim[:, :10] = flash_sim[:, 4:14] * 200
-    full_sim[:, :10] = full_sim[:, 4:14] * 200
+    # flash_sim[:, :10] = flash_sim[:, 4:14] * 200
+    # full_sim[:, :10] = full_sim[:, 4:14] * 200
 
     # Plots
-    PU_n_true_int = gen[:, 2]
-    N_true_fakes_full = full_sim[:, 0]
-    N_true_fakes_flash = flash_sim[:, 0]
+    # PU_n_true_int = gen[:, 2]
+    # N_true_fakes_full = full_sim[:, 0]
+    # N_true_fakes_flash = flash_sim[:, 0]
 
-    names0 = ["N"]
-    names1 = np.array([[f"pt{i}", f"eta{i}", f"phi{i}"]  for i in range(0, 10)]).flatten()
+    N_sel = np.array(gen[:, 6]).flatten()
+    names = np.array([[f"pt{i}", f"eta{i}", f"phi{i}"]  for i in range(0, 10)]).flatten()
     n_ids = np.array([[i, i, i]  for i in range(1, 11)]).flatten()
-    names = np.hstack((names0, names1))
-
-
-    bins_N = np.arange(-0.1, 1.1, step=0.1) - 0.05
-    N_sel = np.rint(N_true_fakes_flash*10).astype(int)
 
 
     for i in range(0, len(names)):
-        if i > 0:
-            test_values = full_sim[:, i].flatten()[N_sel <= n_ids[i-1]]
-            generated_sample = flash_sim[:, i].flatten()[N_sel <= n_ids[i-1]]
-        else:
-            test_values = N_true_fakes_full.flatten()
-            generated_sample = N_true_fakes_flash.flatten()
-            ws = wasserstein_distance(test_values, generated_sample)
-            print(generated_sample.shape)
-            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
 
-            if i == 0:
-                _, rangeR, _ = ax1.hist(
-                    test_values,
-                    histtype="step",
-                    label="FullSim",
-                    lw=1,
-                    bins=bins_N,
-                )
-            else:
-                _, rangeR, _ = ax1.hist(
-                    test_values, histtype="step", label="FullSim", lw=1, bins=100
-                )
-                print(rangeR.shape)
-                generated_sample = np.where(
-                    generated_sample < rangeR.min(), rangeR.min(), generated_sample
-                )
-                generated_sample = np.where(
-                    generated_sample > rangeR.max(), rangeR.max(), generated_sample
-                )
+        test_values = full_sim[:, i].flatten()[N_sel <= n_ids[i-1]]
+        generated_sample = flash_sim[:, i].flatten()[N_sel <= n_ids[i-1]]
+        ws = wasserstein_distance(test_values, generated_sample)
+        print(generated_sample.shape)
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
 
-            if i == 0:
-                ax1.hist(
-                    generated_sample,
-                    bins=bins_N,
-                    histtype="step",
-                    lw=1,
-                    range=[rangeR.min(), rangeR.max()],
-                    label=f"FlashSim, ws={round(ws, 4)}",
-                )
-            else:
-                ax1.hist(
-                    generated_sample,
-                    bins=100,
-                    histtype="step",
-                    lw=1,
-                    range=[rangeR.min(), rangeR.max()],
-                    label=f"FlashSim, ws={round(ws, 4)}",
-                )
-            fig.suptitle(f"Comparison of {names[i]} @ epoch {epoch}", fontsize=16)
-            ax1.legend(frameon=False, loc="upper right")
+        _, rangeR, _ = ax1.hist(
+            test_values, histtype="step", label="FullSim", lw=1, bins=100
+        )
+        print(rangeR.shape)
+        generated_sample = np.where(
+            generated_sample < rangeR.min(), rangeR.min(), generated_sample
+        )
+        generated_sample = np.where(
+            generated_sample > rangeR.max(), rangeR.max(), generated_sample
+        )
 
-            ax1.spines["right"].set_visible(False)
-            ax1.spines["top"].set_visible(False)
-            ax2.spines["right"].set_visible(False)
-            ax2.spines["top"].set_visible(False)
-            ax2.set_yscale("log")
-            if i == 0:
-                ax2.hist(test_values, histtype="step", lw=1, bins=bins_N)
-                ax2.hist(
-                    generated_sample,
-                    bins=bins_N,
-                    histtype="step",
-                    lw=1,
-                    range=[rangeR.min(), rangeR.max()],
-                )
-            else:
-                ax2.hist(test_values, histtype="step", lw=1, bins=100)
-                ax2.hist(
-                    generated_sample,
-                    bins=100,
-                    histtype="step",
-                    lw=1,
-                    range=[rangeR.min(), rangeR.max()],
-                )
-            # ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
-            # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
-            # plt.savefig(os.path.join(save_dir, f"comparison_{names[i]}.png"))
-            writer.add_figure(f"comparison_{names[i]}", fig, global_step=epoch)
-            writer.add_scalar(f"ws/{names[i]}_wasserstein_distance", ws, global_step=epoch)
-            plt.close()
+        ax1.hist(
+            generated_sample,
+            bins=100,
+            histtype="step",
+            lw=1,
+            range=[rangeR.min(), rangeR.max()],
+            label=f"FlashSim, ws={round(ws, 4)}",
+        )
+        fig.suptitle(f"Comparison of {names[i]} @ epoch {epoch}", fontsize=16)
+        ax1.legend(frameon=False, loc="upper right")
 
-            
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
-    ax1.hist2d(
-        PU_n_true_int,
-        N_true_fakes_full,
-        # bins=[
-        #     np.arange(left_of_first_bin, right_of_last_bin + d, d),
-        #     np.arange(left_of_first_bin1, right_of_last_bin1 + d1, d1),
-        # ],
-        cmap="Blues",
-        label="FullSim",
-    )
-    ax1.set_xlabel("PU_n_true_int")
-    ax1.set_ylabel("N_true_fakes_full")
-    x_min, x_max = ax1.get_xlim()
-    y_min, y_max = ax1.get_ylim()
-    ax2.hist2d(
-        PU_n_true_int,
-        N_true_fakes_flash,
-        # bins=[
-        #     np.arange(left_of_first_bin, right_of_last_bin + d, d),
-        #     np.arange(left_of_first_bin2, right_of_last_bin2 + d2, d2),
-        # ],
-        range=[[x_min, x_max], [y_min, y_max]],
-        cmap="Reds",
-        label="FlashSim Latent",
-    )
-    ax2.set_ylim(ax1.get_ylim())
-    ax2.set_xlabel("PU_n_true_int")
-    ax2.set_ylabel("N_true_fakes_latent")
+        ax1.spines["right"].set_visible(False)
+        ax1.spines["top"].set_visible(False)
+        ax2.spines["right"].set_visible(False)
+        ax2.spines["top"].set_visible(False)
+        ax2.set_yscale("log")
 
-    fig.suptitle(
-        "Comparison of N_true_fakes_full vs N_true_fakes_latent vs N_true_fakes_reco",
-        fontsize=16,
-    )
-    ax1.legend(frameon=False, loc="upper right")
-    # plt.savefig(os.path.join(save_dir, f"comparison_N_true_fakes.png"))
-    writer.add_figure(
-        "comparison_N_true_fakes",
-        fig,
-        global_step=epoch,
-    )
-    plt.close()
+        ax2.hist(test_values, histtype="step", lw=1, bins=100)
+        ax2.hist(
+            generated_sample,
+            bins=100,
+            histtype="step",
+            lw=1,
+            range=[rangeR.min(), rangeR.max()],
+        )
+        # ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
+        # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
+        # plt.savefig(os.path.join(save_dir, f"comparison_{names[i]}.png"))
+        writer.add_figure(f"comparison_{names[i]}", fig, global_step=epoch)
+        writer.add_scalar(f"ws/{names[i]}_wasserstein_distance", ws, global_step=epoch)
+        plt.close()
 
-    # Corner plot
 
     

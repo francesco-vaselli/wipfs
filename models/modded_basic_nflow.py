@@ -39,6 +39,7 @@ from torch.nn.functional import softplus
 
 from modded_coupling import PiecewiseCouplingTransformM
 from modded_base_flow import FlowM
+from modded_MADE import ContextMADE
 
 
 class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
@@ -145,7 +146,7 @@ class MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(AutoregressiveTra
         self.tails = tails
         self.tail_bound = tail_bound
 
-        autoregressive_net = made_module.MADE(
+        autoregressive_net = ContextMADE(
             features=features,
             hidden_features=hidden_features,
             context_features=context_features,
@@ -841,7 +842,7 @@ def load_model(device, model_dir=None, filename=None):
     test_history = checkpoint["test_history"]
 
     # Load model
-    model = create_NDE_model(**model_hyperparams)
+    model = create_mixture_flow_model(**model_hyperparams)
     model.load_state_dict(checkpoint["model_state_dict"])
     # model.to(device)
 
@@ -856,6 +857,8 @@ def load_model(device, model_dir=None, filename=None):
     # flow_lr different from lr
     if len(checkpoint["optimizer_state_dict"]["param_groups"]) > 1:
         flow_lr = checkpoint["last_lr"]
+    elif checkpoint["last_lr"] is not None:
+        flow_lr = checkpoint["last_lr"][0]
     else:
         flow_lr = None
 

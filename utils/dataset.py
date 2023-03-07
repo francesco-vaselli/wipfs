@@ -89,32 +89,14 @@ class AllFakesDataset(Dataset):
         self._archives = None
 
         y = self.archives[0]["data"][
-            start : start + limit,
-            [
-                np.hstack(
-                    (
-                        np.arange(start=x_dim, stop=(x_dim + y_dim)),
-                        np.arange(
-                            start=(x_dim + y_dim + z_dim),
-                            stop=(x_dim + y_dim + z_dim + x_dim),
-                        ),
-                    )
-                )
-            ],
+            start : start + limit, x_dim : (x_dim + y_dim)
         ]
         x = self.archives[0]["data"][start : start + limit, 0:x_dim]
-        idxs = np.vstack(
-            (np.arange(0, 10), np.arange(10, 20), np.arange(20, 30))
-        ).T.flatten()  # rearrange as pt, eta, phi
-        x = x[:, idxs]
         z = self.archives[0]["data"][
             start : start + limit,
-            (y_dim + x_dim) : (y_dim + z_dim),  # assuming z_dim = 34
+            (y_dim + x_dim) : (x_dim + y_dim + z_dim),  # assuming z_dim = 34
         ]
-        print(z.shape)
-        # z[:, [1, 2]] = z[:, [1, 2]] / 200.0 # divide ht and pt by 200
-        z[:, [0]] = z[:, [0]] / 10  # divide njet by 10
-        self.x_train = torch.tensor(np.hstack((z, x)), dtype=torch.float32)
+        self.x_train = torch.tensor(x, dtype=torch.float32)
         self.y_train = torch.tensor(y, dtype=torch.float32)
         # self.z_train = torch.tensor(z, dtype=torch.float32)
 

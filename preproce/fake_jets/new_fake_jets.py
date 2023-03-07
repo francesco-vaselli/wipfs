@@ -41,9 +41,11 @@ def vec_sum_pt(pts, phis):
 
     return spt, angle
 
+
 STOP = None
 
-def single_file_preprocess(filename : str) -> pd.DataFrame:
+
+def single_file_preprocess(filename: str) -> pd.DataFrame:
     tree = uproot.open(filename, num_workers=20)
     # define pandas df for fast manipulation
     dfgl = tree.arrays(
@@ -67,22 +69,29 @@ def single_file_preprocess(filename : str) -> pd.DataFrame:
         entry_stop=STOP,
     ).astype("float32")
 
-    num_fakes = dfft.reset_index(level=1).index.value_counts(sort=False).reindex(np.arange(len(dfgl)), fill_value=0).values
+    num_fakes = (
+        dfft.reset_index(level=1)
+        .index.value_counts(sort=False)
+        .reindex(np.arange(len(dfgl)), fill_value=0)
+        .values
+    )
     # fill missing fakes with 0s. seems to be cutting excess fakes per event
-    dfft = dfft.reindex(pd.MultiIndex.from_product([np.arange(len(dfgl)), np.arange(10)]), fill_value=0) 
+    dfft = dfft.reindex(
+        pd.MultiIndex.from_product([np.arange(len(dfgl)), np.arange(10)]), fill_value=0
+    )
 
     # get all fake in one event on the same row
     # NOTE: we now have all pts, then all etas, then all phis
     dfft = dfft.unstack(level=-1).T.reset_index(drop=True).T
     print(dfft)
 
-    df = pd.concat([dfft, dfgl, pd.DataFrame(num_fakes, columns=['num_fakes'])], axis=1)
+    df = pd.concat([dfft, dfgl, pd.DataFrame(num_fakes, columns=["num_fakes"])], axis=1)
     df = df[(df.iloc[:, :10].T != 0).any()]
     # saturate all pts to 200 GeV, then rescale by 200
     df.iloc[:, :10] = df.iloc[:, :10].clip(upper=200)
     df.iloc[:, :10] = df.iloc[:, :10] / 200
     # drop all entries which have n_fakes > 10
-    df = df[df["num_fakes"]<=10]
+    df = df[df["num_fakes"] <= 10]
     df = df.reset_index(drop=True)
     print(df)
 
@@ -102,14 +111,19 @@ def single_file_preprocess(filename : str) -> pd.DataFrame:
     df["pt"] = pt
     df["angle"] = angle
 
+    # reorder columns to have pt, eta, phi for each jet
+    idxs = np.vstack(
+        (np.arange(0, 10), np.arange(10, 20), np.arange(20, 30))
+    ).T.flatten()
+    df.iloc[:, :30] = df.iloc[:, idxs]
     # add NMasks
     print(df["num_fakes"].values.shape)
     # create a mask of shape [len(df), 10*3] which is 1 for the first num_fakes*3 and 0 for the rest
-    NMasks = np.zeros((len(df), 10*3))
+    NMasks = np.zeros((len(df), 10 * 3))
     for i in range(1, 11):
-        NMasks[df["num_fakes"].values == i, :(i)*3] = 1
+        NMasks[df["num_fakes"].values == i, : (i) * 3] = 1
     NMasks = NMasks.astype("float32")
-    #print(mask, df["num_fakes"].values[100],mask[100], df["num_fakes"].values[107], mask[107] )
+    # print(mask, df["num_fakes"].values[100],mask[100], df["num_fakes"].values[107], mask[107] )
     dfnm = pd.DataFrame(NMasks)
     print(dfnm)
     df = pd.concat([df, dfnm], axis=1)
@@ -122,16 +136,17 @@ def single_file_preprocess(filename : str) -> pd.DataFrame:
 
     return df
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
 
     root_files = [
-            "~/wipfs/extract/fake_jets/extracted_files/FJets1.root:FJets",
-            "~/wipfs/extract/fake_jets/extracted_files/FJets2.root:FJets",
-            "~/wipfs/extract/fake_jets/extracted_files/FJets3.root:FJets",
-            "~/wipfs/extract/fake_jets/extracted_files/FJets4.root:FJets",
-            "~/wipfs/extract/fake_jets/extracted_files/FJets5.root:FJets",
-            "~/wipfs/extract/fake_jets/extracted_files/FJets6.root:FJets",
-        ]
+        "~/wipfs/extract/fake_jets/extracted_files/FJets1.root:FJets",
+        "~/wipfs/extract/fake_jets/extracted_files/FJets2.root:FJets",
+        "~/wipfs/extract/fake_jets/extracted_files/FJets3.root:FJets",
+        "~/wipfs/extract/fake_jets/extracted_files/FJets4.root:FJets",
+        "~/wipfs/extract/fake_jets/extracted_files/FJets5.root:FJets",
+        "~/wipfs/extract/fake_jets/extracted_files/FJets6.root:FJets",
+    ]
     df = single_file_preprocess(root_files[0])
     for root_file in root_files[1:]:
         df1 = single_file_preprocess(root_file)

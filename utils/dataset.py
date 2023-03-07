@@ -103,7 +103,6 @@ class AllFakesDataset(Dataset):
             ],
         ]
         x = self.archives[0]["data"][start : start + limit, 0:x_dim]
-        x[:, :10] = x[:, :10] / 200.0  # divide pt by 200
         idxs = np.vstack(
             (np.arange(0, 10), np.arange(10, 20), np.arange(20, 30))
         ).T.flatten()  # rearrange as pt, eta, phi

@@ -20,7 +20,7 @@ sys.path.insert(0, "..")
 from dataset import ElectronDataset
 from modded_basic_nflow import create_NDE_model, create_mixture_flow_model, load_model, save_model, load_mixture_model
 
-from args_basic_train import get_args
+from args import get_args
 from validate_electrons import validate_electrons
 
 

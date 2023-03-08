@@ -44,7 +44,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
             args.rank = args.rank * ngpus_per_node + gpu
         dist.init_process_group(
             backend=args.dist_backend,
-            init_method=args.dist_url,
+            # init_method=args.dist_url,
             world_size=args.world_size,
             rank=args.rank,
         )

@@ -116,10 +116,6 @@ gen_columns = [
     "MGenElectron_phi",
     "MGenElectron_pt",
     "MGenElectron_charge",
-    "MGenPartMother_pdgId",
-    "MGenPartMother_pt",
-    "MGenPartMother_deta",
-    "MGenPartMother_dphi",
     "MGenElectron_statusFlag0",
     "MGenElectron_statusFlag1",
     "MGenElectron_statusFlag2",
@@ -157,7 +153,6 @@ gen_columns = [
 ]
 
 reco_columns = [
-    "MElectron_charge",
     "MElectron_convVeto",
     "MElectron_deltaEtaSC",
     "MElectron_dr03EcalRecHitSumEt",

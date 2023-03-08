@@ -73,14 +73,15 @@ def validate_fakes(
     # N_true_fakes_flash = flash_sim[:, 0]
 
     N_sel = np.array(gen[:, 6]).flatten()
+    print(N_sel)
     names = np.array([[f"pt{i}", f"eta{i}", f"phi{i}"]  for i in range(0, 10)]).flatten()
     n_ids = np.array([[i, i, i]  for i in range(1, 11)]).flatten()
 
 
     for i in range(0, len(names)):
 
-        test_values = full_sim[:, i].flatten()[N_sel <= n_ids[i-1]]
-        generated_sample = flash_sim[:, i].flatten()[N_sel <= n_ids[i-1]]
+        test_values = full_sim[:, i].flatten()[N_sel <= n_ids[i]]
+        generated_sample = flash_sim[:, i].flatten()[N_sel <= n_ids[i]]
         ws = wasserstein_distance(test_values, generated_sample)
         print(generated_sample.shape)
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)

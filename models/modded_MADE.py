@@ -585,7 +585,6 @@ class gluMADE(nn.Module):
             in_degrees=_get_input_degrees(features),
             out_features=hidden_features,
             autoregressive_features=features,
-            context_features=context_features,
             random_mask=random_mask,
             is_output=False,
         )

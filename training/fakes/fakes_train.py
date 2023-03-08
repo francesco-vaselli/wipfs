@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.join("..", "..", "utils"))
 sys.path.insert(0, os.path.join("..", "..", "models"))
 sys.path.insert(0, "..")
 
-from dataset import MyDataset, NewFakesDataset # x, y, z ordered
+from dataset import MyDataset, NewFakesDataset, AllFakesDataset # x, y, z ordered
 from modded_basic_nflow import create_mixture_flow_model, load_model, save_model, create_NDE_model
 
 from args import get_args
@@ -147,14 +147,14 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
 
     dirpath = os.path.dirname(__file__)
 
-    tr_dataset = NewFakesDataset(
+    tr_dataset = AllFakesDataset(
         x_dim=args.x_dim,
         y_dim=args.y_dim,
         z_dim=args.z_dim,
         h5_paths = [os.path.join(dirpath, "..", "datasets", "full_fake_with_mask.hdf5")],
         limit=args.train_limit,
     )
-    te_dataset = NewFakesDataset(
+    te_dataset = AllFakesDataset(
         x_dim=args.x_dim,
         y_dim=args.y_dim,
         z_dim=args.z_dim,

@@ -39,7 +39,7 @@ from torch.nn.functional import softplus
 
 from modded_coupling import PiecewiseCouplingTransformM
 from modded_base_flow import FlowM
-from modded_MADE import ContextMADE
+from modded_MADE import ContextMADE, gluMADE
 
 
 class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
@@ -57,7 +57,7 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
         init_identity = True
     ):
         self.features = features
-        made = made_module.MADE(
+        made = gluMADE( # made_module.MADE(
             features=features,
             hidden_features=hidden_features,
             context_features=context_features,
@@ -146,7 +146,7 @@ class MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(AutoregressiveTra
         self.tails = tails
         self.tail_bound = tail_bound
 
-        autoregressive_net = made_module.MADE(
+        autoregressive_net = gluMADE( # made_module.MADE(
             features=features,
             hidden_features=hidden_features,
             context_features=context_features,

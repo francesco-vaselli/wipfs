@@ -29,6 +29,19 @@ def init_np_seed(worker_id):
     np.random.seed(seed % 4294967296)
 
 
+def setup(backend, rank, world_size):
+    os.environ["MASTER_ADDR"] = "localhost"
+    os.environ["MASTER_PORT"] = "12355"
+
+    # gloo: works
+    # dist.init_process_group("gloo", rank=rank, world_size=world_size)
+
+    # nccl: hangs forever
+    dist.init_process_group(
+        backend=backend, rank=rank, world_size=world_size
+    )
+
+
 def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
 
     # basic setup
@@ -42,12 +55,13 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
             args.rank = int(os.environ["RANK"])
         if args.distributed:
             args.rank = args.rank * ngpus_per_node + gpu
-        dist.init_process_group(
-            backend=args.dist_backend,
-            # init_method=args.dist_url,
-            world_size=args.world_size,
-            rank=args.rank,
-        )
+        # dist.init_process_group(
+        #     backend=args.dist_backend,
+        #     # init_method=args.dist_url,
+        #     world_size=args.world_size,
+        #     rank=args.rank,
+        # )
+        setup(args.dist_backend, args.rank, args.world_size)
 
     if args.log_name is not None:
         log_dir = "runs/%s" % args.log_name

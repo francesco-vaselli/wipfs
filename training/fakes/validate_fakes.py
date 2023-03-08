@@ -80,8 +80,8 @@ def validate_fakes(
 
     for i in range(0, len(names)):
 
-        test_values = full_sim[:, i].flatten()[N_sel <= n_ids[i]]
-        generated_sample = flash_sim[:, i].flatten()[N_sel <= n_ids[i]]
+        test_values = full_sim[:, i].flatten()[N_sel >= n_ids[i]]
+        generated_sample = flash_sim[:, i].flatten()[N_sel >= n_ids[i]]
         ws = wasserstein_distance(test_values, generated_sample)
         print(generated_sample.shape)
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)

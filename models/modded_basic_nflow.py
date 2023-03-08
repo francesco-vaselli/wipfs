@@ -146,7 +146,7 @@ class MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(AutoregressiveTra
         self.tails = tails
         self.tail_bound = tail_bound
 
-        autoregressive_net = ContextMADE(
+        autoregressive_net = made_module.MADE(
             features=features,
             hidden_features=hidden_features,
             context_features=context_features,

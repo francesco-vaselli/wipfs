@@ -178,7 +178,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         batch_size=args.batch_size,
         num_workers=args.n_load_cores,
         pin_memory=True,
-        drop_last=False,
+        drop_last=True,
         shuffle=(train_sampler is None),
         sampler=train_sampler,
         worker_init_fn=init_np_seed
@@ -191,7 +191,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         shuffle=False,
         num_workers=0,
         pin_memory=True,
-        drop_last=False,
+        drop_last=True,
         worker_init_fn=init_np_seed,
     )
 

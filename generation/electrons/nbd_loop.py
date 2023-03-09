@@ -42,7 +42,7 @@ if __name__ == "__main__":
     # specify device and load models
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    ele_flow, _, _, _, trh, tsh = load_model(device=device, filename="checkpoints-latest.pt")   # to be changed
+    ele_flow, _, _, _, trh, tsh = load_model(device=device, model_dir=os.path.dirname(__file__), filename="checkpoints-latest.pt")   # to be changed
 
     # generation loop
     for path in tqdm(files_paths):

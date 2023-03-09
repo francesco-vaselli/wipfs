@@ -164,7 +164,7 @@ def nbd(ele_model, root, file_path, new_root):
         pin_memory=True,
         num_workers=20,
     )
-    flow = ele_model
+    flow = ele_model.to(device)
 
     tot_sample = []
     leftover_sample = []
@@ -172,14 +172,14 @@ def nbd(ele_model, root, file_path, new_root):
 
     for batch_idx, y in enumerate(ele_loader):
 
-        y_cuda = y.float().to(device, non_blocking=True)
+        y = y.float().to(device, non_blocking=True)
         # Prints y device
-        print(y_cuda.device)
+        print(y.device)
         # Compute log prob
         # print(y.shape)
-        if len(y_cuda) == batch_size:
+        if len(y) == batch_size:
             start = time.time()
-            sample = flow.sample(1, context=y_cuda)
+            sample = flow.sample(1, context=y)
             taken = time.time() - start
             print(f"Done {batch_size} data in {taken}s")
             times.append(taken)
@@ -189,8 +189,8 @@ def nbd(ele_model, root, file_path, new_root):
             tot_sample.append(sample)
 
         else:
-            leftover_shape = len(y_cuda)
-            sample = flow.sample(1, context=y_cuda)
+            leftover_shape = len(y)
+            sample = flow.sample(1, context=y)
             sample = sample.detach().cpu().numpy()
             sample = np.squeeze(sample, axis=1)
             # print(sample.shape)

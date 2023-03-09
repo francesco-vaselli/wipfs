@@ -143,5 +143,7 @@ dmypy.json
 /training/electrons/figures_post/
 /preproce/electrons/corner_fig/
 
+/generation/electrons/*.pt
+
 #VSCode
 .vscode/

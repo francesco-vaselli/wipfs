@@ -1,6 +1,7 @@
 import h5py
 import torch
 import numpy as np
+import pandas as pd
 from torch.utils.data import Dataset, DataLoader
 
 
@@ -28,6 +29,50 @@ class MyDataset(Dataset):
         if self._archives is None:  # lazy loading here!
             self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
         return self._archives
+
+    def __len__(self):
+        return len(self.y_train)
+
+    def __getitem__(self, idx):
+        return self.x_train[idx], self.y_train[idx]
+
+
+class FatJetsDataset(Dataset):
+    """Very simple Dataset for reading hdf5 data
+        This is way simpler than muons as we heve enough jets in a single file
+        Still, dataloading is a bottleneck even here
+    Args:
+        Dataset (Pytorch Dataset): Pytorch Dataset class
+    """
+
+    def __init__(self, pkl_paths, start=0, limit=None):
+
+        self.pkl_paths = pkl_paths
+        self.df = pd.read_pickle(self.pkl_paths[0])
+
+        y = self.df.loc[
+            [
+                "MgenjetAK8_pt",
+                "MgenjetAK8_phi",
+                "MgenjetAK8_eta",
+                "MgenjetAK8_hadronFlavour",
+                "MgenjetAK8_partonFlavour",
+                "MgenjetAK8_mass",
+                "MgenjetAK8_ncFlavour",
+                "MgenjetAK8_nbFlavour",
+            ]
+        ].values[start:limit]
+        x = self.df.loc[
+            [
+                "Mpt_ratio",
+                "Meta_sub",
+                "Mphi_sub",
+                "Mfatjet_msoftdrop",
+                "Mfatjet_particleNetMD_XbbvsQCD",
+            ]
+        ].values[start:limit]
+        self.x_train = torch.tensor(x, dtype=torch.float32)  # .to(device)
+        self.y_train = torch.tensor(y, dtype=torch.float32)  # .to(device)
 
     def __len__(self):
         return len(self.y_train)
@@ -123,7 +168,7 @@ class NewVarsDataset(Dataset):
     def __init__(self, h5_paths, x_dim, y_dim, z_dim, start=0, limit=-1):
 
         # we must fix a convention for parametrizing slices
-        z_dim = z_dim+1 # this is done to preprocess the last two variables into one
+        z_dim = z_dim + 1  # this is done to preprocess the last two variables into one
         self.h5_paths = h5_paths
         self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
         self._archives = None
@@ -224,7 +269,7 @@ class noNFakesDataset(Dataset):
         z[:, [1, 2, 3]] = z[:, [1, 2, 3]] / 200.0
         y = y[z[:, 1] > 0]
         z = z[z[:, 1] > 0]
-        z3 = z[:, [1, 2, 3]] 
+        z3 = z[:, [1, 2, 3]]
         # print(f"y shape: {y.shape}, z shape: {z.shape}")
         self.y_train = torch.tensor(y, dtype=torch.float32)
         self.z_train = torch.tensor(z3, dtype=torch.float32)
@@ -252,8 +297,8 @@ class OneDFakesDataset(Dataset):
     def __init__(self, h5_paths, x_dim, y_dim, z_dim, start=0, limit=-1):
 
         # we must fix a convention for parametrizing slices
-        y_dim = y_dim+5
-        z_dim = z_dim+3 # this is done to preprocess the last two variables into one
+        y_dim = y_dim + 5
+        z_dim = z_dim + 3  # this is done to preprocess the last two variables into one
         self.h5_paths = h5_paths
         self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
         self._archives = None
@@ -405,7 +450,7 @@ class SimpleMuonsDataset(Dataset):
 
 
 class ElectronDataset(Dataset):
-    """Dataset for Electron training 
+    """Dataset for Electron training
 
     Args:
         Dataset (Dataset): _description_
@@ -419,8 +464,8 @@ class ElectronDataset(Dataset):
         self._archives = [h5py.File(h5_path, "r") for h5_path in self.h5_paths]
         self._archives = None
 
-        y = self.archives[0]["data"][start:(start + limit), 0:y_dim]
-        x = self.archives[0]["data"][start:(start + limit), y_dim : (y_dim + x_dim)]
+        y = self.archives[0]["data"][start : (start + limit), 0:y_dim]
+        x = self.archives[0]["data"][start : (start + limit), y_dim : (y_dim + x_dim)]
         self.x_train = torch.tensor(x, dtype=torch.float32)  # .to(device)
         self.y_train = torch.tensor(y, dtype=torch.float32)  # .to(device)
 
@@ -542,4 +587,3 @@ class H5FakesDataset(Dataset):
             return self.limit
         else:
             return self.strides[-1]
-            

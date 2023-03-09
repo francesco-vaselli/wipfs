@@ -20,10 +20,10 @@ context_dictionary = {
     "MGenElectron_phi": [],
     "MGenElectron_pt": [],
     "MGenElectron_charge": [],
-   # "MGenPartMother_pdgId": [],
-   # "MGenPartMother_pt": [],
-   # "MGenPartMother_deta": [],
-   # "MGenPartMother_dphi": [],
+    # "MGenPartMother_pdgId": [],
+    # "MGenPartMother_pt": [],
+    # "MGenPartMother_deta": [],
+    # "MGenPartMother_dphi": [],
     "MGenElectron_statusFlag0": [],
     "MGenElectron_statusFlag1": [],
     "MGenElectron_statusFlag2": [],
@@ -61,7 +61,7 @@ context_dictionary = {
 }
 
 target_dictionary = {
-    "MElectron_charge": [["c", 0, [-1, 1]]],
+    # "MElectron_charge": [["c", 0, [-1, 1]]],
     "MElectron_convVeto": [["d", None]],
     #    "MElectron_cutBased": [["d", 0.1, None]],
     #    "MElectron_cutBased_Fall17_V1": [["d", 0.1, None]],

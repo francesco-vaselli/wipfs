@@ -71,7 +71,7 @@ def nbd(ele_model, root, file_path, new_root):
         "GenPartMother_pdgId",
         "GenPartMother_pt",
         "GenPartMother_deta",
-        "MGenPartMother_dphi",
+        "GenPartMother_dphi",
         "GenElectron_statusFlag0",
         "GenElectron_statusFlag1",
         "GenElectron_statusFlag2",

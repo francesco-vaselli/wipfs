@@ -10,10 +10,13 @@ from torch.utils.data import Dataset, DataLoader
 import time
 import awkward as ak
 import os
+import sys
 
-sys.path.insert(0, os.path.join("..", "..", "models"))
-sys.path.insert(0, os.path.join("..", "..", "utils"))
-sys.path.insert(0, os.path.join("..", "..", "training", "electrons"))
+dirpath = os.path.dirname(__file__)
+
+sys.path.insert(0, os.path.join(dirpath, "..", "..", "models"))
+sys.path.insert(0, os.path.join(dirpath, "..", "..", "utils"))
+sys.path.insert(0, os.path.join(dirpath, "..", "..", "training", "electrons"))
 
 
 from postprocessing import postprocessing, reco_columns

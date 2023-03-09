@@ -163,7 +163,7 @@ def nbd(ele_model, root, file_path, new_root):
         ele_dataset,
         batch_size=batch_size,
         shuffle=False,
-        pin_memory=True,
+        pin_memory=False,
         num_workers=20,
     )
     flow = ele_model.to(device)

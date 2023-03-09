@@ -133,9 +133,13 @@ def validate_fatjets(
     # reco[:, 12] = reco[:, 12] * df['GenJet_pt'].values
 
     # Plots
+    names = [
+                "Mpt_phys",
+                "Meta_phys",
+                "Mphi_phys",]
 
 
-    for i in range(0, args.x_dim):
+    for i in range(0, 3):
         ws = wasserstein_distance(reco[:, i], samples[:, i])
 
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)

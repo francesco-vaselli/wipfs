@@ -155,6 +155,7 @@ def nbd(ele_model, root, file_path, new_root):
 
     # start electrons 1to1 generation
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(device)
     batch_size = 10000
     ele_loader = DataLoader(
         ele_dataset,

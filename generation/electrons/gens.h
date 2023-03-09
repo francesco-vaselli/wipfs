@@ -261,7 +261,7 @@ void gens(std::string x) {
 
   ROOT::EnableImplicitMT();
 
-  ROOT::RDataFrame df("Events", x);
+  ROOT::RDataFrame d("Events", x);
 
   auto pre =
       d.Define("GenElectronMask", "abs(GenPart_pdgId) == 11")

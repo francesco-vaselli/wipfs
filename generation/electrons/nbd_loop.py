@@ -42,7 +42,6 @@ if __name__ == "__main__":
     # specify device and load models
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
-    device="cpu"
 
     ele_flow, _, _, _, trh, tsh = load_model(device=device, model_dir=os.path.dirname(__file__), filename="checkpoint-latest.pt")   # to be changed
 

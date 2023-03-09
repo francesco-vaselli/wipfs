@@ -8,7 +8,7 @@ import os
 
 sys.path.insert(0, os.path.join("..", "..", "models"))
 
-from modded_basic_nflow import load_model, load_mixture_model
+from modded_basic_nflow import load_model
 import nbd_func
 
 if __name__ == "__main__":

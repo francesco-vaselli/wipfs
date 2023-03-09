@@ -105,9 +105,7 @@ def nbd(ele_model, root, file_path, new_root):
         "Pileup_nTrueInt",
         "Pileup_pudensity",
         "Pileup_sumEOOT",
-        "Pileup_sumLOOT",
-        "event",
-        "run",
+        "Pileup_sumLOOT"
     ]
 
     # read processed files for jets and save event structure

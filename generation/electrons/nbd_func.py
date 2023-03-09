@@ -172,10 +172,10 @@ def nbd(ele_model, root, file_path, new_root):
 
     for batch_idx, y in enumerate(ele_loader):
 
-        if device is not None:
-            y = y.float().to(device, non_blocking=True)
-
-            # Compute log prob
+        y = y.float().to(device, non_blocking=True)
+        # Prints y device
+        print(y.device)
+        # Compute log prob
         # print(y.shape)
         if len(y) == batch_size:
             start = time.time()
@@ -204,7 +204,6 @@ def nbd(ele_model, root, file_path, new_root):
     total = np.concatenate((tot_sample, leftover_sample), axis=0)
 
     total = pd.DataFrame(total, columns=reco_columns)
-
 
     total = postprocessing(total, target_dictionary)
 

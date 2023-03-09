@@ -50,7 +50,7 @@ class FatJetsDataset(Dataset):
         self.pkl_paths = pkl_paths
         self.df = pd.read_pickle(self.pkl_paths[0])
 
-        y = self.df.loc[
+        y = self.df[
             [
                 "MgenjetAK8_pt",
                 "MgenjetAK8_phi",
@@ -62,7 +62,7 @@ class FatJetsDataset(Dataset):
                 "MgenjetAK8_nbFlavour",
             ]
         ].values[start:limit]
-        x = self.df.loc[
+        x = self.df[
             [
                 "Mpt_ratio",
                 "Meta_sub",

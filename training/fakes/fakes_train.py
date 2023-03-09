@@ -304,10 +304,10 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
                         test_loss, test_log_p, test_log_det
                     )
                 )
+                train_history.append(train_loss)
+                test_history.append(test_loss)
 
         scheduler.step()
-        train_history.append(train_loss)
-        test_history.append(test_loss)
         if epoch % args.val_freq == 0:
             if not args.distributed or (args.rank % ngpus_per_node == 0):
                 if val_func is not None:

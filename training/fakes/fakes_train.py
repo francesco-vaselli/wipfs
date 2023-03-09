@@ -216,8 +216,8 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         train_loss = 0.0
         train_log_p = 0.0
         train_log_det = 0.0
+        ddp_model.train()
         for batch_idx, (_, y, z) in enumerate(train_loader):
-            ddp_model.train()
             optimizer.zero_grad()
 
             if gpu is not None:
@@ -268,41 +268,42 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
                 args.log_name, epoch, train_loss, train_log_p, train_log_det
             )
         )
-        # evaluate on the validation set
-        with torch.no_grad():
-            ddp_model.eval()
-            test_loss = 0.0
-            test_log_p = 0.0
-            test_log_det = 0.0
+        # evaluate on the validation set (on just one gpu)
+        if not args.distributed or (args.rank % ngpus_per_node == 0):
+            with torch.no_grad():
+                ddp_model.eval()
+                test_loss = 0.0
+                test_log_p = 0.0
+                test_log_det = 0.0
 
-            for _, y, z in test_loader:
+                for _, y, z in test_loader:
 
-                if gpu is not None:
-                    z = z.cuda(args.gpu, non_blocking=True)
-                    y = y.cuda(args.gpu, non_blocking=True)
+                    if gpu is not None:
+                        z = z.cuda(args.gpu, non_blocking=True)
+                        y = y.cuda(args.gpu, non_blocking=True)
 
-                # Compute log prob
-                log_p, log_det = ddp_model(z, context=y)
-                loss = -log_p - log_det
+                    # Compute log prob
+                    log_p, log_det = ddp_model(z, context=y)
+                    loss = -log_p - log_det
 
-                # Keep track of total loss.
-                test_loss += (loss.detach()).sum()
-                test_log_p += (-log_p.detach()).sum()
-                test_log_det += (-log_det.detach()).sum()
+                    # Keep track of total loss.
+                    test_loss += (loss.detach()).sum()
+                    test_log_p += (-log_p.detach()).sum()
+                    test_log_det += (-log_det.detach()).sum()
 
-            test_loss = test_loss.item() / len(test_loader.dataset)
-            test_log_p = test_log_p.item() / len(test_loader.dataset)
-            test_log_det = test_log_det.item() / len(test_loader.dataset)
-            if not args.distributed or (args.rank % ngpus_per_node == 0):
-                writer.add_scalar("test/loss", test_loss, epoch)
-                writer.add_scalar("test/log_p", test_log_p, epoch)
-                writer.add_scalar("test/log_det", test_log_det, epoch)
-            # test_loss = test_loss.item() / total_weight.item()
-            print(
-                "Test set: Average loss: {:.4f}, \tAverage log p: {:.4f}, \tAverage log det: {:.4f}".format(
-                    test_loss, test_log_p, test_log_det
+                test_loss = test_loss.item() / len(test_loader.dataset)
+                test_log_p = test_log_p.item() / len(test_loader.dataset)
+                test_log_det = test_log_det.item() / len(test_loader.dataset)
+                if not args.distributed or (args.rank % ngpus_per_node == 0):
+                    writer.add_scalar("test/loss", test_loss, epoch)
+                    writer.add_scalar("test/log_p", test_log_p, epoch)
+                    writer.add_scalar("test/log_det", test_log_det, epoch)
+                # test_loss = test_loss.item() / total_weight.item()
+                print(
+                    "Test set: Average loss: {:.4f}, \tAverage log p: {:.4f}, \tAverage log det: {:.4f}".format(
+                        test_loss, test_log_p, test_log_det
+                    )
                 )
-            )
 
         scheduler.step()
         train_history.append(train_loss)

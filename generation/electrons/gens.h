@@ -257,6 +257,119 @@ auto charge(ROOT::VecOps::RVec<int> &pdgId) {
   return charge;
 }
 
+int isInteresting(int &pdgId) {
+  /* Check if pdgId is compatible with c or b quarks
+   */
+  int num = abs(pdgId);
+  if ((pdgId == 4) || (pdgId == 5)) {
+    return 1;
+  }
+  return 0;
+}
+
+auto mother_genpart_pt(ROOT::VecOps::RVec<int> &mother_idx,
+                       ROOT::VecOps::RVec<int> &genpart_pdgId,
+                       ROOT::VecOps::RVec<float> &genpart_pt,
+                       ROOT::VecOps::RVec<float> &ele_pt) {
+  /* If GenPartMother of MGenElectron is b or c quark, computes its pt
+   */
+  auto ele_size = ele_pt.size();
+  ROOT::VecOps::RVec<float> mother_pt;
+
+  for (size_t i = 0; i < ele_size; i++) {
+    mother_pt.emplace_back(0);
+    int idx = mother_idx[i];
+    int pdgId;
+    while (idx >= 0) {
+      pdgId = genpart_pdgId[idx];
+      if (isInteresting(pdgId) == 1) {
+        mother_pt[i] = genpart_pt[idx];
+      }
+      idx = mother_idx[idx];
+    }
+  }
+
+  return mother_pt;
+}
+
+auto mother_genpart_pdgId(ROOT::VecOps::RVec<int> &mother_idx,
+                          ROOT::VecOps::RVec<int> &genpart_pdgId,
+                          ROOT::VecOps::RVec<int> &ele_pdgId) {
+  /* If GenPartMother of MGenElectron is b or c quark, save its pdgId
+   */
+  auto ele_size = ele_pdgId.size();
+  ROOT::VecOps::RVec<int> mother_pdgId;
+
+  for (size_t i = 0; i < ele_size; i++) {
+    mother_pdgId.emplace_back(0);
+    int idx = mother_idx[i];
+    int pdgId;
+    while (idx >= 0) {
+      pdgId = genpart_pdgId[idx];
+      if (isInteresting(pdgId) == 1) {
+        mother_pdgId[i] = genpart_pdgId[idx];
+      }
+      idx = mother_idx[idx];
+    }
+  }
+
+  return mother_pdgId;
+}
+
+auto mother_genpart_deta(ROOT::VecOps::RVec<int> &mother_idx,
+                         ROOT::VecOps::RVec<int> &genpart_pdgId,
+                         ROOT::VecOps::RVec<float> &genpart_eta,
+                         ROOT::VecOps::RVec<float> &ele_eta) {
+  /* If GenPartMother of MGenElectron is b or c quark, computes deta between the
+   * two particles
+   */
+
+  auto ele_size = ele_eta.size();
+  ROOT::VecOps::RVec<float> mother_deta;
+
+  for (size_t i = 0; i < ele_size; i++) {
+    mother_deta.emplace_back(0.5);
+    int idx = mother_idx[i];
+    int pdgId;
+    while (idx >= 0) {
+      pdgId = genpart_pdgId[idx];
+      if (isInteresting(pdgId) == 1) {
+        mother_deta[i] = ele_eta[i] - genpart_eta[idx];
+      }
+      idx = mother_idx[idx];
+    }
+  }
+
+  return mother_deta;
+}
+
+auto mother_genpart_dphi(ROOT::VecOps::RVec<int> &mother_idx,
+                         ROOT::VecOps::RVec<int> &genpart_pdgId,
+                         ROOT::VecOps::RVec<float> &genpart_phi,
+                         ROOT::VecOps::RVec<float> &ele_phi) {
+  /* If GenPartMother of MGenElectron is b or c quark, computes dphi between the
+   * two particles
+   */
+
+  auto ele_size = ele_phi.size();
+  ROOT::VecOps::RVec<float> mother_dphi;
+
+  for (size_t i = 0; i < ele_size; i++) {
+    mother_dphi.emplace_back(0.5);
+    int idx = mother_idx[i];
+    int pdgId;
+    while (idx >= 0) {
+      pdgId = genpart_pdgId[idx];
+      if (isInteresting(pdgId) == 1) {
+        mother_dphi[i] = TVector2::Phi_mpi_pi(ele_phi[i] - genpart_phi[idx]);
+      }
+      idx = mother_idx[idx];
+    }
+  }
+
+  return mother_dphi;
+}
+
 void gens(std::string x) {
 
   ROOT::EnableImplicitMT();
@@ -293,6 +406,18 @@ void gens(std::string x) {
                   "hadronFlavour_uchar)")
           .Define("CleanGenJet_partonFlavour",
                   "GenJet_partonFlavour[CleanGenJetMask]")
+          .Define("GenPartMother_pdgId", mother_genpart_pdgId,
+                  {"GenPart_genPartIdxMother", "GenPart_pdgId",
+                   "GenElectron_pdgId"})
+          .Define("GenPartMother_pt", mother_genpart_pt,
+                  {"GenPart_genPartIdxMother", "GenPart_pdgId", "GenPart_pt",
+                   "GenElectron_pt"})
+          .Define("MGenPartMother_deta", mother_genpart_deta,
+                  {"GenPart_genPartIdxMother", "GenPart_pdgId", "GenPart_eta",
+                   "GenElectron_eta"})
+          .Define("GenPartMother_dphi", mother_genpart_dphi,
+                  {"GenPart_genPartIdxMother", "GenPart_pdgId", "GenPart_phi",
+                   "GenElectron_phi"})
           .Define("GenElectron_statusFlags",
                   "GenPart_statusFlags[GenElectronMask]")
           .Define("GenElectron_statusFlag0",
@@ -538,5 +663,5 @@ void gens(std::string x) {
                                 "event",
                                 "run"};
 
-    pre.Snapshot("Gens", "testGens.root", col_to_save);
+  pre.Snapshot("Gens", "testGens.root", col_to_save);
 }

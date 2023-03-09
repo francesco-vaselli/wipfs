@@ -412,7 +412,7 @@ void gens(std::string x) {
           .Define("GenPartMother_pt", mother_genpart_pt,
                   {"GenPart_genPartIdxMother", "GenPart_pdgId", "GenPart_pt",
                    "GenElectron_pt"})
-          .Define("MGenPartMother_deta", mother_genpart_deta,
+          .Define("GenPartMother_deta", mother_genpart_deta,
                   {"GenPart_genPartIdxMother", "GenPart_pdgId", "GenPart_eta",
                    "GenElectron_eta"})
           .Define("GenPartMother_dphi", mother_genpart_dphi,

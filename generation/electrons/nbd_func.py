@@ -46,7 +46,7 @@ class GenDS(Dataset):
 # execute only selection of Gen objects (no longer requires matching as we are not training)
 ROOT.gInterpreter.ProcessLine('#include "gens.h"')
 
-
+STOP = 100000
 def nbd(ele_model, root, file_path, new_root):
     """The NanoBuilder function
 
@@ -112,7 +112,7 @@ def nbd(ele_model, root, file_path, new_root):
     tree = uproot.open("testGens.root:Gens", num_workers=20)
 
     # read jet data to df
-    df = tree.arrays(ele_cond, library="pd").astype("float32").dropna()
+    df = tree.arrays(ele_cond, library="pd", entry_stop=STOP).astype("float32").dropna()
     print(df)
     df = df[~df.isin([np.nan, np.inf, -np.inf]).any(1)]
     # crucial step: save original multiindex structure to restructure outputs later
@@ -133,7 +133,7 @@ def nbd(ele_model, root, file_path, new_root):
     )
 
     # read global event info to df
-    dfe = tree.arrays(["event", "run"], library="pd").astype(np.longlong).dropna()
+    dfe = tree.arrays(["event", "run"], library="pd", entry_stop=STOP).astype(np.longlong).dropna()
     print(dfe)
     print(f"Total number of events is {len(dfe)}")
     dfe = dfe[~dfe.isin([np.nan, np.inf, -np.inf]).any(1)]
@@ -160,7 +160,7 @@ def nbd(ele_model, root, file_path, new_root):
     torch.cuda.memory_summary()
 
     print(device)
-    batch_size = 100000
+    batch_size = 20000
     ele_loader = DataLoader(
         ele_dataset,
         batch_size=batch_size,

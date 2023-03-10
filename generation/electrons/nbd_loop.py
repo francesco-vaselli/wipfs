@@ -38,7 +38,7 @@ if __name__ == "__main__":
     # # take remaining files if loop crashes
     # files_paths = files_paths[10 + 74 + 52 :]
     # print(f"We will process a total of {len(files_paths)} files")
-    file_pats = [["/gpfs/ddn/srm/cms//store/mc/RunIIAutumn18NanoAODv6/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8/NANOAODSIM/Nano25Oct2019_102X_upgrade2018_realistic_v20_ext1-v1/250000/047F4368-97D4-1A4E-B896-23C6C72DD2BE.root"]]
+    files_paths = [["/gpfs/ddn/srm/cms//store/mc/RunIIAutumn18NanoAODv6/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8/NANOAODSIM/Nano25Oct2019_102X_upgrade2018_realistic_v20_ext1-v1/250000/047F4368-97D4-1A4E-B896-23C6C72DD2BE.root"]]
     # specify device and load models
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(torch.device("cuda" if torch.cuda.is_available() else "cpu"))

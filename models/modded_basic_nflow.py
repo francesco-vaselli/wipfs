@@ -837,15 +837,15 @@ def load_model(device, model_dir=None, filename=None):
     p = Path(model_dir)
     checkpoint = torch.load(p / filename, map_location="cpu")
 
+    if checkpoint["model_hyperparams"]["base_transform_kwargs"] is not None:
+        checkpoint["model_hyperparams"]["base_kwargs"] = checkpoint["model_hyperparams"]["base_transform_kwargs"]
+    del checkpoint["model_hyperparams"]["base_transform_kwargs"]
     model_hyperparams = checkpoint["model_hyperparams"]
     train_history = checkpoint["train_history"]
     test_history = checkpoint["test_history"]
 
     # Load model
     model = create_mixture_flow_model(**model_hyperparams)
-    if checkpoint["model_hyperparams"]["base_transform_kwargs"] is not None:
-        checkpoint["model_hyperparams"]["base_kwargs"] = checkpoint["model_hyperparams"]["base_transform_kwargs"]
-    del checkpoint["model_hyperparams"]["base_transform_kwargs"]
     model.load_state_dict(checkpoint["model_state_dict"])
     # model.to(device)
 

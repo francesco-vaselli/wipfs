@@ -47,6 +47,6 @@ if __name__ == "__main__":
 
     # generation loop
     for path in tqdm(files_paths):
-        torch.cuda.empy_cache()
+        torch.cuda.empty_cache()
         path_str = str(path)  # shouldn't be needed
         nbd_func.nbd(ele_flow, root, path_str, new_root)

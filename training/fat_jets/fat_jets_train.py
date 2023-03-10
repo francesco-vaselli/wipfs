@@ -91,10 +91,6 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
 
     model = create_mixture_flow_model(**flow_param_dict)
 
-    # print total params number and stuff
-    total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    print(total_params)
-
     start_epoch = 0
     if args.resume_checkpoint is None and os.path.exists(
         os.path.join(save_dir, "checkpoint-latest.pt")
@@ -109,6 +105,9 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
             filename="checkpoint-latest.pt",
         )
         print(f"Resumed from: {start_epoch}")
+
+    total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    print(total_params)
 
     # multi-GPU setup
     if args.distributed:  # Multiple processes, single GPU per process

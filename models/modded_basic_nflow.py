@@ -837,9 +837,12 @@ def load_model(device, model_dir=None, filename=None):
     p = Path(model_dir)
     checkpoint = torch.load(p / filename, map_location="cpu")
 
-    if checkpoint["model_hyperparams"]["base_transform_kwargs"] is not None:
-        checkpoint["model_hyperparams"]["base_kwargs"] = checkpoint["model_hyperparams"]["base_transform_kwargs"]
-    del checkpoint["model_hyperparams"]["base_transform_kwargs"]
+    try:
+        if checkpoint["model_hyperparams"]["base_transform_kwargs"] is not None:
+            checkpoint["model_hyperparams"]["base_kwargs"] = checkpoint["model_hyperparams"]["base_transform_kwargs"]
+            del checkpoint["model_hyperparams"]["base_transform_kwargs"]
+    except KeyError:
+        pass
     model_hyperparams = checkpoint["model_hyperparams"]
     train_history = checkpoint["train_history"]
     test_history = checkpoint["test_history"]

@@ -58,7 +58,7 @@ def nbd(ele_model, root, file_path, new_root):
     """
     # select nano aod, process and save intermmediate files to disk
     s = str(os.path.join(root, file_path))
-    ROOT.gens(s)
+    # ROOT.gens(s)
     print("done saving intermidiate file")
 
     # define list of names for conditioning
@@ -177,34 +177,35 @@ def nbd(ele_model, root, file_path, new_root):
     leftover_sample = []
     times = []
 
-    for batch_idx, y in enumerate(ele_loader):
+    with torch.no_grad():
+        for batch_idx, y in enumerate(ele_loader):
 
-        print(batch_idx)
+            print(batch_idx)
 
-        y = y.float().to(device, non_blocking=True)
-        torch.cuda.memory_summary()
-        # Prints y device
-        print(y.device)
-        # Compute log prob
-        # print(y.shape)
-        if len(y) == batch_size:
-            start = time.time()
-            sample = flow.sample(1, context=y)
-            taken = time.time() - start
-            print(f"Done {batch_size} data in {taken}s")
-            times.append(taken)
-            sample = sample.detach().cpu().numpy()
-            sample = np.squeeze(sample, axis=1)
-            # print(sample.shape)
-            tot_sample.append(sample)
+            y = y.float().to(device, non_blocking=True)
+            torch.cuda.memory_summary()
+            # Prints y device
+            print(y.device)
+            # Compute log prob
+            # print(y.shape)
+            if len(y) == batch_size:
+                start = time.time()
+                sample = flow.sample(1, context=y)
+                taken = time.time() - start
+                print(f"Done {batch_size} data in {taken}s")
+                times.append(taken)
+                sample = sample.detach().cpu().numpy()
+                sample = np.squeeze(sample, axis=1)
+                # print(sample.shape)
+                tot_sample.append(sample)
 
-        else:
-            leftover_shape = len(y)
-            sample = flow.sample(1, context=y)
-            sample = sample.detach().cpu().numpy()
-            sample = np.squeeze(sample, axis=1)
-            # print(sample.shape)
-            leftover_sample.append(sample)
+            else:
+                leftover_shape = len(y)
+                sample = flow.sample(1, context=y)
+                sample = sample.detach().cpu().numpy()
+                sample = np.squeeze(sample, axis=1)
+                # print(sample.shape)
+                leftover_sample.append(sample)
 
     print(np.mean(times))
     tot_sample = np.array(tot_sample)

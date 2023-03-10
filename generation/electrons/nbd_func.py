@@ -46,7 +46,7 @@ class GenDS(Dataset):
 # execute only selection of Gen objects (no longer requires matching as we are not training)
 ROOT.gInterpreter.ProcessLine('#include "gens.h"')
 
-STOP = 100000
+STOP = None
 def nbd(ele_model, root, file_path, new_root):
     """The NanoBuilder function
 
@@ -58,7 +58,7 @@ def nbd(ele_model, root, file_path, new_root):
     """
     # select nano aod, process and save intermmediate files to disk
     s = str(os.path.join(root, file_path))
-    # ROOT.gens(s)
+    ROOT.gens(s)
     print("done saving intermidiate file")
 
     # define list of names for conditioning
@@ -160,7 +160,7 @@ def nbd(ele_model, root, file_path, new_root):
     torch.cuda.memory_summary()
 
     print(device)
-    batch_size = 1000
+    batch_size = 512
     ele_loader = DataLoader(
         ele_dataset,
         batch_size=batch_size,

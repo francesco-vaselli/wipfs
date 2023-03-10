@@ -45,8 +45,10 @@ if __name__ == "__main__":
 
     ele_flow, _, _, _, trh, tsh = load_model(device=device, model_dir=os.path.dirname(__file__), filename="checkpoint-latest.pt")   # to be changed
 
+    ele_flow = ele_flow.to(device)
+
     # generation loop
     for path in tqdm(files_paths):
-        torch.cuda.empty_cache()
+        #torch.cuda.empty_cache()
         path_str = str(path)  # shouldn't be needed
         nbd_func.nbd(ele_flow, root, path_str, new_root)

@@ -169,7 +169,7 @@ def nbd(ele_model, root, file_path, new_root):
         num_workers=20,
     )
     torch.cuda.memory_summary()
-    flow = ele_model.to(device)
+    #flow = ele_model.to(device)
     torch.cuda.memory_summary()
 
     tot_sample = []

@@ -170,6 +170,7 @@ def nbd(ele_model, root, file_path, new_root):
     )
     torch.cuda.memory_summary()
     flow = ele_model # .to(device)
+    torch.cuda.empty_cache()
     torch.cuda.memory_summary()
 
     tot_sample = []

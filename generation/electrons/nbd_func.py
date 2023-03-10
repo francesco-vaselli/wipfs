@@ -46,7 +46,7 @@ class GenDS(Dataset):
 # execute only selection of Gen objects (no longer requires matching as we are not training)
 ROOT.gInterpreter.ProcessLine('#include "gens.h"')
 
-STOP = 100000
+STOP = None
 def nbd(ele_model, root, file_path, new_root):
     """The NanoBuilder function
 

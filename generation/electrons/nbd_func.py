@@ -170,6 +170,7 @@ def nbd(ele_model, root, file_path, new_root):
     )
 
     flow = ele_model # .to(device)
+    flow.eval()
 
     tot_sample = []
     leftover_sample = []

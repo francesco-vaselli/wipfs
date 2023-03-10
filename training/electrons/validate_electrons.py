@@ -147,6 +147,9 @@ def validate_electrons(
         ["MElectron_pfRelIso03_chg", [0, 0.5]],
         ["MElectron_sieie", [0.005, 0.02]],
         ["MElectron_sip3d", [0, 10]],
+        ["MElectron_pt", [0, 100]],
+        ["MElectron_eta", [-3, 3]],
+        ["MElectron_phi", [-3.14, 3.14]],
     ]
     for elm in incriminated:
         column = elm[0]

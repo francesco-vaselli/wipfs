@@ -201,6 +201,56 @@ def validate_electrons(
         df["MElectron_eta"] = df["MElectron_etaMinusGen"] + gen["MGenElectron_eta"]
         df["MElectron_phi"] = df["MElectron_phiMinusGen"] + gen["MGenElectron_phi"]
 
+    physical = ["MElectron_pt", "MElectron_eta", "MElectron_phi"]
+    
+    for column in physical:
+        ws = wasserstein_distance(reco[column], samples[column])
+
+        fig, axs = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
+        fig.suptitle(f"{column} comparison")
+
+        # RECO histogram
+        _, rangeR, _ = axs[0].hist(
+            reco[column], histtype="step", lw=1, bins=100, label="FullSim"
+        )
+
+        # Saturation based on FullSim range
+        saturated_samples[column] = np.where(
+            samples[column] < np.min(rangeR), np.min(rangeR), samples[column]
+        )
+        saturated_samples[column] = np.where(
+            saturated_samples[column] > np.max(rangeR),
+            np.max(rangeR),
+            saturated_samples[column],
+        )
+
+        # Samples histogram
+        axs[0].hist(
+            saturated_samples[column],
+            histtype="step",
+            lw=1,
+            range=[np.min(rangeR), np.max(rangeR)],
+            bins=100,
+            label=f"FlashSim, ws={round(ws, 4)}",
+        )
+
+        axs[0].legend(frameon=False, loc="upper right")
+
+        # Log-scale comparison
+
+        axs[1].set_yscale("log")
+        axs[1].hist(reco[column], histtype="step", lw=1, bins=100)
+        axs[1].hist(
+            saturated_samples[column],
+            histtype="step",
+            lw=1,
+            range=[np.min(rangeR), np.max(rangeR)],
+            bins=100,
+        )
+        writer.add_figure(f"1D_Distributions/{column}", fig, global_step=epoch)
+        writer.add_scalar(f"ws/{column}_wasserstein_distance", ws, global_step=epoch)
+        plt.close()
+
     # Conditioning
 
     targets = ["MElectron_ip3d", "MElectron_sip3d", "MElectron_jetRelIso"]

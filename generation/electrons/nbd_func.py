@@ -160,7 +160,7 @@ def nbd(ele_model, root, file_path, new_root):
     torch.cuda.memory_summary()
 
     print(device)
-    batch_size = 100
+    batch_size = 10000
     ele_loader = DataLoader(
         ele_dataset,
         batch_size=batch_size,
@@ -168,10 +168,8 @@ def nbd(ele_model, root, file_path, new_root):
         pin_memory=True,
         num_workers=20,
     )
-    torch.cuda.memory_summary()
+
     flow = ele_model # .to(device)
-    torch.cuda.empty_cache()
-    torch.cuda.memory_summary()
 
     tot_sample = []
     leftover_sample = []

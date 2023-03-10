@@ -160,7 +160,7 @@ def nbd(ele_model, root, file_path, new_root):
     torch.cuda.memory_summary()
 
     print(device)
-    batch_size = 512
+    batch_size = 1000
     ele_loader = DataLoader(
         ele_dataset,
         batch_size=batch_size,

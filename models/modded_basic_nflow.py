@@ -627,7 +627,7 @@ def create_mixture_flow_model(
     flow.model_hyperparams = {
         "input_dim": input_dim,
         "context_dim": context_dim,
-        "base_transform_kwargs": base_kwargs,
+        "base_kwargs": base_kwargs,
         "transform_type": transform_type,
     }
 
@@ -843,6 +843,9 @@ def load_model(device, model_dir=None, filename=None):
 
     # Load model
     model = create_mixture_flow_model(**model_hyperparams)
+    if checkpoint["model_hyperparams"]["base_transform_kwargs"] is not None:
+        checkpoint["model_hyperparams"]["base_kwargs"] = checkpoint["model_hyperparams"]["base_transform_kwargs"]
+    del checkpoint["model_hyperparams"]["base_transform_kwargs"]
     model.load_state_dict(checkpoint["model_state_dict"])
     # model.to(device)
 

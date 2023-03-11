@@ -127,6 +127,13 @@ def validate_electrons(
         writer.add_scalar(f"ws/{column}_wasserstein_distance", ws, global_step=epoch)
         plt.close()
 
+        # Return to physical kinematic variables
+
+    for df in [reco, samples, saturated_samples]:
+        df["MElectron_pt"] = df["MElectron_ptRatio"] * gen["MGenElectron_pt"]
+        df["MElectron_eta"] = df["MElectron_etaMinusGen"] + gen["MGenElectron_eta"]
+        df["MElectron_phi"] = df["MElectron_phiMinusGen"] + gen["MGenElectron_phi"]
+
     # Zoom-in for high ws distributions
 
     incriminated = [

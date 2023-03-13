@@ -189,11 +189,12 @@ def nbd(ele_model, root, file_path, new_root):
             # print(y.shape)
             if len(y) == batch_size:
                 start = time.time()
-                try:
-                    sample = flow.sample(1, context=y)
-                except:
-                    sample = flow.sample(1, context=y)
-                    print("Error in sample generation, trying again")
+                while True:
+                    try:
+                        sample = flow.sample(1, context=y)
+                        break
+                    except:
+                        print("Error, retrying")
                 taken = time.time() - start
                 print(f"Done {batch_size} data in {taken}s")
                 times.append(taken)

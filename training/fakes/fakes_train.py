@@ -114,7 +114,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
     if args.distributed:  # Multiple processes, single GPU per process
         if args.gpu is not None:
             torch.cuda.set_device(args.gpu)
-            model.cuda(args.gpu)
+            model = model.cuda(args.gpu) # changed into assignment
             ddp_model = DDP(
                 model,
                 device_ids=[args.gpu],
@@ -201,20 +201,21 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
     train_history = []
     test_history = []
 
-    if val_func is not None:
-        if args.validate_at_0:
-            ddp_model.eval()
-            val_func(
-                test_loader,
-                ddp_model,
-                start_epoch,
-                writer,
-                save_dir,
-                args,
-                args.gpu,
-            )
-            print('done with validation')
-            
+    if not args.distributed or (args.rank % ngpus_per_node == 0):
+        if val_func is not None:
+            if args.validate_at_0:
+                ddp_model.eval()
+                val_func(
+                    test_loader,
+                    model,
+                    start_epoch,
+                    writer,
+                    save_dir,
+                    args,
+                    args.gpu,
+                )
+                print('done with validation')
+
     if args.distributed:
         print("[Rank %d] World size : %d" % (args.rank, dist.get_world_size()))
 
@@ -327,7 +328,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
                 if val_func is not None:
                     val_func(
                         test_loader,
-                        ddp_model,
+                        model,
                         epoch,
                         writer,
                         save_dir,
@@ -339,7 +340,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
             if (epoch + 1) % args.save_freq == 0:
                 save_model(
                     epoch,
-                    ddp_model,
+                    model,
                     scheduler,
                     train_history,
                     test_history,

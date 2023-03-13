@@ -201,6 +201,19 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
     train_history = []
     test_history = []
 
+    if val_func is not None:
+        if args.validate_at_0:
+            ddp_model.eval()
+            val_func(
+                test_loader,
+                ddp_model,
+                epoch,
+                writer,
+                save_dir,
+                args,
+                args.gpu,
+            )
+
     if args.distributed:
         print("[Rank %d] World size : %d" % (args.rank, dist.get_world_size()))
 
@@ -313,7 +326,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
                 if val_func is not None:
                     val_func(
                         test_loader,
-                        model,
+                        ddp_model,
                         epoch,
                         writer,
                         save_dir,
@@ -325,7 +338,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
             if (epoch + 1) % args.save_freq == 0:
                 save_model(
                     epoch,
-                    model,
+                    ddp_model,
                     scheduler,
                     train_history,
                     test_history,

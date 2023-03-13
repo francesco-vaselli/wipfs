@@ -204,7 +204,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
     if not args.distributed or (args.rank % ngpus_per_node == 0):
         if val_func is not None:
             if args.validate_at_0:
-                ddp_model.eval()
+                model.eval()
                 val_func(
                     test_loader,
                     model,

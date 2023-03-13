@@ -207,13 +207,14 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
             val_func(
                 test_loader,
                 ddp_model,
-                epoch,
+                start_epoch,
                 writer,
                 save_dir,
                 args,
                 args.gpu,
             )
-
+            print('done with validation')
+            
     if args.distributed:
         print("[Rank %d] World size : %d" % (args.rank, dist.get_world_size()))
 

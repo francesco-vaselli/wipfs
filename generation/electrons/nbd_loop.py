@@ -37,6 +37,10 @@ if __name__ == "__main__":
     files_paths = [path for path in files_paths if path not in ttbar_training_files]
     # take remaining files if loop crashes
     files_paths = files_paths[:]
+
+    # Debug path
+    files_paths = "250000/047F4368-97D4-1A4E-B896-23C6C72DD2BE.root"
+
     print(f"We will process a total of {len(files_paths)} files")
     # specify device and load models
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

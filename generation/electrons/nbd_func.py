@@ -157,7 +157,6 @@ def nbd(ele_model, root, file_path, new_root):
 
     # start electrons 1to1 generation
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    torch.cuda.memory_summary()
 
     print(device)
     batch_size = 10000
@@ -182,7 +181,6 @@ def nbd(ele_model, root, file_path, new_root):
             print(batch_idx)
 
             y = y.float().to(device, non_blocking=True)
-            torch.cuda.memory_summary()
             # Prints y device
             print(y.device)
             # Compute log prob

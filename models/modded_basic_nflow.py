@@ -872,6 +872,8 @@ def load_model(device, model_dir=None, filename=None):
     # training.
     epoch = checkpoint["epoch"]
 
+    optimizer_state_dict = checkpoint["optimizer_state_dict"]
+
     return (
         model,
         scheduler_present_in_checkpoint,
@@ -879,4 +881,5 @@ def load_model(device, model_dir=None, filename=None):
         epoch,
         train_history,
         test_history,
+        optimizer_state_dict
     )

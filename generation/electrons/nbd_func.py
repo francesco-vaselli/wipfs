@@ -281,7 +281,7 @@ def nbd(ele_model, root, file_path, new_root):
         "tightCharge",
     ]
     to_ttree = dict(zip(ele_names, total.T))
-    to_ttree = ak.unflatten(ak.Array(to_ttreej), events_structure_ele)
+    to_ttree = ak.unflatten(ak.Array(to_ttree), events_structure_ele)
 
     to_ttreee = dict(zip(["event", "run"], events_structure.T))
     to_ttreee = ak.Array(to_ttreee)

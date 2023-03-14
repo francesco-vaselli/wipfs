@@ -573,7 +573,7 @@ def validate_electrons(
         reco,
         saturated_samples,
         labels,
-        r"Impact parameter vs $\sqrt(dxy^2 + dz^2)$",
+        r"Impact parameter vs $\sqrt{dxy^2 + dz^2}$",
         ranges=ranges,
     )
     writer.add_figure(

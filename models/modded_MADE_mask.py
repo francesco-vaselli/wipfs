@@ -288,5 +288,5 @@ class NMaskedMADE(nn.Module):
             temps = self.activation(temps)
         for block in self.blocks:
             temps = block(temps, context=context[:, :self.context_layer.in_features])
-        outputs = self.final_layer(temps, context[:, :self.context_layer.in_features])
+        outputs = self.final_layer(temps)
         return outputs

@@ -130,7 +130,7 @@ class MaskAllFakesDataset(Dataset):
 
         y = self.archives[0]["data"][
             start : start + limit, np.hstack(
-            (np.arange(x_dim, x_dim + y_dim) + 
+            (np.arange(x_dim, x_dim + y_dim),
             np.arange(x_dim + y_dim + z_dim, x_dim + y_dim + z_dim + x_dim)))]
         
         x = self.archives[0]["data"][start : start + limit, 0:x_dim]

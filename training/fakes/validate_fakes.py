@@ -46,9 +46,15 @@ def validate_fakes(
             print(f"Batch {bid} / {len(test_loader)}")
             inputs_y = y.cuda(device)
 
-            z_sampled = model.sample(
-                    num_samples=1, context=inputs_y.view(-1, args.y_dim)
-                )
+            while True:
+                try:
+                    z_sampled = model.sample(
+                        num_samples=1, context=inputs_y.view(-1, args.y_dim)
+                    )
+                    break
+                except AssertionError:
+                    print("Sample failed, retrying")
+                    pass
             z_sampled = z_sampled.cpu().detach().numpy()
             inputs_y = inputs_y.cpu().detach().numpy()
             z = z.cpu().detach().numpy()

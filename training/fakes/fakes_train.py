@@ -179,7 +179,6 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         shuffle=(train_sampler is None),
         sampler=train_sampler,
         worker_init_fn=init_np_seed
-        # worker_init_fn=init_np_seed,
     )
 
     test_loader = torch.utils.data.DataLoader(
@@ -194,6 +193,8 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
 
     print("train size: %d" % len(tr_dataset))
     print("test size: %d" % len(te_dataset))
+    print("batch size: %d" % args.batch_size)
+    print("len test loader: %d" % len(test_loader))
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
         optimizer,
         T_max=args.epochs,

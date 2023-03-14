@@ -38,6 +38,8 @@ if __name__ == "__main__":
     # take remaining files if loop crashes
     files_paths = files_paths[:]
 
+    print(files_paths)
+
     # Debug path
     files_paths = files_paths[0]
 

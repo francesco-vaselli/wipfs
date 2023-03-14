@@ -239,7 +239,6 @@ class NMaskedMADE(nn.Module):
             out_features=hidden_features,
             autoregressive_features=features,
             NMask_degree=NMask_degree,
-            context_features=context_features,
             random_mask=random_mask,
             is_output=False,
         )

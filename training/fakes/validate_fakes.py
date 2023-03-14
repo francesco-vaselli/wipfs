@@ -42,32 +42,32 @@ def validate_fakes(
         reco = []
         samples = []
 
-        for bid, (_, y, z) in enumerate(test_loader):
+        for bid, (_, y, x) in enumerate(test_loader):
             # print(f"Batch {bid} / {len(test_loader)}")
             inputs_y = y.cuda(device)
 
             while True:
                 try:
-                    z_sampled = model.sample(
+                    x_sampled = model.sample(
                         num_samples=1, context=inputs_y.view(-1, args.y_dim+args.x_dim)
                     )
                     break
                 except AssertionError:
                     print("Sample failed, retrying")
                     pass
-            z_sampled = z_sampled.cpu().detach().numpy()
+            x_sampled = x_sampled.cpu().detach().numpy()
             inputs_y = inputs_y.cpu().detach().numpy()
-            z = z.cpu().detach().numpy()
-            z_sampled = z_sampled.reshape(-1, args.z_dim)
+            x = x.cpu().detach().numpy()
+            x_sampled = x_sampled.reshape(-1, args.x_dim)
             gen.append(inputs_y[:, :args.y_dim])
-            reco.append(z)
-            samples.append(z_sampled)
-        del inputs_y, z, z_sampled
+            reco.append(x)
+            samples.append(x_sampled)
+        del inputs_y, x, x_sampled
         torch.cuda.empty_cache()
         print("Done sampling")
     gen = np.array(gen).reshape((-1, args.y_dim))
-    full_sim = np.array(reco).reshape((-1, args.z_dim))
-    flash_sim = np.array(samples).reshape((-1, args.z_dim))
+    full_sim = np.array(reco).reshape((-1, args.x_dim))
+    flash_sim = np.array(samples).reshape((-1, args.x_dim))
 
     # Samples postprocessing 
     # flash_sim[:, [1, 2]] = flash_sim[:, [1, 2]] * 200

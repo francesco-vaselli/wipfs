@@ -27,18 +27,16 @@ if __name__ == "__main__":
         "230000/78137863-DAD0-E740-B357-D88AF92BE59F.root",
         "230000/91456D0B-2FDE-2B4F-8C7A-8E60260480CD.root",
     ]
-    # files_paths = [
-    #     os.path.join(d, f)
-    #     for d in os.listdir(root)
-    #     for f in os.listdir(os.path.join(root, d))
-    # ]  # = [x for x in pathlib.Path(root).glob('**/*')]
+    files_paths = [
+        os.path.join(d, f)
+        for d in os.listdir(root)
+        for f in os.listdir(os.path.join(root, d))
+    ]  # = [x for x in pathlib.Path(root).glob('**/*')]
 
-    # # optionally remove training files if we are generating ttbar dataset
-    # files_paths = [path for path in files_paths if path not in ttbar_training_files]
-    # # take remaining files if loop crashes
-    # files_paths = files_paths[:2]
-
-    files_paths = ["250000/047F4368-97D4-1A4E-B896-23C6C72DD2BE.root",]
+    # optionally remove training files if we are generating ttbar dataset
+    files_paths = [path for path in files_paths if path not in ttbar_training_files]
+    # take remaining files if loop crashes
+    files_paths = files_paths[:10]
 
     # print(files_paths)
 

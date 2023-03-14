@@ -47,7 +47,7 @@ class GenDS(Dataset):
 # execute only selection of Gen objects (no longer requires matching as we are not training)
 ROOT.gInterpreter.ProcessLine('#include "gens.h"')
 
-STOP = 10000
+STOP = None
 def nbd(ele_model, root, file_path, new_root):
     """The NanoBuilder function
 
@@ -59,7 +59,7 @@ def nbd(ele_model, root, file_path, new_root):
     """
     # select nano aod, process and save intermmediate files to disk
     s = str(os.path.join(root, file_path))
-    # ROOT.gens(s)
+    ROOT.gens(s)
     print("done saving intermidiate file")
 
     # define list of names for conditioning

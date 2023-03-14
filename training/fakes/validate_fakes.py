@@ -43,7 +43,7 @@ def validate_fakes(
         samples = []
 
         for bid, (_, y, z) in enumerate(test_loader):
-            print(f"Batch {bid} / {len(test_loader)}")
+            # print(f"Batch {bid} / {len(test_loader)}")
             inputs_y = y.cuda(device)
 
             while True:

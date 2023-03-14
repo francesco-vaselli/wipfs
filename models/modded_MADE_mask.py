@@ -7,6 +7,8 @@ from torch.nn import init
 
 from nflows.utils import torchutils
 
+from nflows.nn.nde.MADE import MaskedResiualBlock, MaskedFeedForwardBlock, MaskedLinear
+
 
 def _get_input_degrees(in_features):
     """Returns the degrees an input to MADE should have."""
@@ -70,7 +72,7 @@ class NMaskedLinear(nn.Linear):
         return mask, out_degrees
 
     def forward(self, x, context):
-        return F.linear(x, self.weight * (self.mask * context[:, -self.NMask_degree:]), self.bias) # context mask should be reshaped?
+        return F.linear(x * context[:, -self.NMask_degree:], self.weight * (self.mask), self.bias) # context mask should be reshaped?
 
 
 class NMaskedFeedforwardBlock(nn.Module):
@@ -217,7 +219,6 @@ class NMaskedMADE(nn.Module):
         self,
         features,
         hidden_features,
-        NMask_degree,
         context_features=None,
         num_blocks=2,
         output_multiplier=1,
@@ -231,6 +232,7 @@ class NMaskedMADE(nn.Module):
             raise ValueError("Residual blocks can't be used with random masks.")
         super().__init__()
 
+        NMask_degree = features
         # Initial layer.
         self.initial_layer = NMaskedLinear(
             in_degrees=_get_input_degrees(features),
@@ -250,9 +252,9 @@ class NMaskedMADE(nn.Module):
         # Residual blocks.
         blocks = []
         if use_residual_blocks:
-            block_constructor = NMaskedResidualBlock
+            block_constructor = MaskedResidualBlock
         else:
-            block_constructor = NMaskedFeedforwardBlock
+            block_constructor = MaskedFeedforwardBlock
         prev_out_degrees = self.initial_layer.degrees
         for _ in range(num_blocks):
             blocks.append(
@@ -260,7 +262,6 @@ class NMaskedMADE(nn.Module):
                     in_degrees=prev_out_degrees,
                     autoregressive_features=features,
                     context_features=context_features,
-                    NMask_degree=NMask_degree,
                     random_mask=random_mask,
                     activation=activation,
                     dropout_probability=dropout_probability,
@@ -271,11 +272,10 @@ class NMaskedMADE(nn.Module):
         self.blocks = nn.ModuleList(blocks)
 
         # Final layer.
-        self.final_layer = NMaskedLinear(
+        self.final_layer = MaskedLinear(
             in_degrees=prev_out_degrees,
             out_features=features * output_multiplier,
             autoregressive_features=features,
-            NMask_degree=NMask_degree,
             random_mask=random_mask,
             is_output=True,
         )
@@ -287,6 +287,6 @@ class NMaskedMADE(nn.Module):
         if not self.use_residual_blocks:
             temps = self.activation(temps)
         for block in self.blocks:
-            temps = block(temps, context=context)
-        outputs = self.final_layer(temps, context)
+            temps = block(temps, context=context[:, :self.context_layer.in_features])
+        outputs = self.final_layer(temps, context[:, :self.context_layer.in_features])
         return outputs

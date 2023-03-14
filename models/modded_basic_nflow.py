@@ -32,7 +32,7 @@ from torch.nn.functional import softplus
 
 from modded_coupling import PiecewiseCouplingTransformM
 from modded_base_flow import FlowM
-from modded_MADE import ContextMADE, gluMADE
+from modded_MADE_mask import NMaskedMADE
 from modded_splines import unconstrained_rational_quadratic_spline, rational_quadratic_spline
 import modded_splines
 
@@ -52,7 +52,7 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
         init_identity = True
     ):
         self.features = features
-        made = gluMADE( # made_module.MADE(
+        made = NMaskedMADE( # made_module.MADE(
             features=features,
             hidden_features=hidden_features,
             context_features=context_features,
@@ -112,8 +112,6 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
         return unconstrained_scale, shift
 
 
-
-
 class MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(AutoregressiveTransform):
     def __init__(
         self,
@@ -141,7 +139,7 @@ class MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(AutoregressiveTra
         self.tails = tails
         self.tail_bound = tail_bound
 
-        autoregressive_net = gluMADE( # made_module.MADE(
+        autoregressive_net = NMaskedMADE( # made_module.MADE(
             features=features,
             hidden_features=hidden_features,
             context_features=context_features,

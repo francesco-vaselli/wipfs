@@ -43,7 +43,7 @@ if __name__ == "__main__":
     # Debug path
     files_paths = files_paths[0]
 
-    print(files_paths)
+    print(tqdm(files_paths))
 
     print(f"We will process a total of {len(files_paths)} files")
     # specify device and load models

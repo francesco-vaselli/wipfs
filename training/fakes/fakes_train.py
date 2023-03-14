@@ -181,7 +181,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
     )
     test_loader = torch.utils.data.DataLoader(
         dataset=te_dataset,
-        batch_size=1000,  # manually set batch size to avoid diff shapes
+        batch_size=10000,  # manually set batch size to avoid diff shapes
         shuffle=False,
         num_workers=0,
         pin_memory=True,
@@ -218,10 +218,11 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
                     args.gpu,
                 )
                 print('done with validation')
-
+    
+    dist.barrier()
     if args.distributed:
         print("[Rank %d] World size : %d" % (args.rank, dist.get_world_size()))
-
+    
     print("Start epoch: %d End epoch: %d" % (start_epoch, args.epochs))
     for epoch in range(start_epoch, args.epochs):
         if args.distributed:

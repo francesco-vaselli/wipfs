@@ -191,7 +191,7 @@ def nbd(ele_model, root, file_path, new_root):
                     try:
                         sample = flow.sample(1, context=y)
                         break
-                    except:
+                    except AssertionError:
                         print("Error, retrying")
                 taken = time.time() - start
                 print(f"Done {batch_size} data in {taken}s")

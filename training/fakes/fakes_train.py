@@ -217,6 +217,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
                     args,
                     args.gpu,
                 )
+                torch.cuda.empty_cache()
                 print('done with validation')
     
     dist.barrier()
@@ -238,7 +239,6 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         ddp_model.train()
         for batch_idx, (_, y, z) in enumerate(train_loader):
             optimizer.zero_grad()
-            print('crash?')
             if gpu is not None:
                 z = z.cuda(args.gpu, non_blocking=True)
                 y = y.cuda(args.gpu, non_blocking=True)
@@ -254,7 +254,8 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
 
             # loss = (w * loss).sum() / w.sum()
             loss = (loss).mean()
-
+            t = torch.cuda.get_device_properties(args.rank).total_memory
+            print("rank %d memory used: %d" % (args.rank, t))
             loss.backward()
             optimizer.step()
 

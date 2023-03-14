@@ -58,6 +58,7 @@ def nbd(ele_model, root, file_path, new_root):
     """
     # select nano aod, process and save intermmediate files to disk
     s = str(os.path.join(root, file_path))
+    print(s)
     ROOT.gens(s)
     print("done saving intermidiate file")
 

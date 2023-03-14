@@ -220,9 +220,9 @@ def nbd(ele_model, root, file_path, new_root):
 
     total = postprocessing(total, target_dictionary)
 
-    total["MElectron_pt"] = total["MElectron_ptRatio"] * df["GenElectron_pt"]
-    total["MElectron_eta"] = total["MElectron_etaMinusGen"] + df["GenElectron_eta"]
-    total["MElectron_phi"] = total["MElectron_phiMinusGen"] + df["GenElectron_phi"]
+    total["MElectron_pt"] = total["MElectron_ptRatio"].values * df["GenElectron_pt"].values
+    total["MElectron_eta"] = total["MElectron_etaMinusGen"].values + df["GenElectron_eta"].values
+    total["MElectron_phi"] = total["MElectron_phiMinusGen"].values + df["GenElectron_phi"].values
 
     # Charge: in this branch charge is also a target variable, so we already have it in total dataframe
     # For future: I should use the following code

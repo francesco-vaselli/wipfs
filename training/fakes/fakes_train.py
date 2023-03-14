@@ -164,7 +164,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         start=args.train_limit,
         limit=args.test_limit,
     )
-
+    print('here0')
     if args.distributed:
         train_sampler = torch.utils.data.distributed.DistributedSampler(tr_dataset)
     else:
@@ -180,7 +180,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         sampler=train_sampler,
         worker_init_fn=init_np_seed
     )
-
+    print('here')
     test_loader = torch.utils.data.DataLoader(
         dataset=te_dataset,
         batch_size=1000,  # manually set batch size to avoid diff shapes

@@ -28,12 +28,15 @@ from nflows.transforms.splines.quadratic import (
     quadratic_spline,
     unconstrained_quadratic_spline,
 )
-from nflows.transforms.splines import rational_quadratic
-from nflows.transforms.splines.rational_quadratic import (
-    rational_quadratic_spline,
-    unconstrained_rational_quadratic_spline,)
+# from nflows.transforms.splines import rational_quadratic
+# from nflows.transforms.splines.rational_quadratic import (
+#    rational_quadratic_spline,
+#    unconstrained_rational_quadratic_spline,)
+
+from modded_spline import unconstrained_rational_quadratic_spline, rational_quadratic_spline
+import modded_spline
 from nflows.utils import torchutils
-from nflows.transforms import splines
+# from nflows.transforms import splines
 from torch.nn.functional import softplus
 
 from modded_coupling import PiecewiseCouplingTransformM
@@ -57,9 +60,9 @@ class MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(AutoregressiveTra
         dropout_probability=0.0,
         use_batch_norm=False,
         init_identity=True,
-        min_bin_width=rational_quadratic.DEFAULT_MIN_BIN_WIDTH,
-        min_bin_height=rational_quadratic.DEFAULT_MIN_BIN_HEIGHT,
-        min_derivative=rational_quadratic.DEFAULT_MIN_DERIVATIVE,
+        min_bin_width=modded_spline.DEFAULT_MIN_BIN_WIDTH,
+        min_bin_height=modded_spline.DEFAULT_MIN_BIN_HEIGHT,
+        min_derivative=modded_spline.DEFAULT_MIN_DERIVATIVE,
     ):
         self.num_bins = num_bins
         self.min_bin_width = min_bin_width
@@ -154,9 +157,9 @@ class PiecewiseRationalQuadraticCouplingTransformM(PiecewiseCouplingTransformM):
         apply_unconditional_transform=False,
         img_shape=None,
         init_identity=True,
-        min_bin_width=splines.rational_quadratic.DEFAULT_MIN_BIN_WIDTH,
-        min_bin_height=splines.rational_quadratic.DEFAULT_MIN_BIN_HEIGHT,
-        min_derivative=splines.rational_quadratic.DEFAULT_MIN_DERIVATIVE,
+        min_bin_width=modded_spline.DEFAULT_MIN_BIN_WIDTH,
+        min_bin_height=modded_spline.DEFAULT_MIN_BIN_HEIGHT,
+        min_derivative=modded_spline.DEFAULT_MIN_DERIVATIVE,
     ):
 
         self.num_bins = num_bins
@@ -208,10 +211,10 @@ class PiecewiseRationalQuadraticCouplingTransformM(PiecewiseCouplingTransformM):
             )
 
         if self.tails is None:
-            spline_fn = splines.rational_quadratic_spline
+            spline_fn = rational_quadratic_spline
             spline_kwargs = {}
         else:
-            spline_fn = splines.unconstrained_rational_quadratic_spline
+            spline_fn = unconstrained_rational_quadratic_spline
             spline_kwargs = {"tails": self.tails, "tail_bound": self.tail_bound}
 
         return spline_fn(

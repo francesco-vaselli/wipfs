@@ -62,6 +62,8 @@ def validate_fakes(
             gen.append(inputs_y)
             reco.append(z)
             samples.append(z_sampled)
+        del inputs_y, z, z_sampled
+        torch.cuda.empty_cache()
         print("Done sampling")
     gen = np.array(gen).reshape((-1, args.y_dim))
     full_sim = np.array(reco).reshape((-1, args.z_dim))

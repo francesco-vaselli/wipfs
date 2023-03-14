@@ -298,7 +298,7 @@ def nbd(ele_model, root, file_path, new_root):
         "tightCharge",
     ]
 
-    print(total["mvaFall17V2Iso_WPL"], total["mvaFall17V2Iso_WPL"].dtype)
+    print(total["MElectron_mvaFall17V2Iso_WPL"], total["MElectron_mvaFall17V2Iso_WPL"].dtype)
     to_ttree = dict(zip(ele_names, total.T))
     to_ttree = ak.unflatten(ak.Array(to_ttree), events_structure_ele)
 

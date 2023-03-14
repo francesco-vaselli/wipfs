@@ -52,7 +52,7 @@ def validate_fakes(
                         num_samples=1, context=inputs_y.view(-1, args.y_dim)
                     )
                     break
-                except:
+                except AssertionError:
                     print("Sample failed, retrying")
                     pass
             # z_sampled = model.sample(

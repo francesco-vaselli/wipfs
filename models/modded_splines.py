@@ -141,6 +141,9 @@ def rational_quadratic_spline(
         discriminant = b.pow(2) - 4 * a * c
         if torch.any(discriminant < 0):
             print(discriminant[discriminant < 0])
+            print(a[discriminant < 0], b[discriminant < 0], c[discriminant < 0])
+            print(input_derivatives[discriminant < 0], input_derivatives_plus_one[discriminant < 0], input_delta[discriminant < 0])
+            print(input_heights[discriminant < 0], input_cumheights[discriminant< 0], input_cumwidths[discriminant < 0])
             # discriminant[discriminant < 0] = 0
         assert (discriminant >= 0).all()
 

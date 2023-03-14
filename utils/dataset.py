@@ -55,10 +55,10 @@ class FatJetsDataset(Dataset):
                 "MgenjetAK8_pt",
                 "MgenjetAK8_phi",
                 "MgenjetAK8_eta",
-                "MgenjetAK8_hadronFlavour",
-                "MgenjetAK8_partonFlavour",
+                # "MgenjetAK8_hadronFlavour",
+                # "MgenjetAK8_partonFlavour",
                 "MgenjetAK8_mass",
-                "MgenjetAK8_ncFlavour",
+                # "MgenjetAK8_ncFlavour",
                 "MgenjetAK8_nbFlavour",
             ]
         ].values[start:limit]

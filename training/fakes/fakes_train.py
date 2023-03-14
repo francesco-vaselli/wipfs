@@ -387,5 +387,5 @@ def main():
 
 
 if __name__ == "__main__":
-
+    os.environ['PYTHONWARNINGS'] = 'ignore:semaphore_tracker:UserWarning'
     main()

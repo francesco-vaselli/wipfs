@@ -40,7 +40,7 @@ from torch.nn.functional import softplus
 from modded_coupling import PiecewiseCouplingTransformM
 from modded_base_flow import FlowM
 from modded_MADE import ContextMADE, gluMADE
-from modded_splines import unconstrained_rational_quadratic_spline, unconstrained_quadratic_spline
+from modded_splines import unconstrained_rational_quadratic_spline, rational_quadratic_spline
 import modded_splines
 
 

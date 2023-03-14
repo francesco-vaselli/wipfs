@@ -36,7 +36,7 @@ if __name__ == "__main__":
     # optionally remove training files if we are generating ttbar dataset
     files_paths = [path for path in files_paths if path not in ttbar_training_files]
     # take remaining files if loop crashes
-    files_paths = files_paths[:]
+    files_paths = files_paths[:2]
 
     # print(files_paths)
 

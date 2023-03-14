@@ -401,5 +401,11 @@ def main():
 
 
 if __name__ == "__main__":
+    import torch
+    torch.manual_seed(0)
+    import random
+    random.seed(0)
+    import numpy as np
+    np.random.seed(0)
 
     main()

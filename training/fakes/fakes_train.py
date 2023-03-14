@@ -254,8 +254,8 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
 
             # loss = (w * loss).sum() / w.sum()
             loss = (loss).mean()
-            t = torch.cuda.get_device_properties(args.rank).total_memory
-            print("rank %d memory used: %d" % (args.rank, t))
+            # t = torch.cuda.get_device_properties(args.rank).total_memory
+            # print("rank %d memory used: %d" % (args.rank, t))
             loss.backward()
             optimizer.step()
 

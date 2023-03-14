@@ -114,7 +114,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
     if args.distributed:  # Multiple processes, single GPU per process
         if args.gpu is not None:
             torch.cuda.set_device(args.gpu)
-            model = model.cuda(args.gpu) # changed into assignment
+            model.cuda(args.gpu) # changed into assignment
             ddp_model = DDP(
                 model,
                 device_ids=[args.gpu],
@@ -184,7 +184,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
 
     test_loader = torch.utils.data.DataLoader(
         dataset=te_dataset,
-        batch_size=512,  # manually set batch size to avoid diff shapes
+        batch_size=10000,  # manually set batch size to avoid diff shapes
         shuffle=False,
         num_workers=0,
         pin_memory=True,

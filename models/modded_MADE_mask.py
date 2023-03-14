@@ -7,7 +7,7 @@ from torch.nn import init
 
 from nflows.utils import torchutils
 
-from nflows.transforms.made import MaskedResiualBlock, MaskedFeedForwardBlock, MaskedLinear
+from nflows.transforms.made import MaskedResidualBlock, MaskedFeedforwardBlock, MaskedLinear
 
 
 def _get_input_degrees(in_features):

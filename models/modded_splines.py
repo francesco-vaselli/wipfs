@@ -139,6 +139,9 @@ def rational_quadratic_spline(
         c = -input_delta * (inputs - input_cumheights)
 
         discriminant = b.pow(2) - 4 * a * c
+        mask = torch.abs(discriminant)/ (b.pow(2) + 1e-8) < 1e-6
+        discriminant[mask] = 0
+
         if torch.any(discriminant < 0):
             print(discriminant[discriminant < 0])
             print(a[discriminant < 0], b[discriminant < 0], c[discriminant < 0])

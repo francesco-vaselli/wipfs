@@ -49,7 +49,7 @@ def validate_fakes(
             while True:
                 try:
                     z_sampled = model.sample(
-                        num_samples=1, context=inputs_y.view(-1, args.y_dim)
+                        num_samples=1, context=inputs_y.view(-1, args.y_dim+args.x_dim)
                     )
                     break
                 except AssertionError:
@@ -59,7 +59,7 @@ def validate_fakes(
             inputs_y = inputs_y.cpu().detach().numpy()
             z = z.cpu().detach().numpy()
             z_sampled = z_sampled.reshape(-1, args.z_dim)
-            gen.append(inputs_y)
+            gen.append(inputs_y[:, :args.y_dim])
             reco.append(z)
             samples.append(z_sampled)
         del inputs_y, z, z_sampled

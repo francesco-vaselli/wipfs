@@ -1,6 +1,7 @@
 # the NanoBuilder function, takings as input a NanoAOD file, extracting gen-level information for conditionig,
 # generating a new event with the same topology and saving results in a NanoAOD-like .root file
 
+import json
 import ROOT
 import uproot
 import numpy as np
@@ -127,6 +128,18 @@ def nbd(ele_model, root, file_path, new_root):
     # reset dataframe index for performing 1to1 generation
     df.reset_index(drop=True)
 
+    # preprocessing df
+
+    scale_file = os.path.join("..", "..", "training", "electrons", "scale_factors.json")
+
+    with open(scale_file, "r") as f:
+        scale_factors = json.load(f)
+
+    for col in df.columns:
+        if col in scale_factors.keys():
+            df[col] = df[col] / scale_factors[col]
+
+
     # save gen-level charges for matching them later to the event
     charges = np.reshape(
         df["GenElectron_charge"].values, (len(df["GenElectron_charge"].values), 1)
@@ -219,6 +232,10 @@ def nbd(ele_model, root, file_path, new_root):
     total = pd.DataFrame(total, columns=reco_columns)
 
     total = postprocessing(total, target_dictionary)
+
+    for col in df.columns:
+        if col in scale_factors.keys():
+            df[col] = df[col] * scale_factors[col]
 
     total["MElectron_pt"] = total["MElectron_ptRatio"].values * df["GenElectron_pt"].values
     total["MElectron_eta"] = total["MElectron_etaMinusGen"].values + df["GenElectron_eta"].values

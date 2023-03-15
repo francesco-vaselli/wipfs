@@ -132,14 +132,18 @@ def nbd(ele_model, root, file_path, new_root):
 
     # preprocessing df
 
-    scale_file = os.path.join("..", "..", "training", "electrons", "scale_factors.json")
+    # scale_file = os.path.join("..", "..", "training", "electrons", "scale_factors.json")
 
-    with open(scale_file, "r") as f:
-        scale_factors = json.load(f)
+    # with open(scale_file, "r") as f:
+    #     scale_factors = json.load(f)
 
-    for col in df.columns:
-        if col in scale_factors.keys():
-            df[col] = df[col] / scale_factors[col]
+    # for col in df.columns:
+    #     if col in scale_factors.keys():
+    #         df[col] = df[col] / scale_factors[col]
+    maxes = []
+    for i in range(len(df.columns)):
+        maxes.append(df.iloc[:, i].abs().max())
+        df.iloc[:, i] = df.iloc[:, i] / df.iloc[:, i].abs().max()
 
     # save gen-level charges for matching them later to the event
     charges = np.reshape(
@@ -249,10 +253,11 @@ def nbd(ele_model, root, file_path, new_root):
         saturated = np.where(saturated > max, max, saturated)
         total[col] = saturated
 
-
-    for col in df.columns:
-        if col in scale_factors.keys():
-            df[col] = df[col] * scale_factors[col]
+    for i in range(len(df.columns)):
+        df.iloc[:, i] = df.iloc[:, i] * maxes[i]
+    # for col in df.columns:
+    #     if col in scale_factors.keys():
+    #         df[col] = df[col] * scale_factors[col]
 
     total["MElectron_ptRatio"] = (
         total["MElectron_ptRatio"].values * df["GenElectron_pt"].values

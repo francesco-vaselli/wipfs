@@ -48,6 +48,8 @@ class GenDS(Dataset):
 ROOT.gInterpreter.ProcessLine('#include "gens.h"')
 
 STOP = None
+
+
 def nbd(ele_model, root, file_path, new_root):
     """The NanoBuilder function
 
@@ -106,7 +108,7 @@ def nbd(ele_model, root, file_path, new_root):
         "Pileup_nTrueInt",
         "Pileup_pudensity",
         "Pileup_sumEOOT",
-        "Pileup_sumLOOT"
+        "Pileup_sumLOOT",
     ]
 
     # read processed files for jets and save event structure
@@ -139,14 +141,17 @@ def nbd(ele_model, root, file_path, new_root):
         if col in scale_factors.keys():
             df[col] = df[col] / scale_factors[col]
 
-
     # save gen-level charges for matching them later to the event
     charges = np.reshape(
         df["GenElectron_charge"].values, (len(df["GenElectron_charge"].values), 1)
     )
 
     # read global event info to df
-    dfe = tree.arrays(["event", "run"], library="pd", entry_stop=STOP).astype(np.longlong).dropna()
+    dfe = (
+        tree.arrays(["event", "run"], library="pd", entry_stop=STOP)
+        .astype(np.longlong)
+        .dropna()
+    )
     print(dfe)
     print(f"Total number of events is {len(dfe)}")
     dfe = dfe[~dfe.isin([np.nan, np.inf, -np.inf]).any(1)]
@@ -181,7 +186,7 @@ def nbd(ele_model, root, file_path, new_root):
         num_workers=20,
     )
 
-    flow = ele_model # .to(device)
+    flow = ele_model  # .to(device)
     flow.eval()
 
     tot_sample = []
@@ -237,9 +242,15 @@ def nbd(ele_model, root, file_path, new_root):
         if col in scale_factors.keys():
             df[col] = df[col] * scale_factors[col]
 
-    total["MElectron_pt"] = total["MElectron_ptRatio"].values * df["GenElectron_pt"].values
-    total["MElectron_eta"] = total["MElectron_etaMinusGen"].values + df["GenElectron_eta"].values
-    total["MElectron_phi"] = total["MElectron_phiMinusGen"].values + df["GenElectron_phi"].values
+    total["MElectron_ptRatio"] = (
+        total["MElectron_ptRatio"].values * df["GenElectron_pt"].values
+    )
+    total["MElectron_etaMinusGen"] = (
+        total["MElectron_etaMinusGen"].values + df["GenElectron_eta"].values
+    )
+    total["MElectron_phiMinusGen"] = (
+        total["MElectron_phiMinusGen"].values + df["GenElectron_phi"].values
+    )
 
     # Charge: in this branch charge is also a target variable, so we already have it in total dataframe
     # For future: I should use the following code
@@ -261,7 +272,7 @@ def nbd(ele_model, root, file_path, new_root):
         "dzErr",
         "eInvMinusPInv",
         "energyErr",
-        "etaMinusGen",
+        "eta",
         "hoe",
         "ip3d",
         "isPFcand",
@@ -289,8 +300,8 @@ def nbd(ele_model, root, file_path, new_root):
         "mvaTTH",
         "pfRelIso03_all",
         "pfRelIso03_chg",
-        "phiMinusGen",
-        "ptRatio",
+        "phi",
+        "pt",
         "r9",
         "seedGain",
         "sieie",

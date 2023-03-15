@@ -144,6 +144,10 @@ def nbd(ele_model, root, file_path, new_root):
     for i in range(len(df.columns)):
         maxes.append(df.iloc[:, i].abs().max())
         df.iloc[:, i] = df.iloc[:, i] / df.iloc[:, i].abs().max()
+        print(df.iloc[:, i].abs().max())
+    
+    np.savetxt('maxes', np.array(maxes))
+    print(bubu)
 
     # save gen-level charges for matching them later to the event
     charges = np.reshape(

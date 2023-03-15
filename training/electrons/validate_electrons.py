@@ -55,6 +55,7 @@ def validate_electrons(
             z_sampled = z_sampled.cpu().detach().numpy()
             inputs_y = inputs_y.cpu().detach().numpy()
             z = z.cpu().detach().numpy()
+            print(z.shape)
             z_sampled = z_sampled.reshape(-1, args.zdim)
             gen.append(inputs_y)
             reco.append(z)

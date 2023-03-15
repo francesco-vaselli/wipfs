@@ -214,8 +214,10 @@ if __name__ == "__main__":
     df = pd.DataFrame(data=f.get("data"), columns=gen_columns+reco_columns)
     f.close()
 
-    df = postprocessing_test(df, vars_dictionary)
+    print(df.columns)
 
-    file = h5py.File(f"MElectrons_post.hdf5", "w")
-    dset = file.create_dataset("data", data=df.values, dtype="f4")
-    file.close()
+    # df = postprocessing_test(df, vars_dictionary)
+
+    # file = h5py.File(f"MElectrons_post.hdf5", "w")
+    # dset = file.create_dataset("data", data=df.values, dtype="f4")
+    # file.close()

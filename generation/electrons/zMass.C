@@ -1,20 +1,32 @@
+auto InvariantMass(ROOT::VecOps::RVec<float> &pt,
+                   ROOT::VecOps::RVec<float> &eta,
+                   ROOT::VecOps::RVec<float> &phi) {
 
-void ZMass() {
+  auto m = 0.51099895000e-3; // GeV
+
+  ROOT::Math::PtEtaPhiMVector p1(pt[0], eta[0], phi[0], m);
+  ROOT::Math::PtEtaPhiMVector p2(pt[1], eta[1], phi[1], m);
+
+  return (p1 + p2).mass();
+}
+
+void zMass() {
 
   ROOT::EnableImplicitMT();
 
-  auto f = TFile::Open("/gpfs/ddn/cms/user/cattafe/TTJets/60000/"
-                       "16ADF854-8C85-DB4F-84F0-339B292E3CBD_synth.root")
+  auto f = TFile::Open("047F4368-97D4-1A4E-B896-23C6C72DD2BE.root");
 
-      auto d = ROOT::RDataFrame("Events", f);
+  auto d = ROOT::RDataFrame("Events", f);
 
-  d.Filter("nElectrons >= 2")
-      .Filter("Electron_pt[0] > 20")
-      .Filter("Electron_pt[1] > 20")
-      .Define("ZMass",
-              "sqrt(2*Electron_pt[0]*Electron_pt[1]*(cosh(Electron_eta[0]-"
-              "Electron_eta[1])-cos(Electron_phi[0]-Electron_phi[1])))");
+  auto d_f = d.Filter("nElectron == 2")
+                 .Filter("All(abs(Electron_eta) < 2.5)")
+                 .Filter("All(Electron_pt > 20)")
+                 .Filter("Sum(Electron_charge) == 0")
+                 .Filter("All(Electron_ip3d < 0.015)")
+                 .Define("Z_mass", InvariantMass,
+                         {"Electron_pt", "Electron_eta", "Electron_phi"});
 
-  auto h = d.Histo1D("ZMass");
+  auto h = d_f.Histo1D("Z_mass");
   h->DrawCopy();
+  f->Close();
 }

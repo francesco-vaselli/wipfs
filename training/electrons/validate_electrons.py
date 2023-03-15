@@ -1,4 +1,5 @@
 import os
+import json
 
 import torch
 
@@ -25,6 +26,8 @@ def validate_electrons(
     device,
     clf_loaders=None,
 ):
+    
+    print("validation")
 
     if writer is not None:
         save_dir = os.path.join(save_dir, f"./figures/validation@epoch-{epoch}")
@@ -81,6 +84,8 @@ def validate_electrons(
 
     # 1D FlashSim/FullSim comparison
 
+    range_dict = {}
+
     for column in reco_columns:
         ws = wasserstein_distance(reco[column], samples[column])
 
@@ -101,6 +106,9 @@ def validate_electrons(
             np.max(rangeR),
             saturated_samples[column],
         )
+
+        range_dict[column] = [np.min(rangeR), np.max(rangeR)]
+
 
         # Samples histogram
         axs[0].hist(
@@ -130,6 +138,13 @@ def validate_electrons(
         plt.close()
 
     # Zoom-in for high ws distributions
+
+    f = open("range_dict.json", "w")
+    f.write(json.dumps(range_dict))
+    f.close()
+    os.system("cp range_dict.json ../../generation/electrons/")
+
+    print("ranges saved")
 
     incriminated = [
         ["MElectron_dr03HcalDepth1TowerSumEt", [0, 10]],

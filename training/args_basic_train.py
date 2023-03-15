@@ -6,8 +6,8 @@ SOLVERS = ["dopri5", "bdf", "rk4", "midpoint", 'adams', 'explicit_adams', 'fixed
 LAYERS = ["ignore", "concat", "concat_v2", "squash", "concatsquash", "scale", "concatscale"]
 
 X_DIM = 30
-Y_DIM = 6
-Z_DIM = 4   
+Y_DIM = 42
+Z_DIM = 48  
 
 def add_args(parser):
 
@@ -35,12 +35,12 @@ def add_args(parser):
     parser.add_argument('--bn_lag', type=float, default=0)
 
     # flow options
-    parser.add_argument('--num_flow_steps', type=int, default=4)
-    parser.add_argument('--num_transform_blocks', type=int, default=2)
+    parser.add_argument('--num_flow_steps', type=int, default=20)
+    parser.add_argument('--num_transform_blocks', type=int, default=10)
     parser.add_argument('--activation', type=str, default='relu')
     parser.add_argument('--dropout_probability', type=float, default=0.0)
     parser.add_argument('--batch_norm', type=eval, default=True, choices=[True, False])
-    parser.add_argument('--num_bins', type=int, default=8)
+    parser.add_argument('--num_bins', type=int, default=64)
     parser.add_argument('--tail_bound', type=float, default=3.0)
     parser.add_argument('--hidden_dim', type=int, default=128)
     parser.add_argument('--base_transform_type', type=str, default='rq-autoregressive', choices=['rq-autoregressive', 'rq-coupling'])
@@ -58,7 +58,7 @@ def add_args(parser):
                         help='Optimizer to use', choices=['adam', 'adamax', 'sgd'])
     parser.add_argument('--batch_size', type=int, default=512,
                         help='Batch size (of datasets) for training')
-    parser.add_argument('--lr', type=float, default=1e-4,
+    parser.add_argument('--lr', type=float, default=1e-5,
                         help='Latent learning rate for the Adam optimizer.')
     parser.add_argument('--beta1', type=float, default=0.9,
                         help='Beta1 for Adam.')
@@ -87,9 +87,9 @@ def add_args(parser):
     parser.add_argument('--rescale_data', default=False, action='store_true')
     parser.add_argument('--shuffle_train', type=eval, default=True, choices=[True, False])
     parser.add_argument('--train_start', type=int, default=0)
-    parser.add_argument('--train_limit', type=int, default=500000)
-    parser.add_argument('--test_start', type=int, default=500000)
-    parser.add_argument('--test_limit', type=int, default=600000)
+    parser.add_argument('--train_limit', type=int, default=3800000)
+    parser.add_argument('--test_start', type=int, default=0
+    parser.add_argument('--test_limit', type=int, default=100000)
     
 
     # logging and saving frequency

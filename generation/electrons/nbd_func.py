@@ -238,6 +238,18 @@ def nbd(ele_model, root, file_path, new_root):
 
     total = postprocessing(total, target_dictionary)
 
+    with open(os.path.join(os.path.dirname(__file__), "range_dict.json"), "r") as file:
+        ranges_dict = json.load(file)
+
+    for col in total.columns:
+        min = ranges_dict[col][0]
+        max = ranges_dict[col][1]
+        val = total[col].values
+        saturated = np.where(val < min, min, val)
+        saturated = np.where(saturated > max, max, saturated)
+        total[col] = saturated
+
+
     for col in df.columns:
         if col in scale_factors.keys():
             df[col] = df[col] * scale_factors[col]

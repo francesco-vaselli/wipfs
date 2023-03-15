@@ -47,7 +47,7 @@ class GenDS(Dataset):
 # execute only selection of Gen objects (no longer requires matching as we are not training)
 ROOT.gInterpreter.ProcessLine('#include "gens.h"')
 
-STOP = None
+STOP = 10000
 
 
 def nbd(ele_model, root, file_path, new_root):

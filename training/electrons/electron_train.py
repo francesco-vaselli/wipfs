@@ -196,6 +196,22 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
     if args.distributed:
         print("[Rank %d] World size : %d" % (args.rank, dist.get_world_size()))
 
+    if not args.distributed or (args.rank % ngpus_per_node == 0):
+        if val_func is not None:
+            if args.validate_at_0:
+                model.eval()
+                val_func(
+                    test_loader,
+                    model,
+                    start_epoch,
+                    writer,
+                    save_dir,
+                    args,
+                    args.gpu,
+                )
+                torch.cuda.empty_cache()
+                print('done with validation')
+
     print("Start epoch: %d End epoch: %d" % (start_epoch, args.epochs))
     for epoch in range(start_epoch, args.epochs):
         if args.distributed:

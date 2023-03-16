@@ -70,7 +70,7 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
           torch.nn.init.constant_(made.final_layer.weight, 0.0)
           torch.nn.init.constant_(
               made.final_layer.bias,
-              np.log(np.exp(1 - self._epsilon) - 1),
+              0.0# np.log(np.exp(1 - self._epsilon) - 1),
           )
         super(MaskedAffineAutoregressiveTransformM, self).__init__(made)
 

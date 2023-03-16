@@ -765,6 +765,7 @@ auto extract(ROOT::RDataFrame &d) {
 void prova() {
 
   auto col = "Electron_sip3d";
+  auto col2 = "MElectron_sip3d";
 
   ROOT::EnableImplicitMT();
 
@@ -786,7 +787,7 @@ void prova() {
 
   auto synth_dy = ROOT::RDataFrame("Events", g);
 
-  auto h1 = full_dy.Histo1D({"", "", 50, 0, 10}, col);
+  auto h1 = full_dy.Histo1D({"", "", 50, 0, 10}, col2);
   h1->Scale(1. / h1->Integral());
 
   auto h2 = synth_dy.Histo1D({"", "", 50, 0, 10}, col);
@@ -812,7 +813,7 @@ void prova() {
   auto tt = ROOT::RDataFrame("Events", p);
   auto full_tt = extract(tt);
 
-  auto h3 = full_tt.Histo1D({"", "", 50, 0, 10}, col);
+  auto h3 = full_tt.Histo1D({"", "", 50, 0, 10}, col2);
   h3->Scale(1. / h3->Integral());
 
   auto h4 = synt_tt.Histo1D({"", "", 50, 0, 10}, col);

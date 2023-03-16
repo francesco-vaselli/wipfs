@@ -132,6 +132,7 @@ def validate_fatjets(
     ]
 
     df = pd.DataFrame(data=gen, columns=jet_cond)
+    print(df)
     jet_target = [
         "Mpt_ratio",
         "Meta_sub",
@@ -142,7 +143,7 @@ def validate_fatjets(
     reco = pd.DataFrame(data=reco, columns=jet_target)
     samples = pd.DataFrame(data=samples, columns=jet_target)
 
-    samples[:, 1] = samples[:, 1] + df.loc[:, "MgenjetAK8_eta"].values
+    samples[:, 1] = samples[:, 1] + df["MgenjetAK8_eta"].values
     # samples[:, 9] = samples[:, 9] * df['GenJet_mass'].values
     samples[:, 2] = samples[:, 2] + df["MgenjetAK8_phi"].values
     samples[:, 2] = np.where(

@@ -188,8 +188,11 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         drop_last=True,
         worker_init_fn=init_np_seed,
     )
-    print(len(train_loader.dataset))
-    print(len(test_loader.dataset))
+
+    print("train size: %d" % len(tr_dataset))
+    print("test size: %d" % len(te_dataset))
+    print("batch size: %d" % args.batch_size)
+    print("len test loader: %d" % len(test_loader))
 
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
         optimizer,

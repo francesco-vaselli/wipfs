@@ -832,9 +832,9 @@ void prova() {
 
   auto c1 = new TCanvas("c1", "c1", 800, 600);
 
-  h3->Draw("HIST");
+  h4->Draw("HIST");
+  h3->Draw("HIST same");
   h3->SetLineColor(kRed);
-  h4->Draw("same HIST");
   h4->SetLineColor(kBlue);
 
   c1->SaveAs("tt.pdf");

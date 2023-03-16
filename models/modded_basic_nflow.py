@@ -822,7 +822,7 @@ def save_model(epoch, model, scheduler, train_history, test_history, name, model
     torch.save(dict, p / resume_filename)
 
 
-def load_model(device, model_dir=None, filename=None):
+def load_mixture_model(device, model_dir=None, filename=None):
     """Load a saved model.
     Args:
         filename:       File name

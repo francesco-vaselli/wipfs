@@ -662,5 +662,5 @@ void gens(std::string x) {
                                 "event",
                                 "run"};
 
-  pre.Snapshot("Gens", "testGens.root", col_to_save);
+  matched.Snapshot("Gens", "testGens.root", col_to_save);
 }

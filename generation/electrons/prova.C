@@ -811,15 +811,15 @@ void prova() {
                        "r");
 
   auto tt = ROOT::RDataFrame("Events", p);
-  auto h_t  = tt.Histo1D({"", "", 50, 0, 10}, col);
+  auto h_t  = tt.Histo1D({"", "", 50, -0.1, 0.1}, col);
   h_t->Scale(1. / h_t->Integral());
   auto n = h_t->GetEntries();
   auto full_tt = extract(tt);
-  auto n2 = full_tt.Histo1D({"", "", 50, 0, 10}, col2)->GetEntries();
+  auto n2 = full_tt.Histo1D({"", "", 50, -0.1, 0.1}, col2)->GetEntries();
 
   cout << n << " " << n2 << endl;
 
-  auto h3 = full_tt.Histo1D({"", "", 50, 0, 10}, col2);
+  auto h3 = full_tt.Histo1D({"", "", 50, -0.1, 0.1}, col2);
 
 
   h3->Scale(1. / h3->Integral());
@@ -827,7 +827,7 @@ void prova() {
   auto n3 = h3->GetEntries();
   cout << n3 << endl;
 
-  auto h4 = synt_tt.Histo1D({"", "", 50, 0, 10}, col);
+  auto h4 = synt_tt.Histo1D({"", "", 50, -0.1, 0.1}, col);
   h4->Scale(1. / h4->Integral());
 
   auto c1 = new TCanvas("c1", "c1", 800, 600);

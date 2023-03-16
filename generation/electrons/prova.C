@@ -2,7 +2,7 @@
 
 void prova() {
 
-  auto col = "Electron_pt";
+  auto col = "Electron_sip3d";
 
   ROOT::EnableImplicitMT();
 
@@ -21,19 +21,22 @@ void prova() {
 
   auto synth_dy = ROOT::RDataFrame("Events", g);
 
-  auto h1 = full_dy.Histo1D(col);
-  auto h2 = synth_dy.Histo1D(col);
+  auto h1 = full_dy.Histo1D({"", "", 50, 0, 10}, col);
+  h1->Scale(1./h1->Integral());
 
-  c = new TCanvas("c", "c", 800, 600);
-  h1->Draw();
-  h2->Draw("same");
+  auto h2 = synth_dy.Histo1D({"", "", 50, 0, 10}, col);
+  h2->Scale(1./h2->Integral());
+
+  auto c = new TCanvas("c", "c", 800, 600);
+  h1->Draw("PLC HIST");
+  h2->Draw("same PLC HIST");
 
   c->SaveAs("dy.pdf");
 
   auto m =
       TFile::Open("~/16ADF854-8C85-DB4F-84F0-339B292E3CBD_synth.root", "r");
 
-  synt_tt = ROOT::RDataFrame("Events", m);
+  auto synt_tt = ROOT::RDataFrame("Events", m);
 
   auto p = TFile::Open("/gpfs/ddn/srm/cms//store/mc/RunIIAutumn18NanoAODv6/"
                        "TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8/NANOAODSIM/"
@@ -43,13 +46,16 @@ void prova() {
 
   auto full_tt = ROOT::RDataFrame("Events", p);
 
-  auto h3 = full_tt.Histo1D(col);
-  auto h4 = synt_tt.Histo1D(col);
+  auto h3 = full_tt.Histo1D({"", "", 50, 0, 10}, col);
+  h3->Scale(1./h3->Integral());
 
-  c = new TCanvas("c", "c", 800, 600);
+  auto h4 = synt_tt.Histo1D({"", "", 50, 0, 10}, col);
+  h4->Scale(1./h4->Integral());
 
-  h3->Draw();
-  h4->Draw("same");
+  auto c1 = new TCanvas("c1", "c1", 800, 600);
 
-  c->SaveAs("tt.pdf");
+  h4->Draw("PLC HIST");
+  h3->Draw("PLC HIST same");
+
+  c1->SaveAs("tt.pdf");
 }

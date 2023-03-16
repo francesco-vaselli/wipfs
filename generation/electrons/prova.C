@@ -811,10 +811,15 @@ void prova() {
                        "r");
 
   auto tt = ROOT::RDataFrame("Events", p);
-  tt.Describe();
+  auto n  = tt.Histo1D({"", "", 50, 0, 10}, col)->GetEntries();
   auto full_tt = extract(tt);
-  full_tt.Describe();
-  auto h3 = full_tt.Histo1D({"", "", 50, 0, 10}, col);
+  auto n2 = full_tt.Histo1D({"", "", 50, 0, 10}, col)->GetEntries();
+
+  cout << n << " " << n2 << endl;
+
+  auto h3 = full_tt.Histo1D({"", "", 50, 0, 10}, col2);
+
+
   h3->Scale(1. / h3->Integral());
 
   auto h4 = synt_tt.Histo1D({"", "", 50, 0, 10}, col);

@@ -65,7 +65,7 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
             use_batch_norm=use_batch_norm,
         )
         self._epsilon = 1e-3
-        
+        self.init_identity = init_identity
         if init_identity:
           torch.nn.init.constant_(made.final_layer.weight, 0.0)
           torch.nn.init.constant_(
@@ -112,6 +112,8 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
         )
         unconstrained_scale = autoregressive_params[..., 0]
         shift = autoregressive_params[..., 1]
+        if self.init_identity:
+            shift = shift - 0.5414
         # print(unconstrained_scale, shift)
         return unconstrained_scale, shift
 

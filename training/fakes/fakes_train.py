@@ -84,8 +84,8 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
             # "base_transform_type": args.base_transform_type,  # "rq-autoregressive",
             # "block_size": args.block_size,  # useless param if we have alternating-binary mask
             # "mask_type": args.mask_type,
-            "init_identity_maf": args.init_identity,
-            "init_identity_arqs": args.init_identity,
+            "init_identity_maf": args.init_identity_maf,
+            "init_identity_arqs": args.init_identity_arqs,
         },
         "transform_type": args.transform_type,
     }

@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.join("..", "..", "models"))
 sys.path.insert(0, "..")
 
 from dataset import FatJetsDataset
-from modded_basic_nflow import create_mixture_flow_model, load_model, save_model, load_mixture_model
+from modded_basic_nflow import create_mixture_flow_model, save_model, load_mixture_model
 
 from args import get_args
 from validate_fatjets import validate_fatjets

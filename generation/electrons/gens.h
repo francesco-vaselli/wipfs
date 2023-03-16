@@ -417,18 +417,18 @@ void gens(std::string x) {
           .Define("GenElectron_phi", "Take(GenPart_phi, MGenElectronIdx)")
           .Define("GenElectron_pdgId", "Take(GenPart_pdgId, MGenElectronIdx)")
           .Define("GenElectron_charge", charge, {"GenElectron_pdgId"})
-          .Define("MGenPartMother_pdgId", mother_genpart_pdgId,
+          .Define("GenPartMother_pdgId", mother_genpart_pdgId,
                   {"GenPart_genPartIdxMother", "GenPart_pdgId",
-                   "MGenElectron_pdgId"})
-          .Define("MGenPartMother_pt", mother_genpart_pt,
+                   "GenElectron_pdgId"})
+          .Define("GenPartMother_pt", mother_genpart_pt,
                   {"GenPart_genPartIdxMother", "GenPart_pdgId", "GenPart_pt",
-                   "MGenElectron_pt"})
-          .Define("MGenPartMother_deta", mother_genpart_deta,
+                   "GenElectron_pt"})
+          .Define("GenPartMother_deta", mother_genpart_deta,
                   {"GenPart_genPartIdxMother", "GenPart_pdgId", "GenPart_eta",
-                   "MGenElectron_eta"})
-          .Define("MGenPartMother_dphi", mother_genpart_dphi,
+                   "GenElectron_eta"})
+          .Define("GenPartMother_dphi", mother_genpart_dphi,
                   {"GenPart_genPartIdxMother", "GenPart_pdgId", "GenPart_phi",
-                   "MGenElectron_phi"})
+                   "GenElectron_phi"})
           .Define("GenElectron_statusFlags",
                   "Take(GenPart_statusFlags, MGenElectronIdx)")
           .Define("GenElectron_statusFlag0",
@@ -637,10 +637,10 @@ void gens(std::string x) {
                                 "GenElectron_phi",
                                 "GenElectron_pt",
                                 "GenElectron_charge",
-                                "MGenPartMother_pdgId",
-                                "MGenPartMother_pt",
-                                "MGenPartMother_deta",
-                                "MGenPartMother_dphi",
+                                "GenPartMother_pdgId",
+                                "GenPartMother_pt",
+                                "GenPartMother_deta",
+                                "GenPartMother_dphi",
                                 "GenElectron_statusFlag0",
                                 "GenElectron_statusFlag1",
                                 "GenElectron_statusFlag2",

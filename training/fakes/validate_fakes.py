@@ -18,11 +18,13 @@ def delta_phi1v9(pts, phis):
     filtered_phi = np.where(pts > 0, phis, np.inf)
     dphi = np.expand_dims(filtered_phi[:, 0], axis=-1) - filtered_phi[:, 1:10]
     dphi.flatten()
-    dphi = np.where(np.isfinite(dphi), dphi, -7)
+    finite_mask = np.isfinite(dphi)
+    dphiF = dphi[finite_mask]
+    dhpiF = np.where(dphiF > np.pi, dphiF - 2 * np.pi, dphiF)
+    dhpiF = np.where(dphiF < -np.pi, dphiF + 2 * np.pi, dphiF)
+    dphi[finite_mask] = dhpiF
+    dphi[~finite_mask] = -7
     dphi = dphi.reshape(-1, 9)
-    # constraints the angles in the -pi,pi range
-    dphi = np.where(dphi > np.pi, dphi - 2 * np.pi, dphi)
-    dphi = np.where(dphi < -np.pi, dphi + 2 * np.pi, dphi)
 
     return dphi
 

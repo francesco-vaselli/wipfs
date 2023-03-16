@@ -70,9 +70,8 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
           torch.nn.init.constant_(made.final_layer.weight, 0.0)
           torch.nn.init.constant_(
               made.final_layer.bias,
-              0.5414 # np.log(np.exp(1 - self._epsilon) - 1),
+              0.5414 # the value k to get softplus(k) = 1.0
           )
-          # self._epsilon = 1e-8
 
         super(MaskedAffineAutoregressiveTransformM, self).__init__(made)
 

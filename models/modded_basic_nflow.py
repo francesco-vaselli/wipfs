@@ -595,7 +595,7 @@ def create_mixture_flow_model(
                 context_features=context_dim,
                 dropout_probability=base_kwargs["dropout_probability_maf"],
                 use_batch_norm=base_kwargs["batch_norm_maf"],
-                init_identity=base_kwargs["init_identity_maf"]
+                init_identity=base_kwargs["init_identity"]
             )
         )
         # transform.append(create_random_transform(param_dim=input_dim))
@@ -613,7 +613,7 @@ def create_mixture_flow_model(
                 context_features=context_dim,
                 dropout_probability=base_kwargs["dropout_probability_arqs"],
                 use_batch_norm=base_kwargs["batch_norm_arqs"],
-                init_identity=base_kwargs["init_identity_arqs"]
+                init_identity=base_kwargs["init_identity"]
             )
         )
         # transform.append(create_random_transform(param_dim=input_dim))

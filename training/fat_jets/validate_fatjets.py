@@ -132,7 +132,7 @@ def validate_fatjets(
     ]
 
     df = pd.DataFrame(data=gen, columns=jet_cond)
-    print(df)
+    print(df["MgenjetAK8_eta"].values)
     jet_target = [
         "Mpt_ratio",
         "Meta_sub",

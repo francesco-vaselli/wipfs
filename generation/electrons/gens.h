@@ -407,7 +407,7 @@ void gens(std::string x) {
           .Define("CleanGenJet_partonFlavour",
                   "GenJet_partonFlavour[CleanGenJetMask]");
 
-  matched =
+  auto matched =
       pre.Define("MGenPartIdx", "Electron_genPartIdx[Electron_genPartIdx >= 0]")
           .Define("MGenPart_pdgId", "Take(GenPart_pdgId, MGenPartIdx)")
           .Define("MGenElectronMask", "abs(MGenPart_pdgId) == 11")

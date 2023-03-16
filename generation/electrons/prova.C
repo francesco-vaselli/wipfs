@@ -690,8 +690,8 @@ auto extract(ROOT::RDataFrame &d) {
                   "Electron_eInvMinusPInv[Electron_MGenElectronMask]")
           .Define("MElectron_energyErr",
                   "Electron_energyErr[Electron_MGenElectronMask]")
-          .Define("MElectron_etaMinusGen",
-                  "Electron_eta[Electron_MGenElectronMask] - MGenElectron_eta")
+          .Define("MElectron_eta",
+                  "Electron_eta[Electron_MGenElectronMask]")
           .Define("MElectron_hoe", "Electron_hoe[Electron_MGenElectronMask]")
           .Define("MElectron_ip3d", "Electron_ip3d[Electron_MGenElectronMask]")
           .Define("MElectron_isPFcand",
@@ -764,8 +764,8 @@ auto extract(ROOT::RDataFrame &d) {
 
 void prova() {
 
-  auto col = "Electron_sip3d";
-  auto col2 = "MElectron_sip3d";
+  auto col = "Electron_eta";
+  auto col2 = "MElectron_eta";
 
   ROOT::EnableImplicitMT();
 
@@ -837,5 +837,5 @@ void prova() {
   h3->SetLineColor(kRed);
   h4->SetLineColor(kBlue);
 
-  c1->SaveAs("tt.pdf");
+  c1->SaveAs("tt_eta.pdf");
 }

@@ -21,6 +21,7 @@ def delta_phi1v9(pts, phis):
     # constraints the angles in the -pi,pi range
     dphi = np.where(dphi > np.pi, dphi - 2 * np.pi, dphi)
     dphi = np.where(dphi < -np.pi, dphi + 2 * np.pi, dphi)
+    print(np.isnan(dphi).any())
     dphi = np.where(dphi == np.nan, -5, dphi)
 
     return dphi

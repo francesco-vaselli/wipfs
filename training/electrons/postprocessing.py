@@ -77,7 +77,7 @@ def postprocessing(df, vars_dictionary):
     Postprocessing general function given any dataframe and its dictionary
     """
 
-    with open("scale_factors.json") as scale_file:
+    with open(os.path.join(os.path.dirname(__file__), "scale_factors.json")) as scale_file:
         scale_dict = json.load(scale_file)
 
     for column_name, operation in vars_dictionary.items():

@@ -126,20 +126,6 @@ def nbd(ele_model, root, file_path, new_root):
     # reset dataframe index for performing 1to1 generation
     df.reset_index(drop=True)
 
-    # preprocessing df
-
-    scale_file = os.path.join("..", "..", "training", "electrons", "scale_factors.json")
-
-    with open(scale_file, "r") as f:
-        scale_factors = json.load(f)
-
-    for col in df.columns:
-        if col in scale_factors.keys():
-            if scale_factors[col] != 0:
-                df[col] = df[col] / scale_factors[col]
-            else:
-                pass
-
     # maxes = []
     # for i in range(len(df.columns)):
     #     maxes.append(df.iloc[:, i].abs().max())
@@ -260,12 +246,6 @@ def nbd(ele_model, root, file_path, new_root):
 
     # for i in range(len(df.columns)):
     #     df.iloc[:, i] = df.iloc[:, i] * maxes[i]
-    for col in df.columns:
-        if col in scale_factors.keys():
-            if scale_factors[col] != 0:
-                df[col] = df[col] * scale_factors[col]
-            else:
-                pass
 
     total["MElectron_ptRatio"] = (
         total["MElectron_ptRatio"].values * df["GenElectron_pt"].values

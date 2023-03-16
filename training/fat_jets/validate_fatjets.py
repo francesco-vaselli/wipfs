@@ -132,16 +132,7 @@ def validate_fatjets(
     ]
 
     df = pd.DataFrame(data=gen, columns=jet_cond)
-    print(df["MgenjetAK8_eta"].values)
-    jet_target = [
-        "Mpt_ratio",
-        "Meta_sub",
-        "Mphi_sub",
-        "Mfatjet_msoftdrop",
-        "Mfatjet_particleNetMD_XbbvsQCD",
-    ]
-    reco = pd.DataFrame(data=reco, columns=jet_target)
-    samples = pd.DataFrame(data=samples, columns=jet_target)
+
 
     samples[:, 1] = samples[:, 1] + df["MgenjetAK8_eta"].values
     # samples[:, 9] = samples[:, 9] * df['GenJet_mass'].values
@@ -221,7 +212,16 @@ def validate_fatjets(
     plt.close()
 
     # Conditioning
-
+    jet_target = [
+        "Mpt_ratio",
+        "Meta_sub",
+        "Mphi_sub",
+        "Mfatjet_msoftdrop",
+        "Mfatjet_particleNetMD_XbbvsQCD",
+    ]
+    reco = pd.DataFrame(data=reco, columns=jet_target)
+    samples = pd.DataFrame(data=samples, columns=jet_target)
+    
     targets = ["Mfatjet_particleNetMD_XbbvsQCD"]
 
     ranges = [[-0.1, 1]]

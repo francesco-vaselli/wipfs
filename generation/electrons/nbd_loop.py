@@ -8,7 +8,7 @@ import os
 
 sys.path.insert(0, os.path.join("..", "..", "models"))
 
-from modded_basic_nflow import load_model
+from modded_basic_nflow import load_model, load_mixture_model
 import nbd_func
 
 if __name__ == "__main__":
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
 
-    ele_flow, _, _, _, trh, tsh = load_model(
+    ele_flow, _, _, _, trh, tsh = load_mixture_model(
         device=device,
         model_dir=os.path.dirname(__file__),
         filename="EM1/checkpoint-latest.pt",

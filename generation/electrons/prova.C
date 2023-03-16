@@ -813,7 +813,7 @@ void prova() {
   auto tt = ROOT::RDataFrame("Events", p);
   auto full_tt = extract(tt);
 
-  auto h3 = full_tt.Histo1D({"", "", 50, 0, 10}, col2);
+  auto h3 = full_tt.Histo1D({"", "", 50, 0, 10}, col);
   h3->Scale(1. / h3->Integral());
 
   auto h4 = synt_tt.Histo1D({"", "", 50, 0, 10}, col);

@@ -21,7 +21,7 @@ def delta_phi1v9(pts, phis):
     # constraints the angles in the -pi,pi range
     dphi = np.where(dphi > np.pi, dphi - 2 * np.pi, dphi)
     dphi = np.where(dphi < -np.pi, dphi + 2 * np.pi, dphi)
-    print(np.isnan(dphi).any())
+    # print(np.isnan(dphi).any())
     dphi = np.where(dphi == np.nan, -5, dphi)
 
     return dphi
@@ -162,7 +162,9 @@ def validate_fakes(
     for i in range(2, 10):
 
         test_values = dphi[:, i-1].flatten()[N_sel >= i]
+        test_values = test_values[~np.isnan(test_values)]
         generated_sample = dphi_flash[:, i-1].flatten()[N_sel >= i]
+        generated_sample = generated_sample[~np.isnan(generated_sample)]
         ws = wasserstein_distance(test_values, generated_sample)
         print(generated_sample.shape)
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)

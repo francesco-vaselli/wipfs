@@ -96,6 +96,10 @@ class FatJetsDataset(Dataset):
 
         self.x_train = torch.tensor(np.concatenate((x_b, x_s)), dtype=torch.float32)  # .to(device)
         self.y_train = torch.tensor(np.concatenate((y_b, y_s)), dtype=torch.float32)  # .to(device)
+        
+        perm = torch.randperm(self.x_train.shape[0])
+        self.x_train = self.x_train[perm]
+        self.y_train = self.y_train[perm]
 
     def __len__(self):
         return len(self.y_train)

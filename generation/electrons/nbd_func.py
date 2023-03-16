@@ -260,6 +260,9 @@ def nbd(ele_model, root, file_path, new_root):
     # Charge: in this branch charge is also a target variable, so we already have it in total dataframe
     # For future: I should use the following code
 
+    total = total.values
+
+
     total = np.concatenate((total, charges), axis=1)
 
     # convert to akw arrays for saving to file with correct event structure
@@ -315,7 +318,6 @@ def nbd(ele_model, root, file_path, new_root):
     ]
 
     # print(total["MElectron_mvaFall17V2Iso_WPL"], total["MElectron_mvaFall17V2Iso_WPL"].dtype)
-    total = total.values
     to_ttree = dict(zip(ele_names, total.T))
     to_ttree = ak.unflatten(ak.Array(to_ttree), events_structure_ele)
 

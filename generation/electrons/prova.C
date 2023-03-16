@@ -832,8 +832,8 @@ void prova() {
 
   auto c1 = new TCanvas("c1", "c1", 800, 600);
 
-  h4->Draw("HIST");
-  h3->Draw("HIST same");
+  h3->Draw("HIST");
+  h4->Draw("HIST same");
   h3->SetLineColor(kRed);
   h4->SetLineColor(kBlue);
 

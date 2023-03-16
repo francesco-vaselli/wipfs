@@ -249,7 +249,7 @@ def validate_fatjets(
         sup = rangeR[1]
 
         for cond, color, name in zip(conds, colors, names):
-            nb = gen["Mfatjet_particleNetMD_XbbvsQCD"].values
+            nb = df["Mfatjet_particleNetMD_XbbvsQCD"].values
             mask = np.where(nb == cond, True, False)
             full = reco[target].values
             full = full[mask]

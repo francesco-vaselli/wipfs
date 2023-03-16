@@ -17,7 +17,8 @@ import pandas as pd
 def delta_phi1v9(pts, phis):
     filtered_phi = np.where(pts > 0, phis, np.inf)
     dphi = np.expand_dims(filtered_phi[:, 0], axis=-1) - filtered_phi[:, 1:10]
-    dphi.flatten()
+    dphi = dphi.flatten()
+    #dphi.reshape(-1, 9)
     finite_mask = np.isfinite(dphi)
     dphiF = dphi[finite_mask]
     dhpiF = np.where(dphiF > np.pi, dphiF - 2 * np.pi, dphiF)

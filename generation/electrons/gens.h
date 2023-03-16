@@ -377,19 +377,19 @@ void gens(std::string x) {
   ROOT::RDataFrame d("Events", x);
 
   auto pre =
-      d.Define("GenElectronMask", "abs(GenPart_pdgId) == 11")
-          .Define("GenElectron_pt", "GenPart_pt[GenElectronMask]")
-          .Define("GenElectron_eta", "GenPart_eta[GenElectronMask]")
-          .Define("GenElectron_phi", "GenPart_phi[GenElectronMask]")
-          .Define("GenElectron_pdgId", "GenPart_pdgId[GenElectronMask]")
-          .Define("GenElectron_charge", charge, {"GenElectron_pdgId"})
+      d.Define("EGenElectronMask", "abs(GenPart_pdgId) == 11")
+          .Define("EGenElectron_pt", "GenPart_pt[EGenElectronMask]")
+          .Define("EGenElectron_eta", "GenPart_eta[EGenElectronMask]")
+          .Define("EGenElectron_phi", "GenPart_phi[EGenElectronMask]")
+          .Define("EGenElectron_pdgId", "GenPart_pdgId[EGenElectronMask]")
+          .Define("EGenElectron_charge", charge, {"EGenElectron_pdgId"})
           .Define("GenMuonMask", "abs(GenPart_pdgId) == 13")
           .Define("GenMuon_pt", "GenPart_pt[GenMuonMask]")
           .Define("GenMuon_eta", "GenPart_eta[GenMuonMask]")
           .Define("GenMuon_phi", "GenPart_phi[GenMuonMask]")
           .Define("CleanGenJet_mask_ele", clean_genjet_mask,
-                  {"GenJet_pt", "GenJet_eta", "GenJet_phi", "GenElectron_pt",
-                   "GenElectron_eta", "GenElectron_phi"})
+                  {"GenJet_pt", "GenJet_eta", "GenJet_phi", "EGenElectron_pt",
+                   "EGenElectron_eta", "EGenElectron_phi"})
           .Define("CleanGenJet_mask_muon", clean_genjet_mask,
                   {"GenJet_pt", "GenJet_eta", "GenJet_phi", "GenMuon_pt",
                    "GenMuon_eta", "GenMuon_phi"})
@@ -405,9 +405,20 @@ void gens(std::string x) {
                   "static_cast<ROOT::VecOps::RVec<int>>(CleanGenJet_"
                   "hadronFlavour_uchar)")
           .Define("CleanGenJet_partonFlavour",
-                  "GenJet_partonFlavour[CleanGenJetMask]")
+                  "GenJet_partonFlavour[CleanGenJetMask]");
+
+  matched =
+      pre.Define("MGenPartIdx", "Electron_genPartIdx[Electron_genPartIdx >= 0]")
+          .Define("MGenPart_pdgId", "Take(GenPart_pdgId, MGenPartIdx)")
+          .Define("MGenElectronMask", "abs(MGenPart_pdgId) == 11")
+          .Define("MGenElectronIdx", "MGenPartIdx[MGenElectronMask]")
+          .Define("GenElectron_pt", "Take(GenPart_pt, MGenElectronIdx)")
+          .Define("GenElectron_eta", "Take(GenPart_eta, MGenElectronIdx)")
+          .Define("GenElectron_phi", "Take(GenPart_phi, MGenElectronIdx)")
+          .Define("GenElectron_pdgId", "Take(GenPart_pdgId, MGenElectronIdx)")
+          .Define("GenElectron_charge", charge, {"GenElectron_pdgId"})
           .Define("GenElectron_statusFlags",
-                  "GenPart_statusFlags[GenElectronMask]")
+                  "Take(GenPart_statusFlags, MGenElectronIdx)")
           .Define("GenElectron_statusFlag0",
                   [](ROOT::VecOps::RVec<int> &ints) {
                     int bit = 0;

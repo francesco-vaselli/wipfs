@@ -769,35 +769,35 @@ void prova() {
 
   ROOT::EnableImplicitMT();
 
-  auto f =
-      TFile::Open("/gpfs/ddn/srm/cms//store/mc/RunIIAutumn18NanoAODv6/"
-                  "DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/"
-                  "NANOAODSIM/Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/"
-                  "230000/8244ED99-0F95-9D4F-B393-22EBC589A46D.root",
-                  "r");
+  // auto f =
+  //     TFile::Open("/gpfs/ddn/srm/cms//store/mc/RunIIAutumn18NanoAODv6/"
+  //                 "DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/"
+  //                 "NANOAODSIM/Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/"
+  //                 "230000/8244ED99-0F95-9D4F-B393-22EBC589A46D.root",
+  //                 "r");
 
-  auto dy = ROOT::RDataFrame("Events", f);
+  // auto dy = ROOT::RDataFrame("Events", f);
 
-  auto full_dy = extract(dy);
+  // auto full_dy = extract(dy);
 
 
-  auto g = TFile::Open("/gpfs/ddn/cms/user/cattafe/DYJets/230000/"
-                       "8244ED99-0F95-9D4F-B393-22EBC589A46D_synth.root",
-                       "r");
+  // auto g = TFile::Open("/gpfs/ddn/cms/user/cattafe/DYJets/230000/"
+  //                      "8244ED99-0F95-9D4F-B393-22EBC589A46D_synth.root",
+  //                      "r");
 
-  auto synth_dy = ROOT::RDataFrame("Events", g);
+  // auto synth_dy = ROOT::RDataFrame("Events", g);
 
-  auto h1 = full_dy.Histo1D({"", "", 50, 0, 10}, col2);
-  h1->Scale(1. / h1->Integral());
+  // auto h1 = full_dy.Histo1D({"", "", 50, 0, 10}, col2);
+  // h1->Scale(1. / h1->Integral());
 
-  auto h2 = synth_dy.Histo1D({"", "", 50, 0, 10}, col);
-  h2->Scale(1. / h2->Integral());
+  // auto h2 = synth_dy.Histo1D({"", "", 50, 0, 10}, col);
+  // h2->Scale(1. / h2->Integral());
 
-  auto c = new TCanvas("c", "c", 800, 600);
-  h1->Draw("PLC HIST");
-  h2->Draw("same PLC HIST");
+  // auto c = new TCanvas("c", "c", 800, 600);
+  // h1->Draw("PLC HIST");
+  // h2->Draw("same PLC HIST");
 
-  c->SaveAs("dy.pdf");
+  // c->SaveAs("dy.pdf");
 
   auto m =
       TFile::Open("~/16ADF854-8C85-DB4F-84F0-339B292E3CBD_synth.root", "r");
@@ -811,7 +811,9 @@ void prova() {
                        "r");
 
   auto tt = ROOT::RDataFrame("Events", p);
-  auto n  = tt.Histo1D({"", "", 50, 0, 10}, col)->GetEntries();
+  auto h_t  = tt.Histo1D({"", "", 50, 0, 10}, col);
+  h_t->Scale(1. / h_t->Integral());
+  auto n = h_t->GetEntries();
   auto full_tt = extract(tt);
   auto n2 = full_tt.Histo1D({"", "", 50, 0, 10}, col2)->GetEntries();
 
@@ -830,7 +832,7 @@ void prova() {
 
   auto c1 = new TCanvas("c1", "c1", 800, 600);
 
-  h4->Draw("PLC HIST");
+  h_t->Draw("PLC HIST");
   h3->Draw("PLC HIST same");
 
   c1->SaveAs("tt.pdf");

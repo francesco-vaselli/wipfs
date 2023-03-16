@@ -747,8 +747,8 @@ auto extract(ROOT::RDataFrame &d) {
           .Define("MElectron_phi", "Electron_phi[Electron_MGenElectronMask]")
           .Define("MElectron_phiMinusGen", DeltaPhi,
                   {"MElectron_phi", "MGenElectron_phi"})
-          .Define("MElectron_ptRatio",
-                  "Electron_pt[Electron_MGenElectronMask] / MGenElectron_pt")
+          .Define("MElectron_pt",
+                  "Electron_pt[Electron_MGenElectronMask]")
           .Define("MElectron_r9", "Electron_r9[Electron_MGenElectronMask]")
           .Define("MElectron_seedGain",
                   "Electron_seedGain[Electron_MGenElectronMask]")
@@ -764,8 +764,8 @@ auto extract(ROOT::RDataFrame &d) {
 
 void prova() {
 
-  auto col = "Electron_deltaEtaSC";
-  auto col2 = "MElectron_deltaEtaSC";
+  auto col = "Electron_pt";
+  auto col2 = "MElectron_pt";
 
   ROOT::EnableImplicitMT();
 
@@ -811,15 +811,15 @@ void prova() {
                        "r");
 
   auto tt = ROOT::RDataFrame("Events", p);
-  auto h_t  = tt.Histo1D({"", "", 50, -0.1, 0.1}, col);
+  auto h_t  = tt.Histo1D({"", "", 50, 0., 100}, col);
   h_t->Scale(1. / h_t->Integral());
   auto n = h_t->GetEntries();
   auto full_tt = extract(tt);
-  auto n2 = full_tt.Histo1D({"", "", 50, -0.1, 0.1}, col2)->GetEntries();
+  auto n2 = full_tt.Histo1D({"", "", 50, 0., 100}, col2)->GetEntries();
 
   cout << n << " " << n2 << endl;
 
-  auto h3 = full_tt.Histo1D({"", "", 50, -0.1, 0.1}, col2);
+  auto h3 = full_tt.Histo1D({"", "", 50, 0., 100}, col2);
 
 
   h3->Scale(1. / h3->Integral());
@@ -827,7 +827,7 @@ void prova() {
   auto n3 = h3->GetEntries();
   cout << n3 << endl;
 
-  auto h4 = synt_tt.Histo1D({"", "", 50, -0.1, 0.1}, col);
+  auto h4 = synt_tt.Histo1D({"", "", 50, 0., 100}, col);
   h4->Scale(1. / h4->Integral());
 
   auto c1 = new TCanvas("c1", "c1", 800, 600);
@@ -837,5 +837,5 @@ void prova() {
   h3->SetLineColor(kRed);
   h4->SetLineColor(kBlue);
 
-  c1->SaveAs("tt_deltaetaSc.pdf");
+  c1->SaveAs("tt_pt.pdf");
 }

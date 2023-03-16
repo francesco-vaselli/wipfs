@@ -832,9 +832,10 @@ void prova() {
 
   auto c1 = new TCanvas("c1", "c1", 800, 600);
 
-  h_t->Draw("PLC HIST");
+  h3->Draw("PLC HIST");
+  h3->SetLineColor(kRed);
   h4->Draw("same PLC HIST");
-  h3->Draw("PLC HIST same");
+  h4->SetLineColor(kBlue);
 
   c1->SaveAs("tt.pdf");
 }

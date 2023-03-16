@@ -149,13 +149,17 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
 
     tr_dataset = FatJetsDataset(
         [os.path.join(dirpath, "..", "datasets", "preprocessed.pkl")],
-        start=0,
-        limit=args.train_limit,
+        start_b=0,
+        limit_b=args.train_limit,
+        start_s=0,
+        limit_s=args.train_limit,
     )
     te_dataset = FatJetsDataset(
         [os.path.join(dirpath, "..", "datasets", "preprocessed.pkl")],
         start=args.train_limit,
         limit=args.train_limit + args.test_limit,
+        start_s=args.train_limit,
+        limit_s=args.train_limit + args.test_limit,
     )
 
     if args.distributed:
@@ -197,6 +201,21 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
     output_freq = 50
     train_history = []
     test_history = []
+
+    if not args.distributed or (args.rank % ngpus_per_node == 0):
+        if val_func is not None:
+            if args.validate_at_0:
+                model.eval()
+                val_func(
+                    test_loader,
+                    model,
+                    start_epoch,
+                    writer,
+                    save_dir,
+                    args,
+                    args.gpu,
+                )
+                print('done with validation')
 
     if args.distributed:
         print("[Rank %d] World size : %d" % (args.rank, dist.get_world_size()))

@@ -45,24 +45,37 @@ class FatJetsDataset(Dataset):
         Dataset (Pytorch Dataset): Pytorch Dataset class
     """
 
-    def __init__(self, pkl_paths, start=0, limit=None):
+    def __init__(self, pkl_paths, start_b=0, limit_b = 512005, start_s=512005, limit_s=None):
 
         self.pkl_paths = pkl_paths
         self.df = pd.read_pickle(self.pkl_paths[0])
 
-        y = self.df[
+        y_b = self.df[
             [
                 "MgenjetAK8_pt",
                 "MgenjetAK8_phi",
                 "MgenjetAK8_eta",
-                # "MgenjetAK8_hadronFlavour",
-                # "MgenjetAK8_partonFlavour",
+                "MgenjetAK8_hadronFlavour",
+                "MgenjetAK8_partonFlavour",
                 "MgenjetAK8_mass",
-                # "MgenjetAK8_ncFlavour",
+                "MgenjetAK8_ncFlavour",
                 "MgenjetAK8_nbFlavour",
             ]
-        ].values[start:limit]
-        x = self.df[
+        ].values[start_b:limit_b]
+        y_s = self.df[
+            [
+                "MgenjetAK8_pt",
+                "MgenjetAK8_phi",
+                "MgenjetAK8_eta",
+                "MgenjetAK8_hadronFlavour",
+                "MgenjetAK8_partonFlavour",
+                "MgenjetAK8_mass",
+                "MgenjetAK8_ncFlavour",
+                "MgenjetAK8_nbFlavour",
+            ]
+        ].values[start_s:limit_s]
+                
+        x_b = self.df[
             [
                 "Mpt_ratio",
                 "Meta_sub",
@@ -70,9 +83,19 @@ class FatJetsDataset(Dataset):
                 "Mfatjet_msoftdrop",
                 "Mfatjet_particleNetMD_XbbvsQCD",
             ]
-        ].values[start:limit]
-        self.x_train = torch.tensor(x, dtype=torch.float32)  # .to(device)
-        self.y_train = torch.tensor(y, dtype=torch.float32)  # .to(device)
+        ].values[start_b:limit_b]
+        x_s = self.df[
+            [
+                "Mpt_ratio",
+                "Meta_sub",
+                "Mphi_sub",
+                "Mfatjet_msoftdrop",
+                "Mfatjet_particleNetMD_XbbvsQCD",
+            ]
+        ].values[start_s:limit_s]
+
+        self.x_train = torch.tensor(np.concatenate((x_b, x_s)), dtype=torch.float32)  # .to(device)
+        self.y_train = torch.tensor(np.concatenate((y_b, y_s)), dtype=torch.float32)  # .to(device)
 
     def __len__(self):
         return len(self.y_train)

@@ -92,10 +92,15 @@ def add_args(parser):
     parser.add_argument('--no_rint', type=eval, default=True, choices=[True, False])
     parser.add_argument('--rescale_data', default=False, action='store_true')
     parser.add_argument('--shuffle_train', type=eval, default=True, choices=[True, False])
-    parser.add_argument('--train_start', type=int, default=0)
-    parser.add_argument('--train_limit', type=int, default=5000000)
-    parser.add_argument('--test_start', type=int, default=0)
-    parser.add_argument('--test_limit', type=int, default=100000)
+    parser.add_argument('--train_start_b', type=int, default=0)
+    parser.add_argument('--train_limit_b', type=int, default=450000)
+    parser.add_argument('--train_start_s', type=int, default=512005)
+    parser.add_argument('--train_limit_s', type=int, default=65000)
+    parser.add_argument('--test_start_b', type=int, default=450000)
+    parser.add_argument('--test_limit_b', type=int, default=512005)
+    parser.add_argument('--test_start_s', type=int, default=650000)
+    parser.add_argument('--test_limit_s', type=int, default=None)
+
     
 
     # logging and saving frequency

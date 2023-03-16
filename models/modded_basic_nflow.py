@@ -17,28 +17,24 @@ sys.path.insert(0, os.path.join("..", "utils"))
 from masks import create_block_binary_mask, create_identity_mask
 from permutations import BlockPermutation, IdentityPermutation
 
-from nflows.transforms.base import Transform
 from nflows.transforms.autoregressive import (AutoregressiveTransform)
-from nflows.transforms import made as made_module
-from nflows.transforms.splines.cubic import cubic_spline
-from nflows.transforms.splines.linear import linear_spline
-from nflows.transforms.splines.quadratic import (
-    quadratic_spline,
-    unconstrained_quadratic_spline,
-)
+
 from nflows.transforms.base import CompositeTransform
 from nflows.transforms.autoregressive import MaskedAffineAutoregressiveTransform
 from nflows import transforms
-from nflows.transforms.splines import rational_quadratic
-from nflows.transforms.splines.rational_quadratic import (
-    rational_quadratic_spline,
-    unconstrained_rational_quadratic_spline,)
+# from nflows.transforms.splines import rational_quadratic
+# from nflows.transforms.splines.rational_quadratic import (
+#     rational_quadratic_spline,
+#     unconstrained_rational_quadratic_spline,)
 from nflows.utils import torchutils
-from nflows.transforms import splines
+# from nflows.transforms import splines
 from torch.nn.functional import softplus
 
 from modded_coupling import PiecewiseCouplingTransformM
 from modded_base_flow import FlowM
+from modded_MADE_mask import NMaskedMADE
+from modded_splines import unconstrained_rational_quadratic_spline, rational_quadratic_spline
+import modded_splines
 
 
 class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
@@ -56,7 +52,7 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
         init_identity = True
     ):
         self.features = features
-        made = made_module.MADE(
+        made = NMaskedMADE( # made_module.MADE(
             features=features,
             hidden_features=hidden_features,
             context_features=context_features,
@@ -69,13 +65,14 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
             use_batch_norm=use_batch_norm,
         )
         self._epsilon = 1e-3
-        
+        self.init_identity = init_identity
         if init_identity:
           torch.nn.init.constant_(made.final_layer.weight, 0.0)
           torch.nn.init.constant_(
               made.final_layer.bias,
-              np.log(np.exp(1 - self._epsilon) - 1),
+              0.5414 # the value k to get softplus(k) = 1.0
           )
+
         super(MaskedAffineAutoregressiveTransformM, self).__init__(made)
 
     def _output_dim_multiplier(self):
@@ -99,6 +96,7 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
         # scale = torch.sigmoid(unconstrained_scale + 2.0) + self._epsilon
         scale = F.softplus(unconstrained_scale) + self._epsilon
         log_scale = torch.log(scale)
+        # print(scale, shift)
         outputs = (inputs - shift) / scale
         logabsdet = -torchutils.sum_except_batch(log_scale, num_batch_dims=1)
         return outputs, logabsdet
@@ -113,9 +111,10 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
         )
         unconstrained_scale = autoregressive_params[..., 0]
         shift = autoregressive_params[..., 1]
+        if self.init_identity:
+            shift = shift - 0.5414
+        # print(unconstrained_scale, shift)
         return unconstrained_scale, shift
-
-
 
 
 class MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(AutoregressiveTransform):
@@ -134,9 +133,9 @@ class MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(AutoregressiveTra
         dropout_probability=0.0,
         use_batch_norm=False,
         init_identity=True,
-        min_bin_width=rational_quadratic.DEFAULT_MIN_BIN_WIDTH,
-        min_bin_height=rational_quadratic.DEFAULT_MIN_BIN_HEIGHT,
-        min_derivative=rational_quadratic.DEFAULT_MIN_DERIVATIVE,
+        min_bin_width=modded_splines.DEFAULT_MIN_BIN_WIDTH,
+        min_bin_height=modded_splines.DEFAULT_MIN_BIN_HEIGHT,
+        min_derivative=modded_splines.DEFAULT_MIN_DERIVATIVE,
     ):
         self.num_bins = num_bins
         self.min_bin_width = min_bin_width
@@ -145,7 +144,7 @@ class MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(AutoregressiveTra
         self.tails = tails
         self.tail_bound = tail_bound
 
-        autoregressive_net = made_module.MADE(
+        autoregressive_net = NMaskedMADE( # made_module.MADE(
             features=features,
             hidden_features=hidden_features,
             context_features=context_features,
@@ -231,9 +230,9 @@ class PiecewiseRationalQuadraticCouplingTransformM(PiecewiseCouplingTransformM):
         apply_unconditional_transform=False,
         img_shape=None,
         init_identity=True,
-        min_bin_width=splines.rational_quadratic.DEFAULT_MIN_BIN_WIDTH,
-        min_bin_height=splines.rational_quadratic.DEFAULT_MIN_BIN_HEIGHT,
-        min_derivative=splines.rational_quadratic.DEFAULT_MIN_DERIVATIVE,
+        min_bin_width=modded_splines.DEFAULT_MIN_BIN_WIDTH,
+        min_bin_height=modded_splines.DEFAULT_MIN_BIN_HEIGHT,
+        min_derivative=modded_splines.DEFAULT_MIN_DERIVATIVE,
     ):
 
         self.num_bins = num_bins
@@ -285,10 +284,10 @@ class PiecewiseRationalQuadraticCouplingTransformM(PiecewiseCouplingTransformM):
             )
 
         if self.tails is None:
-            spline_fn = splines.rational_quadratic_spline
+            spline_fn = rational_quadratic_spline
             spline_kwargs = {}
         else:
-            spline_fn = splines.unconstrained_rational_quadratic_spline
+            spline_fn = unconstrained_rational_quadratic_spline
             spline_kwargs = {"tails": self.tails, "tail_bound": self.tail_bound}
 
         return spline_fn(
@@ -595,6 +594,7 @@ def create_mixture_flow_model(
                 context_features=context_dim,
                 dropout_probability=base_kwargs["dropout_probability_maf"],
                 use_batch_norm=base_kwargs["batch_norm_maf"],
+                init_identity=base_kwargs["init_identity"]
             )
         )
         transform.append(create_random_transform(param_dim=input_dim))
@@ -612,6 +612,7 @@ def create_mixture_flow_model(
                 context_features=context_dim,
                 dropout_probability=base_kwargs["dropout_probability_arqs"],
                 use_batch_norm=base_kwargs["batch_norm_arqs"],
+                init_identity=base_kwargs["init_identity"]
             )
         )
         transform.append(create_random_transform(param_dim=input_dim))
@@ -836,58 +837,6 @@ def load_model(device, model_dir=None, filename=None):
     p = Path(model_dir)
     checkpoint = torch.load(p / filename, map_location="cpu")
 
-    model_hyperparams = checkpoint["model_hyperparams"]
-    train_history = checkpoint["train_history"]
-    test_history = checkpoint["test_history"]
-
-    # Load model
-    model = create_NDE_model(**model_hyperparams)
-    model.load_state_dict(checkpoint["model_state_dict"])
-    # model.to(device)
-
-    # Remember that you must call model.eval() to set dropout and batch normalization layers to evaluation mode before running inference.
-    # Failing to do this will yield inconsistent inference results.
-    model.eval()
-
-    # Load optimizer
-    scheduler_present_in_checkpoint = "scheduler_state_dict" in checkpoint.keys()
-
-    # If the optimizer has more than 1 param_group, then we built it with
-    # flow_lr different from lr
-    if len(checkpoint["optimizer_state_dict"]["param_groups"]) > 1:
-        flow_lr = checkpoint["last_lr"]
-    else:
-        flow_lr = None
-
-    # Set the epoch to the correct value. This is needed to resume
-    # training.
-    epoch = checkpoint["epoch"]
-
-    return (
-        model,
-        scheduler_present_in_checkpoint,
-        flow_lr,
-        epoch,
-        train_history,
-        test_history,
-    )
-
-
-def load_mixture_model(device, model_dir=None, filename=None):
-    """Load a saved model.
-    Args:
-        filename:       File name
-    """
-
-    if model_dir is None:
-        raise NameError(
-            "Model directory must be specified."
-            " Store in attribute PosteriorModel.model_dir"
-        )
-
-    p = Path(model_dir)
-    checkpoint = torch.load(p / filename, map_location="cpu")
-    
     try:
         if checkpoint["model_hyperparams"]["base_transform_kwargs"] is not None:
             checkpoint["model_hyperparams"]["base_kwargs"] = checkpoint["model_hyperparams"]["base_transform_kwargs"]
@@ -923,6 +872,8 @@ def load_mixture_model(device, model_dir=None, filename=None):
     # training.
     epoch = checkpoint["epoch"]
 
+    optimizer_state_dict = checkpoint["optimizer_state_dict"]
+
     return (
         model,
         scheduler_present_in_checkpoint,
@@ -930,4 +881,5 @@ def load_mixture_model(device, model_dir=None, filename=None):
         epoch,
         train_history,
         test_history,
+        optimizer_state_dict,
     )

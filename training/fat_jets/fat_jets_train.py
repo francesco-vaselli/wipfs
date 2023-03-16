@@ -149,17 +149,17 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
 
     tr_dataset = FatJetsDataset(
         [os.path.join(dirpath, "..", "datasets", "preprocessed.pkl")],
-        start_b=0,
-        limit_b=args.train_limit,
-        start_s=0,
-        limit_s=args.train_limit,
+        start_b=args.train_start_b,
+        limit_b=args.train_limit_b,
+        start_s=args.train_start_s,
+        limit_s=args.train_limit_s,
     )
     te_dataset = FatJetsDataset(
         [os.path.join(dirpath, "..", "datasets", "preprocessed.pkl")],
-        start=args.train_limit,
-        limit=args.train_limit + args.test_limit,
-        start_s=args.train_limit,
-        limit_s=args.train_limit + args.test_limit,
+        start_b=args.test_start_b,
+        limit_b=args.test_limit_b,
+        start_s=args.test_start_s,
+        limit_s=args.test_limit_s,
     )
 
     if args.distributed:
@@ -181,7 +181,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
 
     test_loader = torch.utils.data.DataLoader(
         dataset=te_dataset,
-        batch_size=args.batch_size,  # manually set batch size to avoid diff shapes
+        batch_size=10000,  # manually set batch size to avoid diff shapes
         shuffle=False,
         num_workers=0,
         pin_memory=True,

@@ -96,7 +96,7 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
         # scale = torch.sigmoid(unconstrained_scale + 2.0) + self._epsilon
         scale = F.softplus(unconstrained_scale) + self._epsilon
         log_scale = torch.log(scale)
-        print(scale, shift)
+        # print(scale, shift)
         outputs = (inputs - shift) / scale
         logabsdet = -torchutils.sum_except_batch(log_scale, num_batch_dims=1)
         return outputs, logabsdet
@@ -597,7 +597,7 @@ def create_mixture_flow_model(
                 init_identity=base_kwargs["init_identity"]
             )
         )
-        # transform.append(create_random_transform(param_dim=input_dim))
+        transform.append(create_random_transform(param_dim=input_dim))
 
     for _ in range(base_kwargs["num_steps_arqs"]):
         transform.append(
@@ -615,7 +615,7 @@ def create_mixture_flow_model(
                 init_identity=base_kwargs["init_identity"]
             )
         )
-        # transform.append(create_random_transform(param_dim=input_dim))
+        transform.append(create_random_transform(param_dim=input_dim))
 
     transform_fnal = CompositeTransform(transform)
 

@@ -800,7 +800,7 @@ void prova() {
   // c->SaveAs("dy.pdf");
 
   auto m =
-      TFile::Open("~/16ADF854-8C85-DB4F-84F0-339B292E3CBD_synth.root", "r");
+      TFile::Open("/gpfs/ddn/cms/user/cattafe/TTJets/EM1/60000/16ADF854-8C85-DB4F-84F0-339B292E3CBD_synth.root", "r");
 
   auto synt_tt = ROOT::RDataFrame("Events", m);
 

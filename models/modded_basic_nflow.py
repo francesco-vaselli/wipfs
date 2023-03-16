@@ -13,7 +13,7 @@ from pathlib import Path
 import sys
 import os
 
-sys.path.insert(0, os.path.join("..", "utils"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "utils"))
 from masks import create_block_binary_mask, create_identity_mask
 from permutations import BlockPermutation, IdentityPermutation
 

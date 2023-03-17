@@ -1,6 +1,6 @@
-auto InvariantMass(ROOT::VecOps::RVec<float> &pt,
-                   ROOT::VecOps::RVec<float> &eta,
-                   ROOT::VecOps::RVec<float> &phi) {
+auto InvariantMass(ROOT::VecOps::RVec<double> &pt,
+                   ROOT::VecOps::RVec<double> &eta,
+                   ROOT::VecOps::RVec<double> &phi) {
 
   auto m = 0.51099895000e-3; // GeV
 

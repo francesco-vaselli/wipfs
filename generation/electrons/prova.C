@@ -797,12 +797,9 @@ void prova() {
 
   auto reco_pt = synth_dy.Take<ROOT::VecOps::RVec<float>>("Electron_pt");
 
-  cout << gen_pt << endl;
-  auto h_pt = new TH2F("h_pt", "", 50, 0, 100, 50, 0, 100);
+  cout << gen_pt.size() << endl;
 
-  // for (int i = 0; i < gen_pt->size(); i++) {
-  //   h_pt->Fill(gen_pt->at(i), reco_pt->at(i));
-  // }
+  auto h_pt = new TH2F("h_pt", "", 50, 0, 100, 50, 0, 100);
 
   auto c_pt = new TCanvas("c_pt", "c_pt", 800, 600);
 

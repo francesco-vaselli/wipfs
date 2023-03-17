@@ -112,7 +112,7 @@ def single_file_preprocess(filename: str) -> pd.DataFrame:
     # df.iloc[:, :10] = df.iloc[:, :10].clip(upper=200)
     # df.iloc[:, :10] = df.iloc[:, :10] / 200
     # apply log to all pts
-    df.iloc[:, :10] = df.iloc[:, :10].apply(lambda x: np.log(x))
+    df.iloc[:, :10] = df.iloc[:, :10].apply(lambda x: np.log1p(x))
     # reorder columns to have pt, eta, phi for each jet
     idxs = np.vstack(
         (np.arange(0, 10), np.arange(10, 20), np.arange(20, 30))

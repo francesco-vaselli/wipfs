@@ -764,8 +764,8 @@ auto extract(ROOT::RDataFrame &d) {
 
 void prova() {
 
-  auto col = "Electron_sip3d";
-  auto col2 = "MElectron_sip3d";
+  auto col = "Electron_pt";
+  auto col2 = "MElectron_pt";
 
   ROOT::EnableImplicitMT();
 
@@ -795,12 +795,12 @@ void prova() {
 
   auto c = new TCanvas("c", "c", 800, 600);
 
-  h1->Draw("PLC HIST");
+  h1->Draw("HIST");
   h1->SetLineColor(kRed);
-  h2->Draw("same PLC HIST");
+  h2->Draw("same HIST");
   h2->SetLineColor(kBlue);
 
-  c->SaveAs("dy_sipr3d.pdf");
+  c->SaveAs("dy_pt.pdf");
 
   // auto m =
   //     TFile::Open("~/16ADF854-8C85-DB4F-84F0-339B292E3CBD_synth.root", "r");

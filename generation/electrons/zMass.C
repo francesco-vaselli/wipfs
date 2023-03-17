@@ -666,6 +666,7 @@ auto extract(ROOT::RDataFrame &d) {
           .Define("Electron_genElectronIdx", genElectronIdx_maker,
                   {"Electron_genPartIdx", "GenPart_pdgId"})
           .Define("Electron_MGenElectronMask", "Electron_genElectronIdx >= 0")
+          .Define("MElectron_charge", "Electron_charge[Electron_MGenElectronMask]")
           .Define("MElectron_convVeto",
                   "Electron_convVeto[Electron_MGenElectronMask]")
           .Define("MElectron_deltaEtaSC",
@@ -757,6 +758,7 @@ auto extract(ROOT::RDataFrame &d) {
                   "Electron_sip3d[Electron_MGenElectronMask]")
           .Define("MElectron_tightCharge",
                   "Electron_tightCharge[Electron_MGenElectronMask]");
+          .Define("MnElectron", "MElectron_pt.size()")
 
   return matched;
 }
@@ -803,11 +805,11 @@ void zMass() {
                  .Define("Z_mass", InvariantMass,
                          {"Electron_pt", "Electron_eta", "Electron_phi"});
 
-  auto d_g = full_dy.Filter("nElectron == 2")
-                       .Filter("All(abs(Electron_eta) < 2.5)")
-                       .Filter("All(Electron_pt > 20)")
-                       .Filter("Sum(Electron_charge) == 0")
-                       .Filter("All(Electron_ip3d < 0.015)")
+  auto d_g = full_dy.Filter("MnElectron == 2")
+                       .Filter("All(abs(MElectron_eta) < 2.5)")
+                       .Filter("All(MElectron_pt > 20)")
+                       .Filter("Sum(MElectron_charge) == 0")
+                       .Filter("All(MElectron_ip3d < 0.015)")
                        .Define("Z_mass", InvariantMass,
                                {"MElectron_pt", "MElectron_eta", "MElectron_phi"});
 

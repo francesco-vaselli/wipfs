@@ -747,8 +747,8 @@ auto extract(ROOT::RDataFrame &d) {
           .Define("MElectron_phi", "Electron_phi[Electron_MGenElectronMask]")
           .Define("MElectron_phiMinusGen", DeltaPhi,
                   {"MElectron_phi", "MGenElectron_phi"})
-          .Define("MElectron_ptRatio",
-                  "Electron_pt[Electron_MGenElectronMask] / MGenElectron_pt")
+          .Define("MElectron_pt",
+                  "Electron_pt[Electron_MGenElectronMask]")
           .Define("MElectron_r9", "Electron_r9[Electron_MGenElectronMask]")
           .Define("MElectron_seedGain",
                   "Electron_seedGain[Electron_MGenElectronMask]")

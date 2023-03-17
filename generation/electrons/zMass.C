@@ -28,7 +28,7 @@ void zMass() {
                  .Define("Z_mass", InvariantMass,
                          {"Electron_pt", "Electron_eta", "Electron_phi"});
 
-  auto h = d_f.Histo1D("Z_mass");
+  auto h = d_f.Histo1D({"", "", 50, 60, 110}, "Z_mass");
   h->DrawCopy();
   f->Close();
 }

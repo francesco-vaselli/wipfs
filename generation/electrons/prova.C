@@ -764,8 +764,8 @@ auto extract(ROOT::RDataFrame &d) {
 
 void prova() {
 
-  auto col = "Electron_pt";
-  auto col2 = "MElectron_pt";
+  auto col = "Electron_deltaEtaSC";
+  auto col2 = "MElectron_deltaEtaSC";
 
   ROOT::EnableImplicitMT();
 
@@ -800,7 +800,7 @@ void prova() {
   h2->Draw("same HIST");
   h2->SetLineColor(kBlue);
 
-  c->SaveAs("dy_pt.pdf");
+  c->SaveAs("dy_deltaetaSC.pdf");
 
   // auto m =
   //     TFile::Open("~/16ADF854-8C85-DB4F-84F0-339B292E3CBD_synth.root", "r");

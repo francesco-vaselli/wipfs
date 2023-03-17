@@ -822,7 +822,7 @@ void zMass() {
                        .Filter("All(MElectron_pt > 20)")
                        .Filter("Sum(MElectron_charge) == 0")
                        .Filter("All(MElectron_ip3d < 0.015)")
-                       .Define("Z_mass", InvariantMass,
+                       .Define("Z_mass", InvariantMass_float,
                                {"MElectron_pt", "MElectron_eta", "MElectron_phi"});
 
   auto h = d_f.Histo1D({"", "", 50, 60, 110}, "Z_mass");

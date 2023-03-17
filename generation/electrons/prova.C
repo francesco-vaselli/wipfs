@@ -769,73 +769,75 @@ void prova() {
 
   ROOT::EnableImplicitMT();
 
-  // auto f =
-  //     TFile::Open("/gpfs/ddn/srm/cms//store/mc/RunIIAutumn18NanoAODv6/"
-  //                 "DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/"
-  //                 "NANOAODSIM/Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/"
-  //                 "230000/8244ED99-0F95-9D4F-B393-22EBC589A46D.root",
-  //                 "r");
+  auto f =
+      TFile::Open("/gpfs/ddn/srm/cms//store/mc/RunIIAutumn18NanoAODv6/"
+                  "DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/"
+                  "NANOAODSIM/Nano25Oct2019_102X_upgrade2018_realistic_v20-v1/"
+                  "230000/8244ED99-0F95-9D4F-B393-22EBC589A46D.root",
+                  "r");
 
-  // auto dy = ROOT::RDataFrame("Events", f);
+  auto dy = ROOT::RDataFrame("Events", f);
 
-  // auto full_dy = extract(dy);
+  auto full_dy = extract(dy);
 
 
-  // auto g = TFile::Open("/gpfs/ddn/cms/user/cattafe/DYJets/230000/"
-  //                      "8244ED99-0F95-9D4F-B393-22EBC589A46D_synth.root",
-  //                      "r");
-
-  // auto synth_dy = ROOT::RDataFrame("Events", g);
-
-  // auto h1 = full_dy.Histo1D({"", "", 50, 0, 10}, col2);
-  // h1->Scale(1. / h1->Integral());
-
-  // auto h2 = synth_dy.Histo1D({"", "", 50, 0, 10}, col);
-  // h2->Scale(1. / h2->Integral());
-
-  // auto c = new TCanvas("c", "c", 800, 600);
-  // h1->Draw("PLC HIST");
-  // h2->Draw("same PLC HIST");
-
-  // c->SaveAs("dy.pdf");
-
-  auto m =
-      TFile::Open("/gpfs/ddn/cms/user/cattafe/TTJets/EM1/60000/16ADF854-8C85-DB4F-84F0-339B292E3CBD_synth.root", "r");
-
-  auto synt_tt = ROOT::RDataFrame("Events", m);
-
-  auto p = TFile::Open("/gpfs/ddn/srm/cms//store/mc/RunIIAutumn18NanoAODv6/"
-                       "TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8/NANOAODSIM/"
-                       "Nano25Oct2019_102X_upgrade2018_realistic_v20_ext1-v1/"
-                       "60000/16ADF854-8C85-DB4F-84F0-339B292E3CBD.root",
+  auto g = TFile::Open("/gpfs/ddn/cms/user/cattafe/DYJets/EM1/230000/"
+                       "8244ED99-0F95-9D4F-B393-22EBC589A46D_synth.root",
                        "r");
 
-  auto tt = ROOT::RDataFrame("Events", p);
-  auto h_t  = tt.Histo1D({"", "", 50, 0., 100}, col);
-  h_t->Scale(1. / h_t->Integral());
-  auto n = h_t->GetEntries();
-  auto full_tt = extract(tt);
-  auto n2 = full_tt.Histo1D({"", "", 50, 0., 100}, col2)->GetEntries();
+  auto synth_dy = ROOT::RDataFrame("Events", g);
 
-  cout << n << " " << n2 << endl;
+  auto h1 = full_dy.Histo1D({"", "", 50, 0, 10}, col2);
+  h1->Scale(1. / h1->Integral());
 
-  auto h3 = full_tt.Histo1D({"", "", 50, 0., 100}, col2);
+  auto h2 = synth_dy.Histo1D({"", "", 50, 0, 10}, col);
+  h2->Scale(1. / h2->Integral());
+
+  auto c = new TCanvas("c", "c", 800, 600);
+  h1->Draw("HIST");
+  h1->SetLineColor(kRed);
+  h2->Draw("same HIST");
+  h2->SetLineColor(kBlue);
+
+  c->SaveAs("dy_pt_m1.pdf");
+
+  // auto m =
+  //     TFile::Open("/gpfs/ddn/cms/user/cattafe/TTJets/EM1/60000/16ADF854-8C85-DB4F-84F0-339B292E3CBD_synth.root", "r");
+
+  // auto synt_tt = ROOT::RDataFrame("Events", m);
+
+  // auto p = TFile::Open("/gpfs/ddn/srm/cms//store/mc/RunIIAutumn18NanoAODv6/"
+  //                      "TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8/NANOAODSIM/"
+  //                      "Nano25Oct2019_102X_upgrade2018_realistic_v20_ext1-v1/"
+  //                      "60000/16ADF854-8C85-DB4F-84F0-339B292E3CBD.root",
+  //                      "r");
+
+  // auto tt = ROOT::RDataFrame("Events", p);
+  // auto h_t  = tt.Histo1D({"", "", 50, 0., 100}, col);
+  // h_t->Scale(1. / h_t->Integral());
+  // auto n = h_t->GetEntries();
+  // auto full_tt = extract(tt);
+  // auto n2 = full_tt.Histo1D({"", "", 50, 0., 100}, col2)->GetEntries();
+
+  // cout << n << " " << n2 << endl;
+
+  // auto h3 = full_tt.Histo1D({"", "", 50, 0., 100}, col2);
 
 
-  h3->Scale(1. / h3->Integral());
+  // h3->Scale(1. / h3->Integral());
 
-  auto n3 = h3->GetEntries();
-  cout << n3 << endl;
+  // auto n3 = h3->GetEntries();
+  // cout << n3 << endl;
 
-  auto h4 = synt_tt.Histo1D({"", "", 50, 0., 100}, col);
-  h4->Scale(1. / h4->Integral());
+  // auto h4 = synt_tt.Histo1D({"", "", 50, 0., 100}, col);
+  // h4->Scale(1. / h4->Integral());
 
-  auto c1 = new TCanvas("c1", "c1", 800, 600);
+  // auto c1 = new TCanvas("c1", "c1", 800, 600);
 
-  h3->Draw("HIST");
-  h4->Draw("HIST same");
-  h3->SetLineColor(kRed);
-  h4->SetLineColor(kBlue);
+  // h3->Draw("HIST");
+  // h4->Draw("HIST same");
+  // h3->SetLineColor(kRed);
+  // h4->SetLineColor(kBlue);
 
-  c1->SaveAs("tt_pt.pdf");
+  // c1->SaveAs("tt_pt.pdf");
 }

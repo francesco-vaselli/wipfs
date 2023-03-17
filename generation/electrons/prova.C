@@ -747,8 +747,7 @@ auto extract(ROOT::RDataFrame &d) {
           .Define("MElectron_phi", "Electron_phi[Electron_MGenElectronMask]")
           .Define("MElectron_phiMinusGen", DeltaPhi,
                   {"MElectron_phi", "MGenElectron_phi"})
-          .Define("MElectron_pt",
-                  "Electron_pt[Electron_MGenElectronMask]")
+          .Define("MElectron_pt", "Electron_pt[Electron_MGenElectronMask]")
           .Define("MElectron_r9", "Electron_r9[Electron_MGenElectronMask]")
           .Define("MElectron_seedGain",
                   "Electron_seedGain[Electron_MGenElectronMask]")
@@ -780,7 +779,6 @@ void prova() {
 
   auto full_dy = extract(dy);
 
-
   auto g = TFile::Open("/gpfs/ddn/cms/user/cattafe/DYJets/EAR1/230000/"
                        "8244ED99-0F95-9D4F-B393-22EBC589A46D_synth.root",
                        "r");
@@ -803,7 +801,9 @@ void prova() {
 
   for (int i = 0; i < gen_pt->size(); i++) {
     auto x = gen_pt->at(i);
-    cout << x << endl;
+    for (auto y : reco_pt->at(i)) {
+      h_pt->Fill(x, y);
+    }
   }
 
   auto c_pt = new TCanvas("c_pt", "c_pt", 800, 600);
@@ -842,7 +842,6 @@ void prova() {
   // cout << n << " " << n2 << endl;
 
   // auto h3 = full_tt.Histo1D({"", "", 50, 0, 10}, col2);
-
 
   // h3->Scale(1. / h3->Integral());
 

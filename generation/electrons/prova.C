@@ -802,7 +802,8 @@ void prova() {
   auto h_pt = new TH2F("h_pt", "", 50, 0, 100, 50, 0, 100);
 
   for (int i = 0; i < gen_pt->size(); i++) {
-    h_pt->Fill((*gen_pt)[i], (*reco_pt)[i]);
+    auto x = gen_pt->at(i);
+    cout << x << endl;
   }
 
   auto c_pt = new TCanvas("c_pt", "c_pt", 800, 600);

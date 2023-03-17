@@ -758,7 +758,7 @@ auto extract(ROOT::RDataFrame &d) {
                   "Electron_sip3d[Electron_MGenElectronMask]")
           .Define("MElectron_tightCharge",
                   "Electron_tightCharge[Electron_MGenElectronMask]")
-          .Define("MnElectron", "nElectron[Electron_MGenElectronMask]");
+          .Define("MnElectron", "MElectron_pt.size()");
 
   return matched;
 }

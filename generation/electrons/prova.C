@@ -793,9 +793,9 @@ void prova() {
   auto h2 = synth_dy.Histo1D({"", "", 50, 0, 100}, col);
   h2->Scale(1. / h2->Integral());
 
-  auto gen_pt = full_dy.Take<float>("MGenElectron_pt");
+  auto gen_pt = full_dy.Take<ROOT::VecOps::RVec<float>>("MGenElectron_pt");
 
-  auto reco_pt = synth_dy.Take<float>("Electron_pt");
+  auto reco_pt = synth_dy.Take<ROOT::VecOps::RVec<float>>("Electron_pt");
 
   auto h_pt = new TH2F("h_pt", "", 50, 0, 100, 50, 0, 100);
 
@@ -816,7 +816,7 @@ void prova() {
   h2->Draw("same HIST");
   h2->SetLineColor(kBlue);
 
-  c->SaveAs("dy_deltaetaSC.pdf");
+  c->SaveAs("dy_pt.pdf");
 
   // auto m =
   //     TFile::Open("~/16ADF854-8C85-DB4F-84F0-339B292E3CBD_synth.root", "r");

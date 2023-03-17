@@ -793,7 +793,7 @@ void prova() {
   auto h2 = synth_dy.Histo1D({"", "", 50, 0, 100}, col);
   h2->Scale(1. / h2->Integral());
 
-  auto gen_pt = full_dy.Take<float, ROOT::VecOps::RVec<float>>("MGenElectron_pt");
+  auto gen_pt = full_dy.Take("MGenElectron_pt");
 
   auto reco_pt = synth_dy.Take<float, ROOT::VecOps::RVec<float>>("Electron_pt");
 

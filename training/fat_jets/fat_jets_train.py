@@ -99,7 +99,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
             save_dir, "checkpoint-latest.pt"
         )  # use the latest checkpoint
     if args.resume_checkpoint is not None and args.resume == True:
-        model, _, args.lr, start_epoch, _, _ = load_mixture_model(
+        model, _, args.lr, start_epoch, _, _,  optimizer_state_dict = load_mixture_model(
             model,
             model_dir=save_dir,
             filename="checkpoint-latest.pt",
@@ -144,6 +144,8 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         betas=(args.beta1, args.beta2),
         weight_decay=args.weight_decay,
     )
+    if args.resume_checkpoint is not None and args.resume == True:
+        optimizer.load_state_dict(optimizer_state_dict)
 
     dirpath = os.path.dirname(__file__)
 

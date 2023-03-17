@@ -764,8 +764,8 @@ auto extract(ROOT::RDataFrame &d) {
 
 void prova() {
 
-  auto col = "Electron_deltaEtaSC";
-  auto col2 = "MElectron_deltaEtaSC";
+  auto col = "Electron_pt";
+  auto col2 = "MElectron_pt";
 
   ROOT::EnableImplicitMT();
 
@@ -792,6 +792,22 @@ void prova() {
 
   auto h2 = synth_dy.Histo1D({"", "", 50, 0, 100}, col);
   h2->Scale(1. / h2->Integral());
+
+  auto gen_pt = full_dy.Take<float>("MGenElectron_pt");
+
+  auto reco_pt = synth_dy.Take<float>("Electron_pt");
+
+  auto h_pt = new TH2F("h_pt", "", 50, 0, 100, 50, 0, 100);
+
+  for (int i = 0; i < gen_pt->size(); i++) {
+    h_pt->Fill(gen_pt->at(i), reco_pt->at(i));
+  }
+
+  auto c_pt = new TCanvas("c_pt", "c_pt", 800, 600);
+
+  h_pt->Draw("COLZ");
+
+  c_pt->SaveAs("dy_2D_pt.pdf");
 
   auto c = new TCanvas("c", "c", 800, 600);
 

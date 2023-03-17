@@ -108,12 +108,9 @@ def single_file_preprocess(filename: str) -> pd.DataFrame:
     df["pt"] = pt
     df["angle"] = angle
 
-    # saturate all pts to 200 GeV, then rescale by 200
-    # df.iloc[:, :10] = df.iloc[:, :10].clip(upper=200)
-    # df.iloc[:, :10] = df.iloc[:, :10] / 200
-    # apply log to all pts
+
     pts = df.iloc[:, :10].values
-    df.iloc[:, :10] = np.where(pts > 0, np.log(pts), 0)
+    df.iloc[:, :10] = np.where(pts > 10, np.log(pts), 0)
     df.iloc[:, :10] = df.iloc[:, :10].clip(upper=5)
     # reorder columns to have pt, eta, phi for each jet
     idxs = np.vstack(

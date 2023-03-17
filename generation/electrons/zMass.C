@@ -14,7 +14,7 @@ void zMass() {
 
   ROOT::EnableImplicitMT();
 
-  auto f = TFile::Open("gpfs/ddn/cms/user/cattafe/DYJets/EM1/230000/"
+  auto f = TFile::Open("/gpfs/ddn/cms/user/cattafe/DYJets/EM1/230000/"
                        "8244ED99-0F95-9D4F-B393-22EBC589A46D_synth.root",
                        "r");
 

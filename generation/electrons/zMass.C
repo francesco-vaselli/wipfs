@@ -829,10 +829,12 @@ void zMass() {
   auto h_g = d_g.Histo1D({"", "", 50, 60, 110}, "Z_mass");
 
   auto c = new TCanvas();
-
-  h->DrawCopy();
+  
+  h_g->Draw();
+  h->Draw("same");
   h->SetLineColor(kBlue);
-  h_g->DrawCopy("same");
   h_g->SetLineColor(kRed);
+
+  c->SaveAs("zMass.pdf");
   f->Close();
 }

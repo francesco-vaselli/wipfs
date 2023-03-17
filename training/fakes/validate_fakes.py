@@ -15,14 +15,14 @@ import pandas as pd
 
 
 def delta_phi1v9(pts, phis):
-    filtered_phi = phis[:, 0:10]
+    filtered_phi = np.where(pts > 0, phis, np.nan)
     dphi = np.expand_dims(filtered_phi[:, 0], axis=-1) - filtered_phi[:, 1:10]
     dphi = dphi.reshape(-1, 9)
     # constraints the angles in the -pi,pi range
     dphi = np.where(dphi > np.pi, dphi - 2 * np.pi, dphi)
     dphi = np.where(dphi < -np.pi, dphi + 2 * np.pi, dphi)
     # print(np.isnan(dphi).any())
-    dphi = np.where(dphi == np.nan, -5, dphi)
+    # dphi = np.where(dphi == np.nan, -5, dphi)
 
     return dphi
 

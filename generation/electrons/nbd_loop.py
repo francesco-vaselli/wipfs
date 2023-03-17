@@ -59,6 +59,9 @@ if __name__ == "__main__":
         filename="EM1/checkpoint-latest.pt",
     )  # to be changed
 
+    files_paths = files_paths[:5]
+
+
     ele_flow = ele_flow.to(device)
 
     # generation loop

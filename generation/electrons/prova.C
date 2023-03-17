@@ -787,10 +787,10 @@ void prova() {
 
   auto synth_dy = ROOT::RDataFrame("Events", g);
 
-  auto h1 = full_dy.Histo1D({"", "", 50, 0, 10}, col2);
+  auto h1 = full_dy.Histo1D({"", "", 50, 0, 100}, col2);
   h1->Scale(1. / h1->Integral());
 
-  auto h2 = synth_dy.Histo1D({"", "", 50, 0, 10}, col);
+  auto h2 = synth_dy.Histo1D({"", "", 50, 0, 100}, col);
   h2->Scale(1. / h2->Integral());
 
   auto c = new TCanvas("c", "c", 800, 600);

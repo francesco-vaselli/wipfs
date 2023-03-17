@@ -828,6 +828,9 @@ void zMass() {
   auto h = d_f.Histo1D({"", "", 50, 60, 110}, "Z_mass");
   auto h_g = d_g.Histo1D({"", "", 50, 60, 110}, "Z_mass");
 
+  h->Scale(1. / h->Integral());
+  h_g->Scale(1. / h_g->Integral());
+
   auto c = new TCanvas();
   
   h_g->Draw();

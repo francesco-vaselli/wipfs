@@ -13,7 +13,9 @@ from pathlib import Path
 import sys
 import os
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "utils"))
+dirpath = os.path.dirname(__file__)
+
+sys.path.insert(0, os.path.join(dirpath, "..", "utils"))
 from masks import create_block_binary_mask, create_identity_mask
 from permutations import BlockPermutation, IdentityPermutation
 
@@ -26,15 +28,15 @@ from nflows.transforms.splines.quadratic import (
     quadratic_spline,
     unconstrained_quadratic_spline,
 )
-from nflows.transforms.base import CompositeTransform
-from nflows.transforms.autoregressive import MaskedAffineAutoregressiveTransform
-from nflows import transforms
-from nflows.transforms.splines import rational_quadratic
-from nflows.transforms.splines.rational_quadratic import (
-    rational_quadratic_spline,
-    unconstrained_rational_quadratic_spline,)
+# from nflows.transforms.splines import rational_quadratic
+# from nflows.transforms.splines.rational_quadratic import (
+#    rational_quadratic_spline,
+#    unconstrained_rational_quadratic_spline,)
+
+from modded_spline import unconstrained_rational_quadratic_spline, rational_quadratic_spline
+import modded_spline
 from nflows.utils import torchutils
-from nflows.transforms import splines
+# from nflows.transforms import splines
 from torch.nn.functional import softplus
 
 from modded_coupling import PiecewiseCouplingTransformM
@@ -69,13 +71,14 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
             use_batch_norm=use_batch_norm,
         )
         self._epsilon = 1e-3
-        
+        self.init_identity = init_identity
         if init_identity:
           torch.nn.init.constant_(made.final_layer.weight, 0.0)
           torch.nn.init.constant_(
               made.final_layer.bias,
-              np.log(np.exp(1 - self._epsilon) - 1),
+              0.5414 # the value k to get softplus(k) = 1.0
           )
+
         super(MaskedAffineAutoregressiveTransformM, self).__init__(made)
 
     def _output_dim_multiplier(self):
@@ -99,6 +102,7 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
         # scale = torch.sigmoid(unconstrained_scale + 2.0) + self._epsilon
         scale = F.softplus(unconstrained_scale) + self._epsilon
         log_scale = torch.log(scale)
+        # print(scale, shift)
         outputs = (inputs - shift) / scale
         logabsdet = -torchutils.sum_except_batch(log_scale, num_batch_dims=1)
         return outputs, logabsdet
@@ -113,9 +117,10 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
         )
         unconstrained_scale = autoregressive_params[..., 0]
         shift = autoregressive_params[..., 1]
+        if self.init_identity:
+            shift = shift - 0.5414
+        # print(unconstrained_scale, shift)
         return unconstrained_scale, shift
-
-
 
 
 class MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(AutoregressiveTransform):
@@ -134,9 +139,9 @@ class MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(AutoregressiveTra
         dropout_probability=0.0,
         use_batch_norm=False,
         init_identity=True,
-        min_bin_width=rational_quadratic.DEFAULT_MIN_BIN_WIDTH,
-        min_bin_height=rational_quadratic.DEFAULT_MIN_BIN_HEIGHT,
-        min_derivative=rational_quadratic.DEFAULT_MIN_DERIVATIVE,
+        min_bin_width=modded_spline.DEFAULT_MIN_BIN_WIDTH,
+        min_bin_height=modded_spline.DEFAULT_MIN_BIN_HEIGHT,
+        min_derivative=modded_spline.DEFAULT_MIN_DERIVATIVE,
     ):
         self.num_bins = num_bins
         self.min_bin_width = min_bin_width
@@ -231,9 +236,9 @@ class PiecewiseRationalQuadraticCouplingTransformM(PiecewiseCouplingTransformM):
         apply_unconditional_transform=False,
         img_shape=None,
         init_identity=True,
-        min_bin_width=splines.rational_quadratic.DEFAULT_MIN_BIN_WIDTH,
-        min_bin_height=splines.rational_quadratic.DEFAULT_MIN_BIN_HEIGHT,
-        min_derivative=splines.rational_quadratic.DEFAULT_MIN_DERIVATIVE,
+        min_bin_width=modded_spline.DEFAULT_MIN_BIN_WIDTH,
+        min_bin_height=modded_spline.DEFAULT_MIN_BIN_HEIGHT,
+        min_derivative=modded_spline.DEFAULT_MIN_DERIVATIVE,
     ):
 
         self.num_bins = num_bins
@@ -285,10 +290,10 @@ class PiecewiseRationalQuadraticCouplingTransformM(PiecewiseCouplingTransformM):
             )
 
         if self.tails is None:
-            spline_fn = splines.rational_quadratic_spline
+            spline_fn = rational_quadratic_spline
             spline_kwargs = {}
         else:
-            spline_fn = splines.unconstrained_rational_quadratic_spline
+            spline_fn = unconstrained_rational_quadratic_spline
             spline_kwargs = {"tails": self.tails, "tail_bound": self.tail_bound}
 
         return spline_fn(

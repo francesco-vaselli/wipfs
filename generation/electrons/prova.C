@@ -797,7 +797,7 @@ void prova() {
 
   auto reco_pt = synth_dy.Take<ROOT::VecOps::RVec<float>>("Electron_pt");
 
-  cout << gen_pt.size() << endl;
+  cout << gen_pt->size() << endl;
 
   auto h_pt = new TH2F("h_pt", "", 50, 0, 100, 50, 0, 100);
 

@@ -833,8 +833,8 @@ void zMass() {
 
   auto c = new TCanvas();
   
-  h_g->Draw();
-  h->Draw("same");
+  h_g->Draw("HIST");
+  h->Draw("same HIST");
   h->SetLineColor(kBlue);
   h_g->SetLineColor(kRed);
 

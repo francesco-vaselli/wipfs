@@ -134,6 +134,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
     elif args.gpu is not None:  # Single process, single GPU per process
         torch.cuda.set_device(args.gpu)
         ddp_model = model.cuda(args.gpu)
+        ddp_model = torch.compile(ddp_model, mode="max-autotune")
         print("going single gpu")
     else:  # Single process, multiple GPUs per process
         model = model.cuda()

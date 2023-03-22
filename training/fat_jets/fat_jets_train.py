@@ -119,9 +119,9 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         if args.gpu is not None:
             torch.cuda.set_device(args.gpu)
             model.cuda(args.gpu)
-            model = torch.compile(model, mode='max-autotune')
+            cmodel = torch.compile(model, mode='max-autotune')
             ddp_model = DDP(
-                model,
+                cmodel,
                 device_ids=[args.gpu],
                 output_device=args.gpu,
                 # check_reduction=True,

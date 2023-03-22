@@ -114,6 +114,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         if args.gpu is not None:
             torch.cuda.set_device(args.gpu)
             model.cuda(args.gpu)
+            model = torch.compile(model, mode='max-autotune')
             ddp_model = DDP(
                 model,
                 device_ids=[args.gpu],
@@ -122,7 +123,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
                 find_unused_parameters=True,
                 static_graph=False,
             )
-            ddp_model = torch.compile(ddp_model, mode='max-autotune')
+            # ddp_model = torch.compile(ddp_model, mode='max-autotune')
             args.batch_size = int(args.batch_size / ngpus_per_node)
             args.workers = 0
             print("going parallel")

@@ -23,6 +23,8 @@ from modded_basic_nflow import create_mixture_flow_model, save_model, load_mixtu
 from args import get_args
 from validate_fatjets import validate_fatjets
 
+import torch._dynamo as dynamo
+torch._dynamo.config.verbose=True
 
 def init_np_seed(worker_id):
     seed = torch.initial_seed()
@@ -123,7 +125,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
                 find_unused_parameters=True,
                 static_graph=False,
             )
-            ddp_model = torch.compile(bddp_model, mode='max-autotune')
+            ddp_model = torch.compile(bddp_model, mode='max-autotune', backend="eager")
             args.batch_size = int(args.batch_size / ngpus_per_node)
             args.workers = 0
             print("going parallel")

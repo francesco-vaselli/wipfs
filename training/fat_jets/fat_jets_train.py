@@ -23,6 +23,9 @@ from modded_basic_nflow import create_mixture_flow_model, save_model, load_mixtu
 from args import get_args
 from validate_fatjets import validate_fatjets
 
+import torch.dynamo as dynamo
+
+
 
 def init_np_seed(worker_id):
     seed = torch.initial_seed()
@@ -32,7 +35,9 @@ def init_np_seed(worker_id):
 def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
 
     # basic setup
-    cudnn.benchmark = False  # to be tried later
+    # cudnn.benchmark = False  # to be tried later
+    torch._dynamo.config.verbose = True
+    torch.backends.cudnn.benchmark = True
     args.gpu = gpu
     if args.gpu is not None:
         print("Use GPU: {} for training".format(args.gpu))

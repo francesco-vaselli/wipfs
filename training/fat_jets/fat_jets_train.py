@@ -120,7 +120,9 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
                 output_device=args.gpu,
                 # check_reduction=True,
                 find_unused_parameters=True,
+                static_graph=False,
             )
+            ddp_model = torch.compile(ddp_model, mode='max-autotune')
             args.batch_size = int(args.batch_size / ngpus_per_node)
             args.workers = 0
             print("going parallel")

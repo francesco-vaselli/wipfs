@@ -31,6 +31,33 @@ def init_np_seed(worker_id):
     np.random.seed(seed % 4294967296)
 
 
+def get_loaders(tr_dataset, te_dataset, train_sampler, args):
+
+    train_loader = torch.utils.data.DataLoader(
+        dataset=tr_dataset,
+        batch_size=args.batch_size,
+        num_workers=args.n_load_cores,
+        pin_memory=True,
+        drop_last=True,
+        shuffle=(train_sampler is None),
+        sampler=train_sampler,
+        worker_init_fn=init_np_seed
+        # worker_init_fn=init_np_seed,
+    )
+
+    test_loader = torch.utils.data.DataLoader(
+        dataset=te_dataset,
+        batch_size=10000,  # manually set batch size to avoid diff shapes
+        shuffle=False,
+        num_workers=0,
+        pin_memory=True,
+        drop_last=True,
+        worker_init_fn=init_np_seed,
+    )
+
+    return train_loader, test_loader
+
+
 def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
 
     # basic setup
@@ -178,26 +205,11 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
     else:
         train_sampler = None
 
-    train_loader = torch.utils.data.DataLoader(
-        dataset=tr_dataset,
-        batch_size=args.batch_size,
-        num_workers=args.n_load_cores,
-        pin_memory=True,
-        drop_last=True,
-        shuffle=(train_sampler is None),
-        sampler=train_sampler,
-        worker_init_fn=init_np_seed
-        # worker_init_fn=init_np_seed,
-    )
-
-    test_loader = torch.utils.data.DataLoader(
-        dataset=te_dataset,
-        batch_size=10000,  # manually set batch size to avoid diff shapes
-        shuffle=False,
-        num_workers=0,
-        pin_memory=True,
-        drop_last=True,
-        worker_init_fn=init_np_seed,
+    train_loader, test_loader = get_loaders(
+        tr_dataset,
+        te_dataset,
+        train_sampler,
+        args
     )
 
     print("train size: %d" % len(tr_dataset))

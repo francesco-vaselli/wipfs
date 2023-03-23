@@ -63,7 +63,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
 
     # define model, we got maf and arqs parts
     flow_param_dict = {
-        "input_dim": args.x_dim,
+        "input_dim": 6, # args.x_dim,
         "context_dim": args.y_dim,
         "base_kwargs": {
             "num_steps_maf": args.num_steps_maf,

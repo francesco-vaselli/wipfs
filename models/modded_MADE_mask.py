@@ -243,8 +243,8 @@ class NMaskedMADE(nn.Module):
             is_output=False,
         )
 
-        if context_features + features - NMask_degree > 0:
-            self.context_layer = nn.Linear(context_features + features - NMask_degree, hidden_features)
+        if context_features > 0:
+            self.context_layer = nn.Linear(context_features, hidden_features)
             print("context_layer", self.context_layer)
 
         self.use_residual_blocks = use_residual_blocks

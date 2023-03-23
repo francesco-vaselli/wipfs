@@ -23,6 +23,8 @@ from modded_basic_nflow import create_mixture_flow_model, save_model, load_mixtu
 from args import get_args
 from validate_fatjets import validate_fatjets
 
+# import torch._dynamo as dynamo
+# torch._dynamo.config.verbose=True
 
 def init_np_seed(worker_id):
     seed = torch.initial_seed()
@@ -114,13 +116,16 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         if args.gpu is not None:
             torch.cuda.set_device(args.gpu)
             model.cuda(args.gpu)
+            # cmodel = torch.compile(model)
             ddp_model = DDP(
                 model,
                 device_ids=[args.gpu],
                 output_device=args.gpu,
                 # check_reduction=True,
                 find_unused_parameters=True,
+                # static_graph=False,
             )
+            # ddp_model = torch.compile(bddp_model, mode='max-autotune', backend="inductor")
             args.batch_size = int(args.batch_size / ngpus_per_node)
             args.workers = 0
             print("going parallel")
@@ -131,6 +136,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
     elif args.gpu is not None:  # Single process, single GPU per process
         torch.cuda.set_device(args.gpu)
         ddp_model = model.cuda(args.gpu)
+        # ddp_model = torch.compile(bddp_model, mode="max-autotune", backend="inductor")
         print("going single gpu")
     else:  # Single process, multiple GPUs per process
         model = model.cuda()

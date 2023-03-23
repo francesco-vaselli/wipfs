@@ -66,6 +66,7 @@ def add_args(parser):
                         help='Batch size (of datasets) for training')
     parser.add_argument('--lr', type=float, default=1e-4,
                         help='Latent learning rate for the Adam optimizer.')
+    parser.add_argument('--hardfix_lr', type=float, default=None,)
     parser.add_argument('--beta1', type=float, default=0.9,
                         help='Beta1 for Adam.')
     parser.add_argument('--beta2', type=float, default=0.999,

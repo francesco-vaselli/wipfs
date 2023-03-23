@@ -138,6 +138,8 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         print("going multi gpu")
 
     lr = args.lr
+    if args.hardfix_lr is not None:
+        lr = args.hardfix_lr
     optimizer = torch.optim.Adam(
         model.parameters(),
         lr=lr,
@@ -145,7 +147,8 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         weight_decay=args.weight_decay,
     )
     if args.resume_checkpoint is not None and args.resume == True:
-        optimizer.load_state_dict(optimizer_state_dict)
+        if args.hardfix_lr is None:
+            optimizer.load_state_dict(optimizer_state_dict)
 
     dirpath = os.path.dirname(__file__)
 

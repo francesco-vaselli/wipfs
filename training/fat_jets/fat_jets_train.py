@@ -399,6 +399,7 @@ def main():
     ngpus_per_node = torch.cuda.device_count()
     if args.distributed:
         args.world_size = ngpus_per_node * args.world_size
+        mp.set_start_method("spawn")
         mp.spawn(
             trainer,
             nprocs=ngpus_per_node,

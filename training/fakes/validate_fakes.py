@@ -101,10 +101,9 @@ def validate_fakes(
     phis = full_sim[:, 2::3]
     pts_flash = flash_sim[:, 0::3]
     phis_flash = flash_sim[:, 2::3]
-    print("am i crashing here?")
     dphi = delta_phi1v9(pts, phis)
     dphi_flash = delta_phi1v9(pts, phis_flash) # using full sim pt as reference of n_jets. should adjust to N_sel
-    print('nope')
+    print(dphi.shape, dphi)
     n_ids = np.array([[i, i, i]  for i in range(1, 3)]).flatten()
 
 
@@ -162,10 +161,10 @@ def validate_fakes(
 
     test_values = dphi.flatten()
     test_values = test_values[~np.isnan(test_values)]
-    print(test_values.shape)
+    print(test_values.shape, test_values)
     generated_sample = dphi_flash.flatten()
     generated_sample = generated_sample[~np.isnan(generated_sample)]
-    print(generated_sample.shape)
+    print(generated_sample.shape, generated_sample)
     ws = wasserstein_distance(test_values, generated_sample)
     print(generated_sample.shape)
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)

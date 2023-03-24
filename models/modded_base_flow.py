@@ -159,8 +159,8 @@ class FlowM(DistributionM):
         embedded_context = self._embedding_net(context)
         noise, logabsdet = self._transform(inputs, context=embedded_context)
         # print(context.shape, context[:, -inputs.shape[1]:], context[:, :7])
-        print(noise.shape, logabsdet.shape)
-        noise = noise * context[:, -inputs.shape[1]:]
+        # print(noise.shape, logabsdet.shape)
+        # noise = noise * context[:, -inputs.shape[1]:]
         if self._context_used_in_base:
             log_prob = self._distribution.log_prob(noise, context=embedded_context)
         else:

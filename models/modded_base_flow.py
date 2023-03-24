@@ -158,6 +158,7 @@ class FlowM(DistributionM):
     def _log_prob(self, inputs, context):
         embedded_context = self._embedding_net(context)
         noise, logabsdet = self._transform(inputs, context=embedded_context)
+        print(noise.device, embedded_context.device)
         if self._context_used_in_base:
             log_prob = self._distribution.log_prob(noise, context=embedded_context)
         else:
@@ -169,7 +170,6 @@ class FlowM(DistributionM):
         if self._context_used_in_base:
             noise = self._distribution.sample(num_samples, context=embedded_context)
         else:
-            print(num_samples*embedded_context.shape[0])
             repeat_noise = self._distribution.sample(torch.Size([num_samples*embedded_context.shape[0]]))
             noise = torch.reshape(
                     repeat_noise,

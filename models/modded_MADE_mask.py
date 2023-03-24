@@ -4,6 +4,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 from torch.nn import init
+import numpy as np
 
 from nflows.utils import torchutils
 
@@ -291,7 +292,7 @@ class NMaskedMADE(nn.Module):
         outputs = self.final_layer(temps)
         outputs = outputs.view(inputs.shape[0], inputs.shape[1], -1)
         mask = context[:, -inputs.shape[1]:]
-        outputs[mask==0, :] = torch.log(torch.exp(1 - 1e-3) - 1)
+        outputs[mask==0, :] = np.log(np.exp(1 - 1e-3) - 1)
         outputs = outputs.view(inputs.shape[0], -1)
         return outputs
         # print(context.shape)  

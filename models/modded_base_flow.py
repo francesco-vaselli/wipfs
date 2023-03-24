@@ -170,7 +170,7 @@ class FlowM(DistributionM):
             noise = self._distribution.sample(num_samples, context=embedded_context)
         else:
             print(num_samples*embedded_context.shape[0])
-            repeat_noise = self._distribution.sample(num_samples*embedded_context.shape[0])
+            repeat_noise = self._distribution.sample(torch.Size([num_samples*embedded_context.shape[0]]))
             noise = torch.reshape(
                     repeat_noise,
                     (embedded_context.shape[0], -1, repeat_noise.shape[1])

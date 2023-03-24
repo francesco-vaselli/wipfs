@@ -290,10 +290,9 @@ class NMaskedMADE(nn.Module):
             temps = block(temps, context=context[:, :self.context_layer.in_features])
         outputs = self.final_layer(temps)
         outputs = outputs.view(inputs.shape[0], inputs.shape[1], -1)
-        param_dim = outputs.shape[-1]
         mask = context[:, -inputs.shape[1]:]
         outputs[mask==0, :] = 0
-
+        outputs = outputs.view(inputs.shape[0], -1)
         return outputs
         # print(context.shape)  
         

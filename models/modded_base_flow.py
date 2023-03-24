@@ -174,7 +174,7 @@ class FlowM(DistributionM):
             noise = torch.reshape(
                     repeat_noise,
                     (embedded_context.shape[0], -1, repeat_noise.shape[1])
-                    )
+                    ).to(embedded_context.device)
 
         if embedded_context is not None:
             # Merge the context dimension with sample dimension in order to apply the transform.

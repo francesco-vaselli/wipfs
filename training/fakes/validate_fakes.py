@@ -16,8 +16,8 @@ import pandas as pd
 
 def delta_phi1v9(pts, phis):
     filtered_phi = np.where(pts > 0, phis, np.nan)
-    dphi = np.expand_dims(filtered_phi[:, 0], axis=-1) - filtered_phi[:, 1:10]
-    dphi = dphi.reshape(-1, 9)
+    dphi = np.expand_dims(filtered_phi[:, 0], axis=-1) - filtered_phi[:, 1]
+    dphi = dphi.reshape(-1, 1)
     # constraints the angles in the -pi,pi range
     dphi = np.where(dphi > np.pi, dphi - 2 * np.pi, dphi)
     dphi = np.where(dphi < -np.pi, dphi + 2 * np.pi, dphi)
@@ -71,7 +71,7 @@ def validate_fakes(
             x_sampled = x_sampled.cpu().detach().numpy()
             inputs_y = inputs_y.cpu().detach().numpy()
             x = x.cpu().detach().numpy()
-            x_sampled = x_sampled.reshape(-1, args.x_dim)
+            x_sampled = x_sampled.reshape(-1, 6)
             gen.append(inputs_y[:, :args.y_dim])
             reco.append(x)
             samples.append(x_sampled)
@@ -79,8 +79,8 @@ def validate_fakes(
         torch.cuda.empty_cache()
         print("Done sampling")
     gen = np.array(gen).reshape((-1, args.y_dim))
-    full_sim = np.array(reco).reshape((-1, args.x_dim))
-    flash_sim = np.array(samples).reshape((-1, args.x_dim))
+    full_sim = np.array(reco).reshape((-1, 6))
+    flash_sim = np.array(samples).reshape((-1, 6))
 
     # Samples postprocessing 
     # flash_sim[:, [1, 2]] = flash_sim[:, [1, 2]] * 200
@@ -95,7 +95,7 @@ def validate_fakes(
 
     N_sel = np.array(gen[:, 6]).flatten()
     print(N_sel)
-    names = np.array([[f"pt{i}", f"eta{i}", f"phi{i}"]  for i in range(0, 10)]).flatten()
+    names = np.array([[f"pt{i}", f"eta{i}", f"phi{i}"]  for i in range(0, 2)]).flatten()
 
     pts = full_sim[:, 0::3]
     phis = full_sim[:, 2::3]
@@ -105,7 +105,7 @@ def validate_fakes(
     dphi = delta_phi1v9(pts, phis)
     dphi_flash = delta_phi1v9(pts, phis_flash) # using full sim pt as reference of n_jets. should adjust to N_sel
     
-    n_ids = np.array([[i, i, i]  for i in range(1, 11)]).flatten()
+    n_ids = np.array([[i, i, i]  for i in range(1, 3)]).flatten()
 
 
     for i in range(0, len(names)):
@@ -159,7 +159,7 @@ def validate_fakes(
         writer.add_scalar(f"ws/{names[i]}_wasserstein_distance", ws, global_step=epoch)
         plt.close()
 
-    for i in range(2, 10):
+    for i in range(2, 3):
 
         test_values = dphi[:, i-1].flatten()[N_sel >= i]
         test_values = test_values[~np.isnan(test_values)]

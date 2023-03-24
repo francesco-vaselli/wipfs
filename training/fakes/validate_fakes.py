@@ -101,10 +101,10 @@ def validate_fakes(
     phis = full_sim[:, 2::3]
     pts_flash = flash_sim[:, 0::3]
     phis_flash = flash_sim[:, 2::3]
-
+    print("am i crashing here?")
     dphi = delta_phi1v9(pts, phis)
     dphi_flash = delta_phi1v9(pts, phis_flash) # using full sim pt as reference of n_jets. should adjust to N_sel
-    
+    print('nope')
     n_ids = np.array([[i, i, i]  for i in range(1, 3)]).flatten()
 
 

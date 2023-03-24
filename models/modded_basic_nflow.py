@@ -180,7 +180,7 @@ class MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(AutoregressiveTra
         transform_params = autoregressive_params.view(
             batch_size, features, self._output_dim_multiplier()
         )
-        print(transform_params.shape, transform_params[0,0,:])
+        # print(transform_params.shape, transform_params[0,0,:])
 
         unnormalized_widths = transform_params[..., : self.num_bins]
         unnormalized_heights = transform_params[..., self.num_bins : 2 * self.num_bins]

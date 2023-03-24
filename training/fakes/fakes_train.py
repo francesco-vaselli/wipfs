@@ -222,6 +222,8 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
                 )
                 print('done with validation')
 
+    dist.barrier()
+    
     if args.distributed:
         print("[Rank %d] World size : %d" % (args.rank, dist.get_world_size()))
 

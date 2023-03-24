@@ -234,11 +234,10 @@ class NMaskedMADE(nn.Module):
 
         NMask_degree = features
         # Initial layer.
-        self.initial_layer = NMaskedLinear(
+        self.initial_layer = MaskedLinear(
             in_degrees=_get_input_degrees(features),
             out_features=hidden_features,
             autoregressive_features=features,
-            NMask_degree=NMask_degree,
             random_mask=random_mask,
             is_output=False,
         )
@@ -281,7 +280,7 @@ class NMaskedMADE(nn.Module):
         )
 
     def forward(self, inputs, context=None):
-        temps = self.initial_layer(inputs, context)
+        temps = self.initial_layer(inputs)
         if context is not None:
             temps += self.activation(self.context_layer(context[:, :self.context_layer.in_features]))
         if not self.use_residual_blocks:

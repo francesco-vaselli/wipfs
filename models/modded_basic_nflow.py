@@ -584,7 +584,7 @@ def create_mixture_flow_model(input_dim, context_dim, base_kwargs, transform_typ
         Flow -- the model
     """
 
-    distribution = distributions.BoxUniform(
+    distribution = distributions.uniform.BoxUniform(
         low=torch.full((input_dim,), -3, dtype=float),
         high=torch.full((input_dim,), 3, dtype=float),
     )

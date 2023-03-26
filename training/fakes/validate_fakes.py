@@ -159,6 +159,7 @@ def validate_fakes(
         writer.add_scalar(f"ws/{names[i]}_wasserstein_distance", ws, global_step=epoch)
         plt.close()
 
+    print("Done with 1v9")
     for i in range(2, 10):
 
         test_values = dphi[:, i-1].flatten()[N_sel >= i]
@@ -214,4 +215,4 @@ def validate_fakes(
         writer.add_scalar(f"ws/dphi1v{i}_wasserstein_distance", ws, global_step=epoch)
         plt.close()
 
-    
+    print("Done with dphi")

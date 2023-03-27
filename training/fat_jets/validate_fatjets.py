@@ -356,7 +356,7 @@ def validate_fatjets(
 
     #plt.plot([0, 1], [0, 1], color="navy", lw=lw, linestyle="--")
     #plt.xlim([0.0, 1.0])
-    plt.yscale("log")
+    # plt.yscale("log")
     plt.ylim([0.0005, 1.05])
     plt.xlabel("Efficency for b-jet (TP)", fontsize=16)
     plt.ylabel("Mistagging prob (FP)", fontsize=16)
@@ -391,7 +391,7 @@ def validate_fatjets(
 
     #plt.plot([0, 1], [0, 1], color="navy", lw=lw, linestyle="--")
     #plt.xlim([0.0, 1.0])
-    plt.yscale("log")
+    # plt.yscale("log")
     plt.ylim([0.0005, 1.05])
     plt.xlabel("Efficency for b-jet (TP)", fontsize=16)
     plt.ylabel("Mistagging prob (FP)", fontsize=16)

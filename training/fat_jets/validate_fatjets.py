@@ -15,7 +15,7 @@ import pandas as pd
 
 
 
-def histANDroc(gen, gen_df, nb):
+def makeROC(gen, gen_df, nb):
     truth = np.abs(gen_df)
     mask_b = np.where(truth[:, 7]==nb)
     mask_s = np.where(truth[:, 7]==2)
@@ -356,8 +356,8 @@ def validate_fatjets(
     writer.add_figure("ROC2v1", fig, global_step=epoch)
     plt.close()
 
-    fpr, tpr, roc_auc, bs, nbs = histANDroc(samples.values, df.values, 0)
-    cfpr, ctpr, croc_auc, cbs, cnbs  = histANDroc(reco.values, df.values, 0)
+    fpr, tpr, roc_auc, bs, nbs = makeROC(samples.values, df.values, 0)
+    cfpr, ctpr, croc_auc, cbs, cnbs  = makeROC(reco.values, df.values, 0)
 
     fig = plt.figure(figsize=(9, 6.5))
     lw = 2

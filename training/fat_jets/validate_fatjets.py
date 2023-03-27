@@ -19,42 +19,28 @@ def histANDroc(gen, gen_df, nb):
     truth = np.abs(gen_df)
     mask_b = np.where(truth[:, 7]==nb)
     mask_s = np.where(truth[:, 7]==2)
-    print(truth[:, 7])
-    # bs = signal
-    # nbs = background
-    bs = gen[mask_s, 4].flatten()
-    nbs = gen[mask_b, 4].flatten()
-    # nbs = nbs[0:len(bs)]
 
-    bs = bs[bs >=-0.05]
-    nbs = nbs[nbs >=-0.05]
+    s = gen[mask_s, 4].flatten()
+    b = gen[mask_b, 4].flatten()
 
-    bs = np.where(bs<0, 0, bs)
-    nbs = np.where(nbs<0, 0, nbs)
+    s = s[s >=-0.05]
+    b = b[b >=-0.05]
 
-    bs = np.where(bs>1, 1, bs)
-    nbs = np.where(nbs>1, 1, nbs)
+    s = np.where(s<0, 0, s)
+    b = np.where(b<0, 0, b)
 
-    # bs = bs[0:len(nbs)]
+    s = np.where(s>1, 1, s)
+    b = np.where(b>1, 1, b)
 
-    figure = plt.figure(figsize=(9, 6.5))
-    ax = plt.gca()
-    ax.spines['right'].set_visible(False)
-    ax.spines['top'].set_visible(False)
-    plt.hist(bs.flatten(), bins=50, label="b",  histtype='step', lw=2, color='C2')
-    plt.hist(nbs.flatten(), bins=50, label="uds",  histtype='step', lw=2, color='C3')
-    plt.title("FlashSim particleNetMD_XbbvsQCD for b ground truth", fontsize=16)
-    plt.legend(fontsize=16, frameon=False, loc='upper left')
-
-    y_bs = np.ones(len(bs))
-    y_nbs = np.zeros(len(nbs))
+    y_bs = np.ones(len(s))
+    y_nbs = np.zeros(len(b))
     y_t = np.concatenate((y_bs, y_nbs))
-    y_s = np.concatenate((bs, nbs))
+    y_s = np.concatenate((s, b))
 
     fpr, tpr, _ = roc_curve(y_t.ravel(), y_s.ravel())
     roc_auc = auc(fpr, tpr)
 
-    return figure, fpr, tpr, roc_auc, bs, nbs
+    return fpr, tpr, roc_auc, s, b
 
 
 def validate_fatjets(
@@ -335,8 +321,8 @@ def validate_fatjets(
     print(gen.shape)
 
     # ROC
-    fig, fpr, tpr, roc_auc, bs, nbs = histANDroc(samples.values, df.values, 1)
-    cfig, cfpr, ctpr, croc_auc, cbs, cnbs  = histANDroc(reco.values, df.values, 1)
+    fpr, tpr, roc_auc, bs, nbs = histANDroc(samples.values, df.values, 1)
+    cfpr, ctpr, croc_auc, cbs, cnbs  = histANDroc(reco.values, df.values, 1)
 
     fig = plt.figure(figsize=(9, 6.5))
     lw = 2
@@ -370,8 +356,8 @@ def validate_fatjets(
     writer.add_figure("ROC2v1", fig, global_step=epoch)
     plt.close()
 
-    fig, fpr, tpr, roc_auc, bs, nbs = histANDroc(samples.values, df.values, 0)
-    cfig, cfpr, ctpr, croc_auc, cbs, cnbs  = histANDroc(reco.values, df.values, 0)
+    fpr, tpr, roc_auc, bs, nbs = histANDroc(samples.values, df.values, 0)
+    cfpr, ctpr, croc_auc, cbs, cnbs  = histANDroc(reco.values, df.values, 0)
 
     fig = plt.figure(figsize=(9, 6.5))
     lw = 2
@@ -393,7 +379,7 @@ def validate_fatjets(
 
     #plt.plot([0, 1], [0, 1], color="navy", lw=lw, linestyle="--")
     #plt.xlim([0.0, 1.0])
-    # plt.yscale("log")
+    plt.yscale("log")
     plt.ylim([0.0005, 1.05])
     plt.xlabel("Efficency for b-jet (TP)", fontsize=16)
     plt.ylabel("Mistagging prob (FP)", fontsize=16)

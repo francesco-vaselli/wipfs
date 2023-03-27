@@ -321,8 +321,8 @@ def validate_fatjets(
     print(gen.shape)
 
     # ROC
-    fpr, tpr, roc_auc, bs, nbs = histANDroc(samples.values, df.values, 1)
-    cfpr, ctpr, croc_auc, cbs, cnbs  = histANDroc(reco.values, df.values, 1)
+    fpr, tpr, roc_auc, bs, nbs = makeROC(samples.values, df.values, 1)
+    cfpr, ctpr, croc_auc, cbs, cnbs  = makeROC(reco.values, df.values, 1)
 
     fig = plt.figure(figsize=(9, 6.5))
     lw = 2

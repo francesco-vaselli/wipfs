@@ -20,8 +20,10 @@ def histANDroc(gen, gen_df, nb):
     mask_b = np.where(truth[:, 7]==nb)
     mask_s = np.where(truth[:, 7]==2)
     print(truth[:, 7])
-    bs = gen[mask_b, 4].flatten()
-    nbs = gen[mask_s, 4].flatten()
+    # bs = signal
+    # nbs = background
+    bs = gen[mask_s, 4].flatten()
+    nbs = gen[mask_b, 4].flatten()
     # nbs = nbs[0:len(bs)]
 
     bs = bs[bs >=-0.05]

@@ -14,6 +14,47 @@ from scipy.stats import wasserstein_distance
 import pandas as pd
 
 
+
+def histANDroc(gen, gen_df, nb):
+    truth = np.abs(gen_df)
+    mask_b = np.where(truth[:, 7]==nb)
+    mask_s = np.where(truth[:, 7]==2)
+    print(truth[:, 7])
+    bs = gen[mask_b, 4].flatten()
+    nbs = gen[mask_s, 4].flatten()
+    # nbs = nbs[0:len(bs)]
+
+    bs = bs[bs >=-0.05]
+    nbs = nbs[nbs >=-0.05]
+
+    bs = np.where(bs<0, 0, bs)
+    nbs = np.where(nbs<0, 0, nbs)
+
+    bs = np.where(bs>1, 1, bs)
+    nbs = np.where(nbs>1, 1, nbs)
+
+    # bs = bs[0:len(nbs)]
+
+    figure = plt.figure(figsize=(9, 6.5))
+    ax = plt.gca()
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    plt.hist(bs.flatten(), bins=50, label="b",  histtype='step', lw=2, color='C2')
+    plt.hist(nbs.flatten(), bins=50, label="uds",  histtype='step', lw=2, color='C3')
+    plt.title("FlashSim particleNetMD_XbbvsQCD for b ground truth", fontsize=16)
+    plt.legend(fontsize=16, frameon=False, loc='upper left')
+
+    y_bs = np.ones(len(bs))
+    y_nbs = np.zeros(len(nbs))
+    y_t = np.concatenate((y_bs, y_nbs))
+    y_s = np.concatenate((bs, nbs))
+
+    fpr, tpr, _ = roc_curve(y_t.ravel(), y_s.ravel())
+    roc_auc = auc(fpr, tpr)
+
+    return figure, fpr, tpr, roc_auc, bs, nbs
+
+
 def validate_fatjets(
     test_loader,
     model,
@@ -288,3 +329,76 @@ def validate_fatjets(
             )
             axs[0].legend(frameon=False, loc="upper right")
             writer.add_figure(f"XbbvsQCD for b content", fig, global_step=epoch)
+
+    print(gen.shape)
+
+    # ROC
+    fig, fpr, tpr, roc_auc, bs, nbs = histANDroc(samples, df, 1)
+    cfig, cfpr, ctpr, croc_auc, cbs, cnbs  = histANDroc(reco, df, 1)
+
+    fig = plt.figure(figsize=(9, 6.5))
+    lw = 2
+    plt.plot(
+        tpr,
+        fpr,
+        color="C1",
+        lw=lw,
+        label=f"ROC curve (area = %0.2f) FlashSim" % roc_auc,
+    )
+    
+    plt.plot(
+        ctpr,
+        cfpr,
+        color="C0",
+        lw=lw,
+        label="ROC curve (area = %0.2f) FullSim" % croc_auc,
+    )
+
+    #plt.plot([0, 1], [0, 1], color="navy", lw=lw, linestyle="--")
+    #plt.xlim([0.0, 1.0])
+    plt.yscale("log")
+    plt.ylim([0.0005, 1.05])
+    plt.xlabel("Efficency for b-jet (TP)", fontsize=16)
+    plt.ylabel("Mistagging prob (FP)", fontsize=16)
+    ax = plt.gca()
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    plt.title("Receiver operating characteristic 2bvs1b", fontsize=16)
+    plt.legend(fontsize=16, frameon=False,loc="best")
+    writer.add_figure("ROC2v1", fig, global_step=epoch)
+    plt.close()
+
+    fig, fpr, tpr, roc_auc, bs, nbs = histANDroc(samples, df, 0)
+    cfig, cfpr, ctpr, croc_auc, cbs, cnbs  = histANDroc(reco, df, 0)
+
+    fig = plt.figure(figsize=(9, 6.5))
+    lw = 2
+    plt.plot(
+        tpr,
+        fpr,
+        color="C1",
+        lw=lw,
+        label=f"ROC curve (area = %0.2f) FlashSim" % roc_auc,
+    )
+    
+    plt.plot(
+        ctpr,
+        cfpr,
+        color="C0",
+        lw=lw,
+        label="ROC curve (area = %0.2f) FullSim" % croc_auc,
+    )
+
+    #plt.plot([0, 1], [0, 1], color="navy", lw=lw, linestyle="--")
+    #plt.xlim([0.0, 1.0])
+    plt.yscale("log")
+    plt.ylim([0.0005, 1.05])
+    plt.xlabel("Efficency for b-jet (TP)", fontsize=16)
+    plt.ylabel("Mistagging prob (FP)", fontsize=16)
+    ax = plt.gca()
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    plt.title("Receiver operating characteristic 2bvs0b", fontsize=16)
+    plt.legend(fontsize=16, frameon=False,loc="best")
+    writer.add_figure("ROC2v0", fig, global_step=epoch)
+    plt.close()

@@ -113,13 +113,13 @@ def single_file_preprocess(filename: str) -> pd.DataFrame:
     print(pts.shape, np.min(pts[np.nonzero(pts)]), pts.max())
     df.iloc[:, :10] = np.where(pts > 10, np.log(pts), 0)
     df.iloc[:, :10] = df.iloc[:, :10].clip(upper=5)
+    df.iloc[:, :10] = df.iloc[:, :10] - 3.5 # shift to 0 mean
 
-    # idea: mirror around min to get gaussian like distribution
-    df.iloc[:, :10] = df.iloc[:, :10] - np.log(15)
-    print(df.iloc[:, :10].values.min())
+    # idea: mirror around min to get gaussian like distribution, abandoned for now
+    # df.iloc[:, :10] = df.iloc[:, :10] - np.log(15)
     # idxs = np.repeat(np.arange(len(df)).reshape(len(df), 1), 10, axis=1)
-    # print(idxs.shape, idxs)
     # pts = df.iloc[:, :10].values
+    # pts = np.where(pts == np.log(15), 0, pts)
     # df.iloc[:, :10] = np.where(idxs % 2 == 0, pts, -pts)
     idxs = np.vstack(
         (np.arange(0, 10), np.arange(10, 20), np.arange(20, 30))

@@ -15,7 +15,7 @@ import pandas as pd
 
 
 def delta_phi1v9(pts, phis):
-    filtered_phi = np.where(pts > 0, phis, np.nan)
+    filtered_phi = np.where(pts > np.log(15)-3.5, phis, np.nan)
     dphi = np.expand_dims(filtered_phi[:, 0], axis=-1) - filtered_phi[:, 1:10]
     dphi = dphi.reshape(-1, 9)
     # constraints the angles in the -pi,pi range

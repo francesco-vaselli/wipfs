@@ -116,7 +116,7 @@ def single_file_preprocess(filename: str) -> pd.DataFrame:
 
     # idea: mirror around min to get gaussian like distribution
     df.iloc[:, :10] = df.iloc[:, :10] - np.log(15)
-    idxs = np.repeat(np.arange(len(df).reshape(len(df), 1), 10, axis=1)
+    idxs = np.repeat(np.arange(len(df)).reshape(len(df), 1), 10, axis=1)
     print(idxs.shape, idxs)
     pts = df.iloc[:, :10].values
     df.iloc[:, :10] = np.where(idxs % 2 == 0, pts, -pts)

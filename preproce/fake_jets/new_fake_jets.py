@@ -110,9 +110,14 @@ def single_file_preprocess(filename: str) -> pd.DataFrame:
 
 
     pts = df.iloc[:, :10].values
+    print(pts.shape, pts.min(), pts.max())
     df.iloc[:, :10] = np.where(pts > 10, np.log(pts), 0)
     df.iloc[:, :10] = df.iloc[:, :10].clip(upper=5)
-    # reorder columns to have pt, eta, phi for each jet
+
+    # idea: mirror around min to get gaussian like distribution
+    df.iloc[:, :10] = df.iloc[:, :10] - np.log(20)
+    idxs = np.arange(len(df))
+    df.iloc[:, :10] = np.where(idxs % 2 == 0, df.iloc[:, :10], -df.iloc[:, :10])
     idxs = np.vstack(
         (np.arange(0, 10), np.arange(10, 20), np.arange(20, 30))
     ).T.flatten()

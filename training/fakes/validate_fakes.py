@@ -293,8 +293,8 @@ def validate_fakes(
         # ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
         # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
         # plt.savefig(os.path.join(save_dir, f"comparison_{names[i]}.png"))
-        writer.add_figure(f"comparison_deltaphi1v{i}", fig, global_step=epoch)
-        writer.add_scalar(f"ws/dphi1v{i}_wasserstein_distance", ws, global_step=epoch)
+        writer.add_figure(f"comparison_deltapt1v{i}", fig, global_step=epoch)
+        writer.add_scalar(f"ws/dpt1v{i}_wasserstein_distance", ws, global_step=epoch)
         plt.close()
 
     print("Done with dpt")

@@ -45,7 +45,7 @@ class FatJetsDataset(Dataset):
         Dataset (Pytorch Dataset): Pytorch Dataset class
     """
 
-    def __init__(self, pkl_paths, start_b=0, limit_b = 512005, start_s=512005, limit_s=None):
+    def __init__(self, pkl_paths, start_b=0, limit_b = 512005, start_s=512005, limit_s=None, oversample_b=1, oversample_s=20):
 
         self.pkl_paths = pkl_paths
         self.df = pd.read_pickle(self.pkl_paths[0])
@@ -93,6 +93,11 @@ class FatJetsDataset(Dataset):
                 "Mfatjet_particleNetMD_XbbvsQCD",
             ]
         ].values[start_s:limit_s]
+
+        x_b = np.repeat(x_b, oversample_b, axis=0)
+        y_b = np.repeat(y_b, oversample_b, axis=0)
+        x_s = np.repeat(x_s, oversample_s, axis=0)
+        y_s = np.repeat(y_s, oversample_s, axis=0)
 
         self.x_train = torch.tensor(np.concatenate((x_b, x_s)), dtype=torch.float32)  # .to(device)
         self.y_train = torch.tensor(np.concatenate((y_b, y_s)), dtype=torch.float32)  # .to(device)

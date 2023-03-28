@@ -96,11 +96,15 @@ def add_args(parser):
     parser.add_argument('--train_start_b', type=int, default=0)
     parser.add_argument('--train_limit_b', type=int, default=400000)
     parser.add_argument('--train_start_s', type=int, default=512005)
-    parser.add_argument('--train_limit_s', type=int, default=650000)
+    parser.add_argument('--train_limit_s', type=int, default=520482)
     parser.add_argument('--test_start_b', type=int, default=400000)
     parser.add_argument('--test_limit_b', type=int, default=482005)
-    parser.add_argument('--test_start_s', type=int, default=650000)
-    parser.add_argument('--test_limit_s', type=int, default=680000)
+    parser.add_argument('--test_start_s', type=int, default=520482)
+    parser.add_argument('--test_limit_s', type=int, default=522299)
+    parser.add_argument('--train_oversample_b', type=int, default=1)
+    parser.add_argument('--train_oversample_s', type=int, default=20)
+    parser.add_argument('--test_oversample_b', type=int, default=1)
+    parser.add_argument('--test_oversample_s', type=int, default=20)
 
     
 

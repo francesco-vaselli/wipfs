@@ -191,6 +191,8 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         limit_b=args.train_limit_b,
         start_s=args.train_start_s,
         limit_s=args.train_limit_s,
+        oversample_b = args.train_oversample_b,
+        oversample_s = args.train_oversample_s,
     )
     te_dataset = FatJetsDataset(
         [os.path.join(dirpath, "..", "datasets", "preprocessed.pkl")],
@@ -198,6 +200,8 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         limit_b=args.test_limit_b,
         start_s=args.test_start_s,
         limit_s=args.test_limit_s,
+        oversample_b = args.test_oversample_b,
+        oversample_s = args.test_oversample_s,
     )
 
     if args.distributed:

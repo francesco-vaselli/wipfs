@@ -149,7 +149,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
                 device_ids=[args.gpu],
                 output_device=args.gpu,
                 # check_reduction=True,
-                find_unused_parameters=True,
+                # find_unused_parameters=True,
                 # static_graph=False,
             )
             # ddp_model = torch.compile(bddp_model, mode='max-autotune', backend="inductor")

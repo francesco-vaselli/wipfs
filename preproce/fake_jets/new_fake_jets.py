@@ -164,7 +164,7 @@ if __name__ == "__main__":
 
     print(df)
 
-    save_file = h5py.File(f"../../training/datasets/full_fake_with_mask.hdf5", "w")
+    save_file = h5py.File(f"../../training/datasets/full_fake_with_mask_ptmean0.hdf5", "w")
 
     dset = save_file.create_dataset("data", data=df.values, dtype="f4")
 

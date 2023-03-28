@@ -113,7 +113,7 @@ def single_file_preprocess(filename: str) -> pd.DataFrame:
     print(pts.shape, np.min(pts[np.nonzero(pts)]), pts.max())
     df.iloc[:, :10] = np.where(pts > 10, np.log(pts), 0)
     df.iloc[:, :10] = df.iloc[:, :10].clip(upper=5)
-    df.iloc[:, :10] = df.iloc[:, :10] - 3.5 # shift to 0 mean
+    df.iloc[:, :10] = df.iloc[:, :10] - 3 # shift to 0 mean
 
     # idea: mirror around min to get gaussian like distribution, abandoned for now
     # df.iloc[:, :10] = df.iloc[:, :10] - np.log(15)

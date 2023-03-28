@@ -14,8 +14,23 @@ from scipy.stats import wasserstein_distance
 import pandas as pd
 
 
+def D_phi1v9(N, phis):
+    filtered_phi = phis
+    for i in range(0, 10):
+        filtered_phi[:, i][N <= i+1] = np.nan
+    dphi = np.expand_dims(filtered_phi[:, 0], axis=-1) - filtered_phi[:, 1:10]
+    dphi = dphi.reshape(-1, 9)
+    # constraints the angles in the -pi,pi range
+    dphi = np.where(dphi > np.pi, dphi - 2 * np.pi, dphi)
+    dphi = np.where(dphi < -np.pi, dphi + 2 * np.pi, dphi)
+    # print(np.isnan(dphi).any())
+    # dphi = np.where(dphi == np.nan, -5, dphi)
+
+    return dphi
+
+
 def delta_phi1v9(pts, phis):
-    filtered_phi = np.where(pts > np.log(15)-3.5, phis, np.nan)
+    filtered_phi = np.where(pts > np.log(15)-3, phis, np.nan)
     dphi = np.expand_dims(filtered_phi[:, 0], axis=-1) - filtered_phi[:, 1:10]
     dphi = dphi.reshape(-1, 9)
     # constraints the angles in the -pi,pi range

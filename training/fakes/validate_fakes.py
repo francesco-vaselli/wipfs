@@ -42,6 +42,14 @@ def delta_phi1v9(pts, phis):
     return dphi
 
 
+def delta_pt1v9(pts_ref, pts):
+    filtered_pts = np.where(pts_ref > np.log(15)-3, np.exp(pts+3), np.nan)
+    dpt = np.expand_dims(filtered_pts[:, 0], axis=-1) - filtered_pts[:, 1:10]
+    dpt = dpt.reshape(-1, 9)
+
+    return dpt
+
+
 def validate_fakes(
     test_loader,
     model,
@@ -119,6 +127,8 @@ def validate_fakes(
 
     dphi = delta_phi1v9(pts, phis)
     dphi_flash = delta_phi1v9(pts, phis_flash) # using full sim pt as reference of n_jets. should adjust to N_sel
+    dpt = delta_pt1v9(pts, pts)
+    dpt_flash = delta_pt1v9(pts, pts_flash)
     
     n_ids = np.array([[i, i, i]  for i in range(1, 11)]).flatten()
 
@@ -231,3 +241,60 @@ def validate_fakes(
         plt.close()
 
     print("Done with dphi")
+
+    for i in range(2, 10):
+
+        test_values = dpt[:, i-1].flatten()[N_sel >= i]
+        test_values = test_values[~np.isnan(test_values)]
+        print(test_values.shape)
+        generated_sample = dpt_flash[:, i-1].flatten()[N_sel >= i]
+        generated_sample = generated_sample[~np.isnan(generated_sample)]
+        print(generated_sample.shape)
+        ws = wasserstein_distance(test_values, generated_sample)
+        print(generated_sample.shape)
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
+
+        _, rangeR, _ = ax1.hist(
+            test_values, histtype="step", label="FullSim", lw=1, bins=100
+        )
+        print(rangeR.shape)
+        generated_sample = np.where(
+            generated_sample < rangeR.min(), rangeR.min(), generated_sample
+        )
+        generated_sample = np.where(
+            generated_sample > rangeR.max(), rangeR.max(), generated_sample
+        )
+
+        ax1.hist(
+            generated_sample,
+            bins=100,
+            histtype="step",
+            lw=1,
+            range=[rangeR.min(), rangeR.max()],
+            label=f"FlashSim, ws={round(ws, 4)}",
+        )
+        fig.suptitle(f"comparison_deltaphi1v{i} @ epoch {epoch}", fontsize=16)
+        ax1.legend(frameon=False, loc="upper right")
+
+        ax1.spines["right"].set_visible(False)
+        ax1.spines["top"].set_visible(False)
+        ax2.spines["right"].set_visible(False)
+        ax2.spines["top"].set_visible(False)
+        ax2.set_yscale("log")
+
+        ax2.hist(test_values, histtype="step", lw=1, bins=100)
+        ax2.hist(
+            generated_sample,
+            bins=100,
+            histtype="step",
+            lw=1,
+            range=[rangeR.min(), rangeR.max()],
+        )
+        # ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
+        # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
+        # plt.savefig(os.path.join(save_dir, f"comparison_{names[i]}.png"))
+        writer.add_figure(f"comparison_deltaphi1v{i}", fig, global_step=epoch)
+        writer.add_scalar(f"ws/dphi1v{i}_wasserstein_distance", ws, global_step=epoch)
+        plt.close()
+
+    print("Done with dpt")

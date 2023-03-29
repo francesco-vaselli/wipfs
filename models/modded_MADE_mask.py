@@ -300,7 +300,7 @@ class NMaskedMADE(nn.Module):
         outputs = self.final_layer(temps)
         if self.mask_on:
             outputs = outputs.view(inputs.shape[0], inputs.shape[1], -1)
-            mask = context[:, -inputs.shape[1]:]
+            mask = context[:, 7:10]
             outputs[mask==0, :] = np.log(np.exp(1 - 1e-3) - 1)
             outputs = outputs.view(inputs.shape[0], -1)
         return outputs
@@ -390,7 +390,7 @@ class MAFNMaskedMADE(nn.Module):
         outputs = self.final_layer(temps)
         if self.mask_on:
             outputs = outputs.view(inputs.shape[0], inputs.shape[1], -1)
-            mask = context[:, -inputs.shape[1]:]
+            mask = context[:, 7:10]
             outputs[mask==0, :] = 0.5414
             outputs = outputs.view(inputs.shape[0], -1)
         return outputs

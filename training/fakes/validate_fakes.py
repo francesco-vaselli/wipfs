@@ -47,7 +47,7 @@ def validate_fakes(
             while True:
                 try:
                     x_sampled = model.sample(
-                        num_samples=1, context=inputs_y.view(-1, args.y_dim+args.x_dim)
+                        num_samples=1, context=inputs_y # .view(-1, args.y_dim+args.x_dim)
                     )
                     break
                 except AssertionError:

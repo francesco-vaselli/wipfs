@@ -32,6 +32,7 @@ class NMaskedLinear(nn.Linear):
         super().__init__(
             in_features=len(in_degrees), out_features=out_features, bias=bias
         )
+        self.mask_on = mask_on
         self.NMask_degree = NMask_degree
         mask, degrees = self._get_mask_and_degrees(
             in_degrees=in_degrees,

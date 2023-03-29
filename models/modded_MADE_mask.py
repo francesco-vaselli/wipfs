@@ -70,7 +70,9 @@ class NMaskedLinear(nn.Linear):
                 max_ = max(1, autoregressive_features - 1)
                 min_ = min(1, autoregressive_features - 1)
                 out_degrees = torch.arange(out_features) % max_ + min_
+                print(max_, min_, out_degrees, in_degrees)
             mask = (out_degrees[..., None] >= in_degrees).float()
+            print(mask)
 
         return mask, out_degrees
 

@@ -76,6 +76,8 @@ class NMaskedLinear(nn.Linear):
     def forward(self, x, context):
         print(self.mask.size(), x.size(), context.size())
         print(self.mask[0, :], x[0, :], context[0, :])
+        print(torch.unique(self.mask))
+        print(torch.random((128,3))*self.mask)
         if self.mask_on:
             # print(context[:, 7:10])
             return F.linear(x * context[:, 7:10], self.weight * (self.mask), self.bias) # context mask should be reshaped?

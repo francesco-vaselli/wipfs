@@ -119,7 +119,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
                 model,
                 device_ids=[args.gpu],
                 output_device=args.gpu,
-                # check_reduction=True,
+                check_reduction=True,
             )
             args.batch_size = int(args.batch_size / ngpus_per_node)
             args.workers = 0
@@ -373,6 +373,9 @@ def main():
     save_dir = os.path.join("checkpoints", args.log_name)
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
+
+    if args.dist_url == "env://" and args.world_size == -1:
+        args.world_size = int(os.environ["WORLD_SIZE"])
 
     val_func = validate_fakes
     ngpus_per_node = torch.cuda.device_count()

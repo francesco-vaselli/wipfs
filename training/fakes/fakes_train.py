@@ -63,7 +63,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
 
     # define model, we got maf and arqs parts
     flow_param_dict = {
-        "input_dim": 6, # args.x_dim,
+        "input_dim": 3, # args.x_dim,
         "context_dim": args.y_dim,
         "base_kwargs": {
             "num_steps_maf": args.num_steps_maf,
@@ -85,6 +85,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
             # "block_size": args.block_size,  # useless param if we have alternating-binary mask
             # "mask_type": args.mask_type,
             "init_identity": args.init_identity,
+            "mask_on":args.mask_on,
         },
         "transform_type": args.transform_type,
     }

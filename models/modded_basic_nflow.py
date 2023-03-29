@@ -32,7 +32,7 @@ from torch.nn.functional import softplus
 
 from modded_coupling import PiecewiseCouplingTransformM
 from modded_base_flow import FlowM
-from modded_MADE_mask import NMaskedMADE
+from modded_MADE_mask import NMaskedMADE, MAFNMaskedMADE
 from modded_splines import unconstrained_rational_quadratic_spline, rational_quadratic_spline
 import modded_splines
 
@@ -49,10 +49,11 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
         activation=F.relu,
         dropout_probability=0.0,
         use_batch_norm=False,
-        init_identity = True
+        init_identity = True,
+        mask_on = False,
     ):
         self.features = features
-        made = NMaskedMADE( # made_module.MADE(
+        made = MAFNMaskedMADE( # made_module.MADE(
             features=features,
             hidden_features=hidden_features,
             context_features=context_features,
@@ -63,6 +64,7 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
             activation=activation,
             dropout_probability=dropout_probability,
             use_batch_norm=use_batch_norm,
+            mask_on = mask_on,
         )
         self._epsilon = 1e-3
         self.init_identity = init_identity
@@ -136,6 +138,7 @@ class MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(AutoregressiveTra
         min_bin_width=modded_splines.DEFAULT_MIN_BIN_WIDTH,
         min_bin_height=modded_splines.DEFAULT_MIN_BIN_HEIGHT,
         min_derivative=modded_splines.DEFAULT_MIN_DERIVATIVE,
+        mask_on=False,
     ):
         self.num_bins = num_bins
         self.min_bin_width = min_bin_width
@@ -155,6 +158,7 @@ class MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(AutoregressiveTra
             activation=activation,
             dropout_probability=dropout_probability,
             use_batch_norm=use_batch_norm,
+            mask_on=mask_on
         )
 
         if init_identity:
@@ -594,7 +598,8 @@ def create_mixture_flow_model(
                 context_features=context_dim,
                 dropout_probability=base_kwargs["dropout_probability_maf"],
                 use_batch_norm=base_kwargs["batch_norm_maf"],
-                init_identity=base_kwargs["init_identity"]
+                init_identity=base_kwargs["init_identity"],
+                mask_on=base_kwargs["mask_on"],
             )
         )
         # transform.append(create_random_transform(param_dim=input_dim))
@@ -612,7 +617,8 @@ def create_mixture_flow_model(
                 context_features=context_dim,
                 dropout_probability=base_kwargs["dropout_probability_arqs"],
                 use_batch_norm=base_kwargs["batch_norm_arqs"],
-                init_identity=base_kwargs["init_identity"]
+                init_identity=base_kwargs["init_identity"],
+                mask_on=base_kwargs["mask_on"],
             )
         )
         # transform.append(create_random_transform(param_dim=input_dim))

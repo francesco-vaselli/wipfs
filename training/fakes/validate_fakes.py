@@ -8,23 +8,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import corner
 import matplotlib.lines as mlines
-from sklearn.metrics import roc_curve, auc
-from sklearn.utils import shuffle
 from scipy.stats import wasserstein_distance
 import pandas as pd
-
-
-def delta_phi1v9(pts, phis):
-    filtered_phi = np.where(pts > 0, phis, np.nan)
-    dphi = filtered_phi[:, 0] - filtered_phi[:, 1]
-    dphi = dphi.reshape(-1, 1)
-    # constraints the angles in the -pi,pi range
-    dphi = np.where(dphi > np.pi, dphi - 2 * np.pi, dphi)
-    dphi = np.where(dphi < -np.pi, dphi + 2 * np.pi, dphi)
-    # print(np.isnan(dphi).any())
-    # dphi = np.where(dphi == np.nan, -5, dphi)
-
-    return dphi
 
 
 def validate_fakes(
@@ -71,7 +56,7 @@ def validate_fakes(
             x_sampled = x_sampled.cpu().detach().numpy()
             inputs_y = inputs_y.cpu().detach().numpy()
             x = x.cpu().detach().numpy()
-            x_sampled = x_sampled.reshape(-1, 6)
+            x_sampled = x_sampled.reshape(-1, 3)
             gen.append(inputs_y[:, :args.y_dim])
             reco.append(x)
             samples.append(x_sampled)
@@ -79,8 +64,8 @@ def validate_fakes(
         torch.cuda.empty_cache()
         print("Done sampling")
     gen = np.array(gen).reshape((-1, args.y_dim))
-    full_sim = np.array(reco).reshape((-1, 6))
-    flash_sim = np.array(samples).reshape((-1, 6))
+    full_sim = np.array(reco).reshape((-1, 3))
+    flash_sim = np.array(samples).reshape((-1, 3))
 
     # Samples postprocessing 
     # flash_sim[:, [1, 2]] = flash_sim[:, [1, 2]] * 200
@@ -97,13 +82,7 @@ def validate_fakes(
     print(N_sel)
     names = np.array([[f"pt{i}", f"eta{i}", f"phi{i}"]  for i in range(0, 2)]).flatten()
 
-    pts = full_sim[:, 0::3]
-    phis = full_sim[:, 2::3]
-    pts_flash = flash_sim[:, 0::3]
-    phis_flash = flash_sim[:, 2::3]
-    dphi = delta_phi1v9(pts, phis)
-    dphi_flash = delta_phi1v9(pts, phis_flash) # using full sim pt as reference of n_jets. should adjust to N_sel
-    print(dphi.shape, dphi)
+
     n_ids = np.array([[i, i, i]  for i in range(1, 3)]).flatten()
 
 
@@ -157,59 +136,3 @@ def validate_fakes(
         writer.add_figure(f"comparison_{names[i]}", fig, global_step=epoch)
         writer.add_scalar(f"ws/{names[i]}_wasserstein_distance", ws, global_step=epoch)
         plt.close()
-
-
-    test_values = dphi.flatten()
-    test_values = test_values[~np.isnan(test_values)]
-    print(test_values.shape, test_values)
-    generated_sample = dphi_flash.flatten()
-    generated_sample = generated_sample[~np.isnan(generated_sample)]
-    print(generated_sample.shape, generated_sample)
-    ws = wasserstein_distance(test_values, generated_sample)
-    print(generated_sample.shape)
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
-
-    _, rangeR, _ = ax1.hist(
-        test_values, histtype="step", label="FullSim", lw=1, bins=100
-    )
-    print(rangeR.shape)
-    generated_sample = np.where(
-        generated_sample < rangeR.min(), rangeR.min(), generated_sample
-    )
-    generated_sample = np.where(
-        generated_sample > rangeR.max(), rangeR.max(), generated_sample
-    )
-
-    ax1.hist(
-        generated_sample,
-        bins=100,
-        histtype="step",
-        lw=1,
-        range=[rangeR.min(), rangeR.max()],
-        label=f"FlashSim, ws={round(ws, 4)}",
-    )
-    fig.suptitle(f"comparison_deltaphi1v{i} @ epoch {epoch}", fontsize=16)
-    ax1.legend(frameon=False, loc="upper right")
-
-    ax1.spines["right"].set_visible(False)
-    ax1.spines["top"].set_visible(False)
-    ax2.spines["right"].set_visible(False)
-    ax2.spines["top"].set_visible(False)
-    ax2.set_yscale("log")
-
-    ax2.hist(test_values, histtype="step", lw=1, bins=100)
-    ax2.hist(
-        generated_sample,
-        bins=100,
-        histtype="step",
-        lw=1,
-        range=[rangeR.min(), rangeR.max()],
-    )
-    # ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
-    # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
-    # plt.savefig(os.path.join(save_dir, f"comparison_{names[i]}.png"))
-    writer.add_figure(f"comparison_deltaphi1v2", fig, global_step=epoch)
-    writer.add_scalar(f"ws/dphi1v2_wasserstein_distance", ws, global_step=epoch)
-    plt.close()
-
-    

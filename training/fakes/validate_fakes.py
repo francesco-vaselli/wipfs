@@ -86,7 +86,7 @@ def validate_fakes(
     n_ids = np.array([[i, i, i]  for i in range(1, 3)]).flatten()
 
 
-    for i in range(0, len(names)):
+    for i in range(0, 3):
 
         test_values = full_sim[:, i].flatten()[N_sel >= n_ids[i]]
         generated_sample = flash_sim[:, i].flatten()[N_sel >= n_ids[i]]

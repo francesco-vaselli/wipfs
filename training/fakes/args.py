@@ -54,7 +54,7 @@ def add_args(parser):
     parser.add_argument('--block_size', type=int, default=2)
     parser.add_argument('--mask_type', type=str, default='alternating-binary', choices=['alternating-binary', 'block-binary', 'identity'])
     parser.add_argument('--init_identity', type=eval, default=True, choices=[True, False])
-    parser.add_argument('-mask_on', type=eval, default=False, choices=[True, False])
+    parser.add_argument('--mask_on', type=eval, default=False, choices=[True, False])
 
 
     # training options

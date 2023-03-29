@@ -135,7 +135,7 @@ class MaskAllFakesDataset(Dataset):
         
         x = self.archives[0]["data"][start : start + limit, 0:x_dim]
 
-        self.x_train = torch.tensor(x[:, :3], dtype=torch.float32)
+        self.x_train = torch.tensor(x[:, :3], dtype=torch.float32)# [1, 0, 2]], dtype=torch.float32)
         self.y_train = torch.tensor(y, dtype=torch.float32)
         # self.z_train = torch.tensor(z, dtype=torch.float32)
 

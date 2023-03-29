@@ -22,6 +22,7 @@ from nflows.transforms.autoregressive import (AutoregressiveTransform)
 from nflows.transforms.base import CompositeTransform
 from nflows.transforms.autoregressive import MaskedAffineAutoregressiveTransform
 from nflows import transforms
+from nflows.transforms import made as made_module
 # from nflows.transforms.splines import rational_quadratic
 # from nflows.transforms.splines.rational_quadratic import (
 #     rational_quadratic_spline,
@@ -53,7 +54,7 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
         mask_on = False,
     ):
         self.features = features
-        made = MAFNMaskedMADE( # made_module.MADE(
+        made = made_module.MADE( # MAFNMaskedMADE( # made_module.MADE(
             features=features,
             hidden_features=hidden_features,
             context_features=context_features,
@@ -64,7 +65,7 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
             activation=activation,
             dropout_probability=dropout_probability,
             use_batch_norm=use_batch_norm,
-            mask_on = mask_on,
+            # mask_on = mask_on,
         )
         self._epsilon = 1e-3
         self.init_identity = init_identity
@@ -147,7 +148,7 @@ class MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(AutoregressiveTra
         self.tails = tails
         self.tail_bound = tail_bound
 
-        autoregressive_net = NMaskedMADE( # made_module.MADE(
+        autoregressive_net = made_module.MADE( # NMaskedMADE( # made_module.MADE(
             features=features,
             hidden_features=hidden_features,
             context_features=context_features,
@@ -158,7 +159,7 @@ class MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(AutoregressiveTra
             activation=activation,
             dropout_probability=dropout_probability,
             use_batch_norm=use_batch_norm,
-            mask_on=mask_on
+            # mask_on=mask_on
         )
 
         if init_identity:
@@ -602,7 +603,7 @@ def create_mixture_flow_model(
                 mask_on=base_kwargs["mask_on"],
             )
         )
-        transform.append(create_random_transform(param_dim=input_dim))
+        # transform.append(create_random_transform(param_dim=input_dim))
 
     for _ in range(base_kwargs["num_steps_arqs"]):
         transform.append(
@@ -621,7 +622,7 @@ def create_mixture_flow_model(
                 mask_on=base_kwargs["mask_on"],
             )
         )
-        transform.append(create_random_transform(param_dim=input_dim))
+        # transform.append(create_random_transform(param_dim=input_dim))
 
     transform_fnal = CompositeTransform(transform)
 

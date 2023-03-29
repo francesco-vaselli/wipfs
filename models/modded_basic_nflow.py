@@ -602,7 +602,7 @@ def create_mixture_flow_model(
                 mask_on=base_kwargs["mask_on"],
             )
         )
-        # transform.append(create_random_transform(param_dim=input_dim))
+        transform.append(create_random_transform(param_dim=input_dim))
 
     for _ in range(base_kwargs["num_steps_arqs"]):
         transform.append(
@@ -621,7 +621,7 @@ def create_mixture_flow_model(
                 mask_on=base_kwargs["mask_on"],
             )
         )
-        # transform.append(create_random_transform(param_dim=input_dim))
+        transform.append(create_random_transform(param_dim=input_dim))
 
     transform_fnal = CompositeTransform(transform)
 

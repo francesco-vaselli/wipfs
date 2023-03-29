@@ -34,6 +34,7 @@ class NMaskedLinear(nn.Linear):
         )
         self.mask_on = mask_on
         self.NMask_degree = NMask_degree
+        self.out_features = out_features
         mask, degrees = self._get_mask_and_degrees(
             in_degrees=in_degrees,
             out_features=out_features,
@@ -77,7 +78,7 @@ class NMaskedLinear(nn.Linear):
         print(self.mask.size(), x.size(), context.size())
         print(self.mask[0, :], x[0, :], context[0, :])
         print(torch.unique(self.mask))
-        print(torch.rand(128,3)*self.mask)
+        print(torch.rand(self.out_features,3)*self.mask)
         if self.mask_on:
             # print(context[:, 7:10])
             return F.linear(x * context[:, 7:10], self.weight * (self.mask), self.bias) # context mask should be reshaped?

@@ -75,7 +75,7 @@ class NMaskedLinear(nn.Linear):
 
     def forward(self, x, context):
         if self.mask_on:
-            print(context[:, 7:10])
+            # print(context[:, 7:10])
             return F.linear(x * context[:, 7:10], self.weight * (self.mask), self.bias) # context mask should be reshaped?
         else:
             return F.linear(x , self.weight * (self.mask), self.bias)

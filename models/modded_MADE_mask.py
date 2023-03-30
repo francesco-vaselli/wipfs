@@ -378,6 +378,7 @@ class MAFNMaskedMADE(nn.Module):
             temps = block(temps, context=context[:, :self.context_layer.in_features])
         outputs = self.final_layer(temps)
         outputs = outputs.view(inputs.shape[0], inputs.shape[1], -1)
+        print(context[:, self.context_layer.in_features:].size())
         mask = torch.hstack((torch.zeros(inputs.shape[0], 1).to(context.device), context[:, self.context_layer.in_features:]))
         outputs[mask==0, :] = 0.5414
         outputs = outputs.view(inputs.shape[0], -1)

@@ -120,7 +120,6 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
                 model,
                 device_ids=[args.gpu],
                 output_device=args.gpu,
-                check_reduction=True,
             )
             args.batch_size = int(args.batch_size / ngpus_per_node)
             args.workers = 0

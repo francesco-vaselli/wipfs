@@ -97,7 +97,9 @@ def validate_fakes(
             inputs_y = inputs_y.cpu().detach().numpy()
             x = x.cpu().detach().numpy()
             zero_full = x[:, 0]
+            print(zero_full)
             x = x[:, 1:]
+            print(x_sampled.shape)
             x_sampled = x_sampled.reshape(-1, args.x_dim)[:, 1:]
             zero_flash = x_sampled.reshape(-1, args.x_dim)[:, 0]
             gen.append(inputs_y[:, :args.y_dim])

@@ -50,7 +50,7 @@ def add_args(parser):
     parser.add_argument('--hidden_dim_maf', type=int, default=128)
     parser.add_argument('--hidden_dim_arqs', type=int, default=198)
     parser.add_argument('--base_transform_type', type=str, default='rq-autoregressive', choices=['rq-autoregressive', 'rq-coupling'])
-    parser.add_argument('--transform_type', type=str, default='random-permutation', choices=['random-permutation', 'block-permutation', 'no-permutation'])
+    parser.add_argument('--permute_type', type=str, default='triplet-permutation', choices=['random-permutation', 'block-permutation', 'triplet-permutation', 'no-permutation'])
     parser.add_argument('--block_size', type=int, default=2)
     parser.add_argument('--mask_type', type=str, default='alternating-binary', choices=['alternating-binary', 'block-binary', 'identity'])
     parser.add_argument('--init_identity', type=eval, default=True, choices=[True, False])

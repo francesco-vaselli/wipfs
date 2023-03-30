@@ -85,6 +85,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
             # "block_size": args.block_size,  # useless param if we have alternating-binary mask
             # "mask_type": args.mask_type,
             "init_identity": args.init_identity,
+            "permute_type": args.permute_type,
         },
         "transform_type": args.transform_type,
     }

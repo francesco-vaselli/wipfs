@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 from nflows.transforms.permutations import Permutation
 import nflows.utils.typechecks as check
 
@@ -31,5 +32,27 @@ class IdentityPermutation(Permutation):
             raise ValueError("Number of features must be a positive integer.")
 
         super().__init__(
-                torch.arange(features),
+            torch.arange(features),
+        )
+
+
+class TripletPermutation(Permutation):
+    """Permutes the input in triplets.
+    The first three elements are shuffled between them and so forth
+    All the triplets are permuted in the same way"""
+
+    def __init__(self, features, dim=1):
+        if not check.is_positive_int(features):
+            raise ValueError("Number of features must be a positive integer.")
+        if features % 3 != 0:
+            raise ValueError("Number of features must be a multiple of 3.")
+
+        triplet_perm = torch.arange(3)[torch.randperm(3)]
+        new_idx = torch.tensor(
+            np.array(
+                [n * 3 + triplet_perm for n in range(0, int(features / 3))]
+            ).flatten()
+        )
+        super().__init__(
+            torch.arange(features)[new_idx],
         )

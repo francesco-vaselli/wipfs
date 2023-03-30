@@ -73,7 +73,7 @@ class NMaskedLinear(nn.Linear):
         return mask, out_degrees
 
     def forward(self, x, context):
-        print(x.size(), torch.hstack((torch.zeros(x.shape[0], 1).to(x.device), context[:, -self.NMask_degree:])).size())
+        # print(x.size(), torch.hstack((torch.zeros(x.shape[0], 1).to(x.device), context[:, -self.NMask_degree:])).size())
         return F.linear(x * torch.hstack((torch.zeros(x.shape[0], 1).to(x.device), context[:, -self.NMask_degree:])), self.weight * (self.mask), self.bias) # context mask should be reshaped?
 
 
@@ -292,7 +292,7 @@ class NMaskedMADE(nn.Module):
             temps = block(temps, context=context[:, :self.context_layer.in_features])
         outputs = self.final_layer(temps)
         outputs = outputs.view(inputs.shape[0], inputs.shape[1], -1)
-        mask = torch.hstack((torch.zeros(inputs.shape[0], 1).to(context.device), context[:, -inputs.shape[1]:]))
+        mask = torch.hstack((torch.zeros(inputs.shape[0], 1).to(context.device), context[:, self.context_layer.in_features:]))
         outputs[mask==0, :] = np.log(np.exp(1 - 1e-3) - 1)
         outputs = outputs.view(inputs.shape[0], -1)
         return outputs
@@ -320,7 +320,7 @@ class MAFNMaskedMADE(nn.Module):
             raise ValueError("Residual blocks can't be used with random masks.")
         super().__init__()
 
-        NMask_degree = features -1 
+        NMask_degree = features -1
         # Initial layer.
         self.initial_layer = NMaskedLinear(
             in_degrees=_get_input_degrees(features),
@@ -378,7 +378,7 @@ class MAFNMaskedMADE(nn.Module):
             temps = block(temps, context=context[:, :self.context_layer.in_features])
         outputs = self.final_layer(temps)
         outputs = outputs.view(inputs.shape[0], inputs.shape[1], -1)
-        mask = torch.hstack((torch.zeros(inputs.shape[0], 1).to(context.device), context[:, -inputs.shape[1]:]))
+        mask = torch.hstack((torch.zeros(inputs.shape[0], 1).to(context.device), context[:, self.context_layer.in_features:]))
         outputs[mask==0, :] = 0.5414
         outputs = outputs.view(inputs.shape[0], -1)
         return outputs

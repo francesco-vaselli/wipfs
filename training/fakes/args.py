@@ -98,6 +98,7 @@ def add_args(parser):
     parser.add_argument('--train_limit', type=int, default=1000000)
     parser.add_argument('--test_start', type=int, default=0)
     parser.add_argument('--test_limit', type=int, default=100000)
+    parser.add_argument('--first_var', type=str, default='const', choices=['const', 'rand'])
     
 
     # logging and saving frequency

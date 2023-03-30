@@ -155,6 +155,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         z_dim=args.z_dim,
         h5_paths = [os.path.join(dirpath, "..", "datasets", "full_fake_with_mask_ptmean0.hdf5")],
         limit=args.train_limit,
+        first = args.first_var,
     )
     te_dataset = MaskAllFakesDataset(
         x_dim=args.x_dim,
@@ -163,6 +164,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         h5_paths =[os.path.join(dirpath, "..", "datasets", "full_fake_with_mask_ptmean0.hdf5")],
         start=args.train_limit,
         limit=args.test_limit,
+        first = args.first_var,
     )
 
     if args.distributed:

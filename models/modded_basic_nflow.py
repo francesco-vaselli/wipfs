@@ -651,7 +651,7 @@ def create_mixture_flow_model(input_dim, context_dim, base_kwargs, permute_type)
         "input_dim": input_dim,
         "context_dim": context_dim,
         "base_kwargs": base_kwargs,
-        "transform_type": transform_type,
+        "permute_type": permute_type,
     }
 
     return flow

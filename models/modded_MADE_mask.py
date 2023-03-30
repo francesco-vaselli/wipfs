@@ -319,7 +319,7 @@ class MAFNMaskedMADE(nn.Module):
             raise ValueError("Residual blocks can't be used with random masks.")
         super().__init__()
 
-        NMask_degree = features
+        NMask_degree = features -1 
         # Initial layer.
         self.initial_layer = NMaskedLinear(
             in_degrees=_get_input_degrees(features),
@@ -331,7 +331,7 @@ class MAFNMaskedMADE(nn.Module):
         )
 
         if context_features + features - NMask_degree > 0:
-            self.context_layer = nn.Linear(context_features + features - NMask_degree, hidden_features)
+            self.context_layer = nn.Linear(context_features + features -1 - NMask_degree, hidden_features)
             print("context_layer", self.context_layer)
 
         self.use_residual_blocks = use_residual_blocks
@@ -377,7 +377,7 @@ class MAFNMaskedMADE(nn.Module):
             temps = block(temps, context=context[:, :self.context_layer.in_features])
         outputs = self.final_layer(temps)
         outputs = outputs.view(inputs.shape[0], inputs.shape[1], -1)
-        mask = torch.hstack((torch.zeros(input.shape[0], 1).to(context.device), context[:, -inputs.shape[1]:]))
+        mask = torch.hstack((torch.zeros(inputs.shape[0], 1).to(context.device), context[:, -inputs.shape[1]:]))
         outputs[mask==0, :] = 0.5414
         outputs = outputs.view(inputs.shape[0], -1)
         return outputs

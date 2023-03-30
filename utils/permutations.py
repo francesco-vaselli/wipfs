@@ -48,11 +48,11 @@ class TripletPermutation(Permutation):
             raise ValueError("Number of features must be a multiple of 3.")
 
         triplet_perm = torch.arange(3)[torch.randperm(3)]
-        new_idx = np.array(
-                [n * 3 + triplet_perm for n in range(0, int(features / 3))]
+        new_idx = torch.tensor(
+            np.array(
+                [n * 3 + triplet_perm.numpy() for n in range(0, int(features / 3))]
             ).flatten()
-        print(new_idx, new_idx.dtype)
-        new_idx = torch.tensor(new_idx, dtype=torch.int)
+        )
         super().__init__(
             torch.arange(features)[new_idx],
         )

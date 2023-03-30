@@ -617,8 +617,8 @@ def create_mixture_flow_model(input_dim, context_dim, base_kwargs, permute_type)
             )
         )
         # transform.append(create_random_transform(param_dim=input_dim))
-        if permute_type == "triplet-permutation":
-            transform.append(create_triplet_permute(param_dim=input_dim))
+        # if permute_type == "triplet-permutation":
+        #     transform.append(create_triplet_permute(param_dim=input_dim))
 
     for _ in range(base_kwargs["num_steps_arqs"]):
         transform.append(
@@ -637,8 +637,8 @@ def create_mixture_flow_model(input_dim, context_dim, base_kwargs, permute_type)
             )
         )
         # transform.append(create_random_transform(param_dim=input_dim))
-        if permute_type == "triplet-permutation":
-            transform.append(create_triplet_permute(param_dim=input_dim))
+        # if permute_type == "triplet-permutation":
+        #     transform.append(create_triplet_permute(param_dim=input_dim))
 
     transform_fnal = CompositeTransform(transform)
 

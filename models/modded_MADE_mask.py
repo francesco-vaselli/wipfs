@@ -73,7 +73,7 @@ class NMaskedLinear(nn.Linear):
         return mask, out_degrees
 
     def forward(self, x, context):
-        return F.linear(x * context[:, -self.NMask_degree:], self.weight * (self.mask), self.bias) # context mask should be reshaped?
+        return F.linear(x * torch.hstack((torch.zeros(input.shape[0], 1), context[:, -self.NMask_degree:])), self.weight * (self.mask), self.bias) # context mask should be reshaped?
 
 
 class NMaskedFeedforwardBlock(nn.Module):
@@ -377,7 +377,7 @@ class MAFNMaskedMADE(nn.Module):
             temps = block(temps, context=context[:, :self.context_layer.in_features])
         outputs = self.final_layer(temps)
         outputs = outputs.view(inputs.shape[0], inputs.shape[1], -1)
-        mask = context[:, -inputs.shape[1]:]
+        mask = torch.hstack((torch.zeros(input.shape[0], 1), context[:, -inputs.shape[1]:]))
         outputs[mask==0, :] = 0.5414
         outputs = outputs.view(inputs.shape[0], -1)
         return outputs

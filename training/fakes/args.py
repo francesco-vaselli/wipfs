@@ -4,7 +4,7 @@ NONLINEARITIES = ["tanh", "relu", "softplus", "elu", "swish", "square", "identit
 SOLVERS = ["dopri5", "bdf", "rk4", "midpoint", 'adams', 'explicit_adams', 'fixed_adams']
 LAYERS = ["ignore", "concat", "concat_v2", "squash", "concatsquash", "scale", "concatscale"]
 
-X_DIM = 30
+X_DIM = 31
 Y_DIM = 7
 Z_DIM = 3   
 

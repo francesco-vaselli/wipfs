@@ -77,6 +77,8 @@ def validate_fakes(
         gen = []
         reco = []
         samples = []
+        zeros_full = []
+        zeros_flash = []
 
         for bid, (_, y, x) in enumerate(test_loader):
             # print(f"Batch {bid} / {len(test_loader)}")
@@ -85,7 +87,7 @@ def validate_fakes(
             while True:
                 try:
                     x_sampled = model.sample(
-                        num_samples=1, context=inputs_y.view(-1, args.y_dim+args.x_dim)
+                        num_samples=1, context=inputs_y # .view(-1, args.y_dim+args.x_dim)
                     )
                     break
                 except AssertionError:
@@ -94,16 +96,23 @@ def validate_fakes(
             x_sampled = x_sampled.cpu().detach().numpy()
             inputs_y = inputs_y.cpu().detach().numpy()
             x = x.cpu().detach().numpy()
-            x_sampled = x_sampled.reshape(-1, args.x_dim)
+            zero_full = x[:, 0]
+            x = x[:, 1:]
+            x_sampled = x_sampled.reshape(-1, args.x_dim)[:, 1:]
+            zero_flash = x_sampled.reshape(-1, args.x_dim)[:, 0]
             gen.append(inputs_y[:, :args.y_dim])
             reco.append(x)
             samples.append(x_sampled)
+            zeros_full.append(zero_full)
+            zeros_flash.append(zero_flash)
         del inputs_y, x, x_sampled
         torch.cuda.empty_cache()
         print("Done sampling")
     gen = np.array(gen).reshape((-1, args.y_dim))
-    full_sim = np.array(reco).reshape((-1, args.x_dim))
-    flash_sim = np.array(samples).reshape((-1, args.x_dim))
+    full_sim = np.array(reco).reshape((-1, args.x_dim-1))
+    flash_sim = np.array(samples).reshape((-1, args.x_dim-1))
+    zeros_flash = np.array(zeros_flash).reshape((-1, 1))
+    zeros_full = np.array(zeros_full).reshape((-1, 1))
 
     # Samples postprocessing 
     # flash_sim[:, [1, 2]] = flash_sim[:, [1, 2]] * 200
@@ -132,6 +141,18 @@ def validate_fakes(
     
     n_ids = np.array([[i, i, i]  for i in range(1, 11)]).flatten()
 
+    # plot zeros
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
+    ax1.hist(zeros_full, histtype="step", label="FullSim", lw=1, bins=100)
+    ax2.hist(zeros_flash, histtype="step", label="FlashSim", lw=1, bins=100)
+    ax1.set_xlabel("first var")
+    ax2.set_xlabel("first var")
+    ax1.set_ylabel("Events")
+    ax2.set_ylabel("Events")
+    ax1.legend()
+    ax2.legend()
+    writer.add_figure(f"zeros", fig, global_step=epoch)
+    writer.add_scalar(f"zeros_full", np.mean(zeros_full), global_step=epoch)
 
     for i in range(0, len(names)):
 

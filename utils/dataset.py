@@ -120,7 +120,7 @@ class MaskAllFakesDataset(Dataset):
         Dataset (Pytorch Dataset): Pytorch Dataset class
     """
 
-    def __init__(self, h5_paths, x_dim, y_dim, z_dim, start=0, limit=-1):
+    def __init__(self, h5_paths, x_dim, y_dim, z_dim, start=0, limit=-1, first='const'):
 
         # we must fix a convention for parametrizing slices
 
@@ -130,12 +130,19 @@ class MaskAllFakesDataset(Dataset):
 
         y = self.archives[0]["data"][
             start : start + limit, np.hstack(
-            (np.arange(x_dim, x_dim + y_dim),
-            np.arange(x_dim + y_dim + z_dim, x_dim + y_dim + z_dim + x_dim)))]
+            (np.arange(x_dim-1, x_dim + y_dim),
+            np.arange(x_dim-1 + y_dim + z_dim, x_dim-1 + y_dim + z_dim + x_dim-1)))]
         
-        x = self.archives[0]["data"][start : start + limit, 0:x_dim]
+        x = self.archives[0]["data"][start : start + limit, 0:x_dim-1]
 
         self.x_train = torch.tensor(x, dtype=torch.float32)
+        if first == 'const':
+            self.x_train = torch.hstack((torch.zeros(len(self.x_train), 1), self.x_train))
+        elif first == 'rand':
+            self.x_train = torch.hstack((torch.rand(len(self.x_train), 1), self.x_train))
+        else:
+            raise ValueError('first must be either const or rand')
+
         self.y_train = torch.tensor(y, dtype=torch.float32)
         # self.z_train = torch.tensor(z, dtype=torch.float32)
 

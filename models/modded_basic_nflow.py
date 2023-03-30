@@ -335,7 +335,7 @@ def create_triplet_permute(param_dim):
     return transforms.CompositeTransform(
         [
             TripletPermutation(features=param_dim),
-            transforms.LULinear(param_dim, identity_init=True),
+            # transforms.LULinear(param_dim, identity_init=True),
         ]
     )
 

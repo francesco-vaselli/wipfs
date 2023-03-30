@@ -583,7 +583,7 @@ def create_NDE_model(
     return flow
 
 
-def create_mixture_flow_model(input_dim, context_dim, base_kwargs, transform_type):
+def create_mixture_flow_model(input_dim, context_dim, base_kwargs, permute_type):
     """Build NSF (neural spline flow) model. This uses the nsf module
     available at https://github.com/bayesiains/nsf.
     This models the posterior distribution p(x|y).
@@ -617,7 +617,7 @@ def create_mixture_flow_model(input_dim, context_dim, base_kwargs, transform_typ
             )
         )
         # transform.append(create_random_transform(param_dim=input_dim))
-        if base_kwargs['permute_type'] == "triplet-permutation":
+        if permute_type == "triplet-permutation":
             transform.append(create_triplet_permute(param_dim=input_dim))
 
     for _ in range(base_kwargs["num_steps_arqs"]):
@@ -637,7 +637,7 @@ def create_mixture_flow_model(input_dim, context_dim, base_kwargs, transform_typ
             )
         )
         # transform.append(create_random_transform(param_dim=input_dim))
-        if base_kwargs['permute_type'] == "triplet-permutation":
+        if permute_type == "triplet-permutation":
             transform.append(create_triplet_permute(param_dim=input_dim))
 
     transform_fnal = CompositeTransform(transform)

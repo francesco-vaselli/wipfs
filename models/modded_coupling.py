@@ -84,11 +84,19 @@ class CouplingTransformM(Transform):
             raise ValueError(
                 "Expected features = {}, got {}.".format(self.features, inputs.shape[1])
             )
+        
+        mask = context[:, self.transform_net.context_features:self.transform_net.context_features+self.features]
 
         identity_split = inputs[:, self.identity_features, ...]
         transform_split = inputs[:, self.transform_features, ...]
 
-        transform_params = self.transform_net(identity_split, context)
+        transform_params = self.transform_net(identity_split* mask[:, self.identity_features], context[:, :self.transform_net.context_features])
+        b, d = transform_params.shape
+        # For 2D data, reshape transform_params from Bx(D*?) to BxDx?
+        transform_params = transform_params.reshape(b, d, -1)
+        transform_params[mask[:, self.transform_features]==0, :] = np.log(np.exp(1 - 1e-3) - 1)
+        transform_params = transform_params.view(inputs.shape[0], -1)
+
         transform_split, logabsdet = self._coupling_transform_forward(
             inputs=transform_split, transform_params=transform_params
         )
@@ -103,6 +111,8 @@ class CouplingTransformM(Transform):
         outputs[:, self.identity_features, ...] = identity_split
         outputs[:, self.transform_features, ...] = transform_split
 
+
+
         return outputs, logabsdet
 
     def inverse(self, inputs, context=None):
@@ -114,6 +124,8 @@ class CouplingTransformM(Transform):
                 "Expected features = {}, got {}.".format(self.features, inputs.shape[1])
             )
 
+        mask = context[:, self.transform_net.context_features:self.transform_net.context_features+self.features]
+
         identity_split = inputs[:, self.identity_features, ...]
         transform_split = inputs[:, self.transform_features, ...]
 
@@ -123,7 +135,12 @@ class CouplingTransformM(Transform):
                 identity_split, context
             )
 
-        transform_params = self.transform_net(identity_split, context)
+        transform_params = self.transform_net(identity_split* mask[:, self.identity_features], context[:, :self.transform_net.context_features])
+        b, d = transform_params.shape
+        # For 2D data, reshape transform_params from Bx(D*?) to BxDx?
+        transform_params = transform_params.reshape(b, d, -1)
+        transform_params[mask[:, self.transform_features]==0, :] = np.log(np.exp(1 - 1e-3) - 1)
+        transform_params = transform_params.view(inputs.shape[0], -1)
         transform_split, logabsdet_split = self._coupling_transform_inverse(
             inputs=transform_split, transform_params=transform_params
         )

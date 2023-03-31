@@ -14,7 +14,7 @@ import sys
 import os
 
 sys.path.insert(0, os.path.join("..", "utils"))
-from masks import create_block_binary_mask, create_identity_mask
+from masks import create_block_binary_mask, create_identity_mask, create_triplet_mask
 from permutations import BlockPermutation, IdentityPermutation, TripletPermutation
 
 from nflows.transforms.autoregressive import AutoregressiveTransform
@@ -603,42 +603,66 @@ def create_mixture_flow_model(input_dim, context_dim, base_kwargs, permute_type)
 
     distribution = distributions.StandardNormal((input_dim,))
     transform = []
-    for _ in range(base_kwargs["num_steps_maf"]):
-        transform.append(
-            MaskedAffineAutoregressiveTransformM(
-                features=input_dim,
-                use_residual_blocks=base_kwargs["use_residual_blocks_maf"],
-                num_blocks=base_kwargs["num_transform_blocks_maf"],
-                hidden_features=base_kwargs["hidden_dim_maf"],
-                context_features=context_dim,
-                dropout_probability=base_kwargs["dropout_probability_maf"],
-                use_batch_norm=base_kwargs["batch_norm_maf"],
-                init_identity=base_kwargs["init_identity"],
-            )
-        )
-        # transform.append(create_random_transform(param_dim=input_dim))
-        if permute_type == "triplet-permutation":
-            transform.append(create_triplet_permute(param_dim=input_dim))
+    # for _ in range(base_kwargs["num_steps_maf"]):
+    #     transform.append(
+    #         MaskedAffineAutoregressiveTransformM(
+    #             features=input_dim,
+    #             use_residual_blocks=base_kwargs["use_residual_blocks_maf"],
+    #             num_blocks=base_kwargs["num_transform_blocks_maf"],
+    #             hidden_features=base_kwargs["hidden_dim_maf"],
+    #             context_features=context_dim,
+    #             dropout_probability=base_kwargs["dropout_probability_maf"],
+    #             use_batch_norm=base_kwargs["batch_norm_maf"],
+    #             init_identity=base_kwargs["init_identity"],
+    #         )
+    #     )
+    #     # transform.append(create_random_transform(param_dim=input_dim))
+    #     if permute_type == "triplet-permutation":
+    #         transform.append(create_triplet_permute(param_dim=input_dim))
 
-    for _ in range(base_kwargs["num_steps_arqs"]):
+    # the same as above but with piecewise rational quadratic splines
+
+    # for _ in range(base_kwargs["num_steps_arqs"]):
+    #     transform.append(
+    #         MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(
+    #             features=input_dim,
+    #             tails="linear",
+    #             use_residual_blocks=base_kwargs["use_residual_blocks_arqs"],
+    #             hidden_features=base_kwargs["hidden_dim_arqs"],
+    #             num_blocks=base_kwargs["num_transform_blocks_arqs"],
+    #             tail_bound=base_kwargs["tail_bound_arqs"],
+    #             num_bins=base_kwargs["num_bins_arqs"],
+    #             context_features=context_dim,
+    #             dropout_probability=base_kwargs["dropout_probability_arqs"],
+    #             use_batch_norm=base_kwargs["batch_norm_arqs"],
+    #             init_identity=base_kwargs["init_identity"],
+    #         )
+    #     )
+
+    # coupling
+    for j in range(base_kwargs["num_steps_coupling"]):
         transform.append(
-            MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(
-                features=input_dim,
-                tails="linear",
-                use_residual_blocks=base_kwargs["use_residual_blocks_arqs"],
-                hidden_features=base_kwargs["hidden_dim_arqs"],
-                num_blocks=base_kwargs["num_transform_blocks_arqs"],
-                tail_bound=base_kwargs["tail_bound_arqs"],
-                num_bins=base_kwargs["num_bins_arqs"],
-                context_features=context_dim,
-                dropout_probability=base_kwargs["dropout_probability_arqs"],
-                use_batch_norm=base_kwargs["batch_norm_arqs"],
-                init_identity=base_kwargs["init_identity"],
-            )
+        PiecewiseRationalQuadraticCouplingTransformM(
+            mask=create_triplet_mask(input_dim, j),
+            transform_net_create_fn=(
+                lambda in_features, out_features: nn_.ResidualNet(
+                    in_features=in_features,
+                    out_features=out_features,
+                    hidden_features=base_kwargs["hidden_dim_coupling"],
+                    context_features=context_dim,
+                    num_blocks=base_kwargs["num_transform_blocks_coupling"],
+                    activation=F.relu,
+                    dropout_probability=base_kwargs["dropout_probability_coupling"],
+                    use_batch_norm=base_kwargs["batch_norm_coupling"],
+                )
+            ),
+            num_bins=base_kwargs["num_bins_coupling"],
+            tails="linear",
+            tail_bound=base_kwargs["tail_bound_coupling"],
+            apply_unconditional_transform=False,
+            init_identity=base_kwargs["init_identity"],
         )
-        # transform.append(create_random_transform(param_dim=input_dim))
-        if permute_type == "triplet-permutation":
-            transform.append(create_triplet_permute(param_dim=input_dim))
+        )
 
     transform_fnal = CompositeTransform(transform)
 

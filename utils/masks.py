@@ -38,8 +38,6 @@ def create_triplet_mask(features, step):
         raise ValueError("Number of features must be a positive integer.")
     if features % 3 != 0:
         raise ValueError("Number of features must be a multiple of 3.")
-    if step >= features:
-        raise ValueError("Step must be smaller than the number of features.")
     
     if step >= features/3:
         step = step % int(features/3)

@@ -93,7 +93,7 @@ class CouplingTransformM(Transform):
         transform_params = self.transform_net(identity_split* mask[:, self.identity_features], context[:, :self.transform_net.context_features])
         # For 2D data, reshape transform_params from Bx(D*?) to BxDx?
         print(transform_params.shape)
-        transform_params = transform_params.reshape(inputs.shape[0], self.transform_features, -1)
+        transform_params = transform_params.view(inputs.shape[0], self.transform_features, -1)
         print(transform_params.shape)
         transform_params[mask[:, self.transform_features]==0, :] = np.log(np.exp(1 - 1e-3) - 1)
         transform_params = transform_params.view(inputs.shape[0], -1)

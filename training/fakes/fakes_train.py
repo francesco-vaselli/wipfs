@@ -67,20 +67,20 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         "context_dim": args.y_dim,
         "base_kwargs": {
             "num_steps_maf": args.num_steps_maf,
-            "num_steps_arqs": args.num_steps_arqs,
+            "num_steps_coupling": args.num_steps_arqs,
             "num_transform_blocks_maf": args.num_transform_blocks_maf,  # DNN layers per coupling
-            "num_transform_blocks_arqs": args.num_transform_blocks_arqs,  # DNN layers per coupling
+            "num_transform_blocks_coupling": args.num_transform_blocks_arqs,  # DNN layers per coupling
             "activation": args.activation,
             "dropout_probability_maf": args.dropout_probability_maf,
-            "dropout_probability_arqs": args.dropout_probability_arqs,
+            "dropout_probability_coupling": args.dropout_probability_arqs,
             "use_residual_blocks_maf": args.use_residual_blocks_maf,
-            "use_residual_blocks_arqs": args.use_residual_blocks_arqs,
+            "use_residual_blocks_coupling": args.use_residual_blocks_arqs,
             "batch_norm_maf": args.batch_norm_maf,
-            "batch_norm_arqs": args.batch_norm_arqs,
-            "num_bins_arqs": args.num_bins,
-            "tail_bound_arqs": args.tail_bound,
+            "batch_norm_coupling": args.batch_norm_arqs,
+            "num_bins_coupling": args.num_bins,
+            "tail_bound_coupling": args.tail_bound,
             "hidden_dim_maf": args.hidden_dim_maf,
-            "hidden_dim_arqs": args.hidden_dim_arqs,
+            "hidden_dim_coupling": args.hidden_dim_arqs,
             # "base_transform_type": args.base_transform_type,  # "rq-autoregressive",
             # "block_size": args.block_size,  # useless param if we have alternating-binary mask
             # "mask_type": args.mask_type,

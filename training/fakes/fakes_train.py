@@ -123,9 +123,9 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
             model.cuda(args.gpu) # changed into assignment
             ddp_model = DDP(
                 model,
-                device_ids=[args.gpu],
-                output_device=args.gpu,
-                check_reduction=True,
+                device_ids=None # [args.gpu],
+                output_device=None # args.gpu,
+                # check_reduction=True,
             )
             args.batch_size = int(args.batch_size / ngpus_per_node)
             args.workers = 0
@@ -385,7 +385,7 @@ def main():
 
     val_func = validate_fakes
     ngpus_per_node = torch.cuda.device_count()
-    print(ngpus_per_node)
+
     if args.distributed:
         args.world_size = ngpus_per_node * args.world_size
         mp.spawn(

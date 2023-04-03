@@ -235,7 +235,7 @@ class NMaskedMADE(nn.Module):
             raise ValueError("Residual blocks can't be used with random masks.")
         super().__init__()
 
-        NMask_degree = features-1
+        NMask_degree = features
         # Initial layer.
         self.initial_layer = NMaskedLinear(
             in_degrees=_get_input_degrees(features),
@@ -247,7 +247,7 @@ class NMaskedMADE(nn.Module):
         )
 
         if context_features + features - NMask_degree > 0:
-            self.context_layer = nn.Linear(context_features + features -1 - NMask_degree, hidden_features)
+            self.context_layer = nn.Linear(context_features, hidden_features)
             print("context_layer", self.context_layer)
 
         self.use_residual_blocks = use_residual_blocks
@@ -322,7 +322,7 @@ class MAFNMaskedMADE(nn.Module):
             raise ValueError("Residual blocks can't be used with random masks.")
         super().__init__()
 
-        NMask_degree = features -1
+        NMask_degree = features
         # Initial layer.
         self.initial_layer = NMaskedLinear(
             in_degrees=_get_input_degrees(features),
@@ -334,7 +334,7 @@ class MAFNMaskedMADE(nn.Module):
         )
 
         if context_features + features - NMask_degree > 0:
-            self.context_layer = nn.Linear(context_features + features -1 - NMask_degree, hidden_features)
+            self.context_layer = nn.Linear(context_features, hidden_features)
             print("context_layer", self.context_layer)
 
         self.use_residual_blocks = use_residual_blocks

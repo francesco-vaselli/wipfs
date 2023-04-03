@@ -40,6 +40,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
     if args.distributed:
         if args.dist_url == "env://" and args.rank == -1:
             args.rank = int(os.environ["RANK"])
+            args.dist_url = os.environ["MASTER_ADDR"]
         if args.distributed:
             args.rank = args.rank * ngpus_per_node + gpu
         dist.init_process_group(

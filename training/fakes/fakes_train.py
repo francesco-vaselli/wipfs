@@ -123,8 +123,8 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
             model.cuda(args.gpu) # changed into assignment
             ddp_model = DDP(
                 model,
-                device_ids=None # [args.gpu],
-                output_device=None # args.gpu,
+                device_ids=None, # [args.gpu],
+                output_device=None, # args.gpu,
                 # check_reduction=True,
             )
             args.batch_size = int(args.batch_size / ngpus_per_node)

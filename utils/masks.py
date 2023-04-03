@@ -43,5 +43,5 @@ def create_triplet_mask(features, step):
         step = step % int(features/3)
     
     mask = torch.zeros(features).byte()
-    mask[step:step+3] += 1
+    mask[(step*3):(3 + step*3)] += 1
     return mask

@@ -47,6 +47,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         if args.distributed:
             args.rank = args.rank * ngpus_per_node + gpu
             print("rank: {}".format(args.rank))
+            torch.cuda.set_device(args.rank)
         dist.init_process_group(
             backend=args.dist_backend,
             init_method= args.dist_url, # dist.TCPStore("r246n05", 29800),# args.dist_url,
@@ -119,13 +120,13 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
     # multi-GPU setup
     if args.distributed:  # Multiple processes, single GPU per process
         if args.gpu is not None:
+            torch.cuda.set_device(args.gpu)
+            model.cuda(args.gpu) # changed into assignment
             ddp_model = DDP(
                 model,
                 device_ids=[args.gpu],
                 output_device=args.gpu,
             )
-            torch.cuda.set_device(args.gpu)
-            ddp_model.cuda(args.gpu) # changed into assignment
             args.batch_size = int(args.batch_size / ngpus_per_node)
             args.workers = 0
             print("going parallel")
@@ -384,6 +385,7 @@ def main():
 
     val_func = validate_fakes
     ngpus_per_node = torch.cuda.device_count()
+    print(ngpus_per_node)
     if args.distributed:
         args.world_size = ngpus_per_node * args.world_size
         mp.spawn(

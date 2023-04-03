@@ -144,7 +144,10 @@ class MaskAllFakesDataset(Dataset):
             raise ValueError('first must be either const or rand')
 
         self.y_train = torch.tensor(y[:, :y_dim], dtype=torch.float32)
-        self.y_train = torch.hstack((self.y_train, torch.ones(len(self.y_train), 1)))
+        if first == 'const':
+            self.y_train = torch.hstack((self.y_train, torch.ones(len(self.y_train), 1)))
+        else:
+            self.y_train = torch.hstack((self.y_train, torch.zeros(len(self.y_train), 1)))
         self.y_train = torch.hstack((self.y_train, torch.tensor(y[:, y_dim:], dtype=torch.float32)))
         # self.z_train = torch.tensor(z, dtype=torch.float32)
 

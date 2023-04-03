@@ -43,7 +43,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
             print("rank: {}".format(args.rank))
             # args.dist_url = os.environ["MASTER_ADDR"]
             # args.gpu = int(os.environ["LOCAL_RANK"])
-            print("Now Use GPU: {} for training".format(args.gpu))
+            # print("Now Use GPU: {} for training".format(args.gpu))
         if args.distributed:
             args.rank = args.rank * ngpus_per_node + gpu
             print("rank: {}".format(args.rank))
@@ -119,13 +119,13 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
     # multi-GPU setup
     if args.distributed:  # Multiple processes, single GPU per process
         if args.gpu is not None:
-            torch.cuda.set_device(args.gpu)
-            model.cuda(args.gpu) # changed into assignment
             ddp_model = DDP(
                 model,
                 device_ids=[args.gpu],
                 output_device=args.gpu,
             )
+            torch.cuda.set_device(args.gpu)
+            ddp_model.cuda(args.gpu) # changed into assignment
             args.batch_size = int(args.batch_size / ngpus_per_node)
             args.workers = 0
             print("going parallel")

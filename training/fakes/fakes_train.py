@@ -47,7 +47,6 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
         if args.distributed:
             args.rank = args.rank * ngpus_per_node + gpu
             print("rank: {}".format(args.rank))
-            torch.cuda.set_device(args.rank)
         dist.init_process_group(
             backend=args.dist_backend,
             init_method= args.dist_url, # dist.TCPStore("r246n05", 29800),# args.dist_url,
@@ -126,6 +125,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
                 model,
                 device_ids=[args.gpu],
                 output_device=args.gpu,
+                check_reduction=True,
             )
             args.batch_size = int(args.batch_size / ngpus_per_node)
             args.workers = 0

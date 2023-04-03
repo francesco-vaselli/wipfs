@@ -246,7 +246,7 @@ class NMaskedMADE(nn.Module):
 
         if context_features + features - NMask_degree > 0:
             self.context_layer = nn.Linear(context_features + features - NMask_degree, hidden_features)
-            print("context_layer", self.context_layer)
+            # print("context_layer", self.context_layer)
 
         self.use_residual_blocks = use_residual_blocks
         self.activation = activation
@@ -332,7 +332,7 @@ class MAFNMaskedMADE(nn.Module):
 
         if context_features + features - NMask_degree > 0:
             self.context_layer = nn.Linear(context_features + features - NMask_degree, hidden_features)
-            print("context_layer", self.context_layer)
+            # print("context_layer", self.context_layer)
 
         self.use_residual_blocks = use_residual_blocks
         self.activation = activation

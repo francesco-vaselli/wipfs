@@ -139,7 +139,7 @@ class MaskAllFakesDataset(Dataset):
         if first == 'const':
             self.x_train = torch.hstack((torch.zeros(len(self.x_train), 1), self.x_train))
         elif first == 'rand':
-            self.x_train = torch.hstack((torch.rand(len(self.x_train), 1), self.x_train))
+            self.x_train = torch.hstack((torch.normal(len(self.x_train), 1), self.x_train))
         else:
             raise ValueError('first must be either const or rand')
 

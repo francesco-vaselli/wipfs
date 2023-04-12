@@ -487,10 +487,10 @@ def validate_fatjets(
     else:
         writer.add_figure(f"{epoch}/corner", fig)
 
-    sig_reco = reco[reco["is_signal"] == 1]
-    sig_samples = samples[samples["is_signal"] == 1]
-    bkg_reco = reco[reco["is_signal"] == 0]
-    bkg_samples = samples[samples["is_signal"] == 0]
+    sig_reco = reco[df["is_signal"] == 1]
+    sig_samples = samples[df["is_signal"] == 1]
+    bkg_reco = reco[df["is_signal"] == 0]
+    bkg_samples = samples[df["is_signal"] == 0]
 
     fig = make_corner(sig_reco, sig_samples, labels=["Mfatjet_msoftdrop", "Mfatjet_particleNetMD_XbbvsQCD"], title="Signal softdrop mass vs XbbvsQCD",
                         ranges=[[0, 200], [0,1]])

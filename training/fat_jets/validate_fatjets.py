@@ -327,6 +327,8 @@ def validate_fatjets(
     samples["Mfatjet_msoftdrop"] = np.where(
         samples["Mfatjet_msoftdrop"] < 0, -1, samples["Mfatjet_msoftdrop"]
     )
+    reco["Mfatjet_msoftdrop"] = reco["Mfatjet_msoftdrop"].clip(upper=500)
+    samples["Mfatjet_msoftdrop"] = samples["Mfatjet_msoftdrop"].clip(upper=500)
 
 
     targets = ["Mfatjet_particleNetMD_XbbvsQCD"]

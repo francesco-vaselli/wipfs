@@ -478,7 +478,7 @@ def validate_fatjets(
         writer.add_figure(f"{epoch}/ROC2v0", fig)
     plt.close()
 
-    fig = make_corner(reco, samples, labels=["Mfatjet_msoftdrop", "Mfatjet_particleNetMD_XbbvsQCD"])
+    fig = make_corner(reco, samples, labels=["Mfatjet_msoftdrop", "Mfatjet_particleNetMD_XbbvsQCD"], title="softdrop mass vs XbbvsQCD")
     if isinstance(epoch, int):
         writer.add_figure("corner", fig, global_step=epoch)
     else:

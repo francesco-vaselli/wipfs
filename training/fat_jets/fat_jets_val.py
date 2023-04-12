@@ -65,7 +65,7 @@ def validator(gpu, save_dir, ngpus_per_node, args, val_func):
     cudnn.benchmark = False  # to be tried later
     args.gpu = gpu
     if args.gpu is not None:
-        print("Use GPU: {} for training".format(args.gpu))
+        print("Use GPU: {} for validation".format(args.gpu))
 
     if args.distributed:
         if args.dist_url == "env://" and args.rank == -1:

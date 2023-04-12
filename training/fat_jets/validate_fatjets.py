@@ -327,8 +327,8 @@ def validate_fatjets(
     samples["Mfatjet_msoftdrop"] = np.where(
         samples["Mfatjet_msoftdrop"] < 0, -1, samples["Mfatjet_msoftdrop"]
     )
-    reco["Mfatjet_msoftdrop"] = reco["Mfatjet_msoftdrop"].clip(upper=500)
-    samples["Mfatjet_msoftdrop"] = samples["Mfatjet_msoftdrop"].clip(upper=500)
+    # reco["Mfatjet_msoftdrop"] = reco["Mfatjet_msoftdrop"].clip(upper=500)
+    # samples["Mfatjet_msoftdrop"] = samples["Mfatjet_msoftdrop"].clip(upper=500)
 
 
     targets = ["Mfatjet_particleNetMD_XbbvsQCD"]
@@ -480,7 +480,8 @@ def validate_fatjets(
         writer.add_figure(f"{epoch}/ROC2v0", fig)
     plt.close()
 
-    fig = make_corner(reco, samples, labels=["Mfatjet_msoftdrop", "Mfatjet_particleNetMD_XbbvsQCD"], title="softdrop mass vs XbbvsQCD")
+    fig = make_corner(reco, samples, labels=["Mfatjet_msoftdrop", "Mfatjet_particleNetMD_XbbvsQCD"], title="softdrop mass vs XbbvsQCD",
+                      ranges=[[0, 500], [0,1]])
     if isinstance(epoch, int):
         writer.add_figure("corner", fig, global_step=epoch)
     else:

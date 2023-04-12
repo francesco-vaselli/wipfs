@@ -479,3 +479,7 @@ def validate_fatjets(
     plt.close()
 
     fig = make_corner(reco, samples, labels=["Mfatjet_msoftdrop", "Mfatjet_particleNetMD_XbbvsQCD"])
+    if isinstance(epoch, int):
+        writer.add_figure("corner", fig, global_step=epoch)
+    else:
+        writer.add_figure(f"{epoch}/corner", fig)

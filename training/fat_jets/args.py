@@ -120,6 +120,7 @@ def add_args(parser):
                         help='Whether to disable validation altogether.')
     parser.add_argument('--save_val_results', default=True, action='store_true',
                         help='Whether to save the validation results.')
+    parser.add_argument("--val_at_epoch", type=int, default=None,)
     
     # resuming
     parser.add_argument('--resume_checkpoint', type=str, default=None,

@@ -26,6 +26,7 @@ from validate_fatjets import validate_fatjets
 # import torch._dynamo as dynamo
 # torch._dynamo.config.verbose=True
 
+
 def init_np_seed(worker_id):
     seed = torch.initial_seed()
     np.random.seed(seed % 4294967296)
@@ -120,20 +121,31 @@ def validator(gpu, save_dir, ngpus_per_node, args, val_func):
 
     model = create_mixture_flow_model(**flow_param_dict)
 
-    start_epoch = 0
-    if args.resume_checkpoint is None and os.path.exists(
-        os.path.join(save_dir, "checkpoint-latest.pt")
-    ):
-        args.resume_checkpoint = os.path.join(
-            save_dir, "checkpoint-latest.pt"
-        )  # use the latest checkpoint
-    if args.resume_checkpoint is not None and args.resume == True:
-        model, _, args.lr, start_epoch, _, _,  optimizer_state_dict = load_mixture_model(
-            model,
-            model_dir=save_dir,
-            filename="checkpoint-latest.pt",
-        )
-        print(f"Resumed from: {start_epoch}")
+    if args.val_at_epoch != None:
+        start_epoch = args.val_at_epoch
+        if args.resume_checkpoint is None and os.path.exists(
+            os.path.join(save_dir, f"model_@epoch_{start_epoch}.pt")
+        ):
+            args.resume_checkpoint = os.path.join(
+                save_dir, f"model_@epoch_{start_epoch}.pt"
+            )  # use the latest checkpoint
+        if args.resume_checkpoint is not None and args.resume == True:
+            (
+                model,
+                _,
+                args.lr,
+                start_epoch,
+                _,
+                _,
+                optimizer_state_dict,
+            ) = load_mixture_model(
+                model,
+                model_dir=save_dir,
+                filename=f"model_@epoch_{start_epoch}.pt",
+            )
+            print(f"Resumed from: {start_epoch}")
+    else:
+        ValueError("Please specify the epoch to validate at")
 
     total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(total_params)
@@ -191,8 +203,8 @@ def validator(gpu, save_dir, ngpus_per_node, args, val_func):
         limit_b=args.train_limit_b,
         start_s=args.train_start_s,
         limit_s=args.train_limit_s,
-        oversample_b = args.train_oversample_b,
-        oversample_s = args.train_oversample_s,
+        oversample_b=args.train_oversample_b,
+        oversample_s=args.train_oversample_s,
     )
     te_dataset = ValFatJetsDataset(
         [os.path.join(dirpath, "..", "datasets", "preprocessed.pkl")],
@@ -200,8 +212,8 @@ def validator(gpu, save_dir, ngpus_per_node, args, val_func):
         limit_b=args.test_limit_b,
         start_s=args.test_start_s,
         limit_s=args.test_limit_s,
-        oversample_b = args.test_oversample_b,
-        oversample_s = args.test_oversample_s,
+        oversample_b=args.test_oversample_b,
+        oversample_s=args.test_oversample_s,
     )
 
     if args.distributed:
@@ -209,12 +221,7 @@ def validator(gpu, save_dir, ngpus_per_node, args, val_func):
     else:
         train_sampler = None
 
-    train_loader, test_loader = get_loaders(
-        tr_dataset,
-        te_dataset,
-        train_sampler,
-        args
-    )
+    train_loader, test_loader = get_loaders(tr_dataset, te_dataset, train_sampler, args)
 
     print("test size: %d" % len(te_dataset))
     print("len test loader: %d" % len(test_loader))
@@ -242,7 +249,7 @@ def validator(gpu, save_dir, ngpus_per_node, args, val_func):
                 args,
                 args.gpu,
             )
-            print('done with validation')
+            print("done with validation")
 
 
 def main():
@@ -276,5 +283,5 @@ def main():
 
 
 if __name__ == "__main__":
-    os.environ['PYTHONWARNINGS'] = 'ignore:semaphore_tracker:UserWarning'
+    os.environ["PYTHONWARNINGS"] = "ignore:semaphore_tracker:UserWarning"
     main()

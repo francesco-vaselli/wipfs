@@ -12,7 +12,58 @@ from sklearn.metrics import roc_curve, auc
 from sklearn.utils import shuffle
 from scipy.stats import wasserstein_distance
 import pandas as pd
+import corner
 
+
+def make_corner(reco, samples, labels, title, ranges=None, *args, **kwargs):
+    """utility fnc for making corner plots
+
+    Args:
+        reco (df): full sim df
+        samples (df): flash sim df
+        labels (_type_): _description_
+        title (_type_): _description_
+        ranges (_type_, optional): _description_. Defaults to None.
+
+    Returns:
+        _type_: _description_
+    """    
+    blue_line = mlines.Line2D([], [], color="tab:blue", label="FullSim")
+    red_line = mlines.Line2D([], [], color="tab:orange", label="FlashSim")
+    fig = corner.corner(
+        reco[labels],
+        range=ranges,
+        labels=labels,
+        color="tab:blue",
+        levels=[0.5, 0.9, 0.99],
+        hist_bin_factor=3,
+        scale_hist=True,
+        plot_datapoints=False,
+        *args,
+        **kwargs
+    )
+    corner.corner(
+        samples[labels],
+        range=ranges,
+        fig=fig,
+        color="tab:orange",
+        levels=[0.5, 0.9, 0.99],
+        hist_bin_factor=3,
+        scale_hist=True,
+        plot_datapoints=False,
+        *args,
+        **kwargs
+    )
+    plt.legend(
+        fontsize=24,
+        frameon=False,
+        handles=[blue_line, red_line],
+        bbox_to_anchor=(0.0, 1.0, 1.0, 4.0),
+        loc="upper right",
+    )
+    plt.suptitle(title, fontsize=20)
+    plt.close()
+    return fig
 
 
 def makeROC(gen, gen_df, nb):
@@ -69,10 +120,12 @@ def validate_fatjets(
         gen = []
         reco = []
         samples = []
+        signal_flag = []
 
         for bid, (z, y) in enumerate(test_loader):
 
-            inputs_y = y.cuda(device)
+            inputs_y = y.cuda(device)[:, : args.y_dim]
+            is_signal = y.cuda(device)[:, -1]
 
             while True:
                 try:
@@ -85,15 +138,19 @@ def validate_fatjets(
                     pass
             z_sampled = z_sampled.cpu().detach().numpy()
             inputs_y = inputs_y.cpu().detach().numpy()
+            is_signal = is_signal.cpu().detach().numpy()
             z = z.cpu().detach().numpy()
             z_sampled = z_sampled.reshape(-1, args.x_dim)
             gen.append(inputs_y)
             reco.append(z)
             samples.append(z_sampled)
+            signal_flag.append(is_signal)
 
     gen = np.array(gen).reshape((-1, args.y_dim))
     reco = np.array(reco).reshape((-1, args.x_dim))
     samples = np.array(samples).reshape((-1, args.x_dim))
+    signal_flag = np.array(signal_flag).reshape((-1, 1))
+    gen = np.concatenate((gen, signal_flag), axis=1)
 
     names = [
         "Mpt",
@@ -142,7 +199,10 @@ def validate_fatjets(
             lw=1,
             range=[rangeR.min(), rangeR.max()],
         )
-        writer.add_figure(f"{names[i]}", fig, global_step=epoch)
+        if isinstance(epoch, int):
+            writer.add_figure(f"{names[i]}", fig, global_step=epoch)
+        else:
+            writer.add_figure(f"{epoch}/{names[i]}", fig)
         plt.savefig(f"{save_dir}/{names[i]}.png")
 
     plt.close()
@@ -158,6 +218,7 @@ def validate_fatjets(
         "MgenjetAK8_mass",
         "MgenjetAK8_ncFlavour",
         "MgenjetAK8_nbFlavour",
+        "is_signal"
     ]
 
     df = pd.DataFrame(data=gen, columns=jet_cond)
@@ -235,7 +296,11 @@ def validate_fatjets(
             lw=1,
             range=[rangeR.min(), rangeR.max()],
         )
-        writer.add_figure(f"{names[i]}", fig, global_step=epoch)
+        if isinstance(epoch, int):
+            writer.add_figure(f"{names[i]}", fig, global_step=epoch)
+        else:
+            writer.add_figure(f"{epoch}/{names[i]}", fig)
+
         plt.savefig(f"{save_dir}/{names[i]}.png")
 
     plt.close()
@@ -250,6 +315,19 @@ def validate_fatjets(
     ]
     reco = pd.DataFrame(data=reco, columns=jet_target)
     samples = pd.DataFrame(data=samples, columns=jet_target)
+
+    # postprocess softdrop
+    reco["Mfatjet_msoftdrop"] = reco["Mfatjet_msoftdrop"] * df["MgenjetAK8_mass"].values
+    samples["Mfatjet_msoftdrop"] = (
+        samples["Mfatjet_msoftdrop"] * df["MgenjetAK8_mass"].values
+    )
+    reco["Mfatjet_msoftdrop"] = np.where(
+        reco["Mfatjet_msoftdrop"] < 0, -1, reco["Mfatjet_msoftdrop"]
+    )
+    samples["Mfatjet_msoftdrop"] = np.where(
+        samples["Mfatjet_msoftdrop"] < 0, -1, samples["Mfatjet_msoftdrop"]
+    )
+
 
     targets = ["Mfatjet_particleNetMD_XbbvsQCD"]
 
@@ -316,7 +394,10 @@ def validate_fatjets(
                 color=color,
             )
             axs[0].legend(frameon=False, loc="upper right")
-            writer.add_figure(f"XbbvsQCD for b content", fig, global_step=epoch)
+            if isinstance(epoch, int):
+                writer.add_figure(f"XbbvsQCD for b content", fig, global_step=epoch)
+            else:
+                writer.add_figure(f"{epoch}/XbbvsQCD for b content", fig)
 
     print(gen.shape)
 
@@ -353,7 +434,10 @@ def validate_fatjets(
     ax.spines['top'].set_visible(False)
     plt.title("Receiver operating characteristic 2bvs1b", fontsize=16)
     plt.legend(fontsize=16, frameon=False,loc="best")
-    writer.add_figure("ROC2v1", fig, global_step=epoch)
+    if isinstance(epoch, int):
+        writer.add_figure("ROC2v1", fig, global_step=epoch)
+    else:
+        writer.add_figure(f"{epoch}/ROC2v1", fig)
     plt.close()
 
     fpr, tpr, roc_auc, bs, nbs = makeROC(samples.values, df.values, 0)
@@ -388,5 +472,10 @@ def validate_fatjets(
     ax.spines['top'].set_visible(False)
     plt.title("Receiver operating characteristic 2bvs0b", fontsize=16)
     plt.legend(fontsize=16, frameon=False,loc="best")
-    writer.add_figure("ROC2v0", fig, global_step=epoch)
+    if isinstance(epoch, int):
+        writer.add_figure("ROC2v0", fig, global_step=epoch)
+    else:
+        writer.add_figure(f"{epoch}/ROC2v0", fig)
     plt.close()
+
+    fig = make_corner(reco, samples, labels=["Mfatjet_msoftdrop", "Mfatjet_particleNetMD_XbbvsQCD"])

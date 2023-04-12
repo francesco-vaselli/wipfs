@@ -113,6 +113,84 @@ class FatJetsDataset(Dataset):
         return self.x_train[idx], self.y_train[idx]
 
 
+class ValFatJetsDataset(Dataset):
+    """Very simple Dataset for reading hdf5 data
+        This is way simpler than muons as we heve enough jets in a single file
+        Still, dataloading is a bottleneck even here
+    Args:
+        Dataset (Pytorch Dataset): Pytorch Dataset class
+    """
+
+    def __init__(self, pkl_paths, start_b=0, limit_b = 512005, start_s=512005, limit_s=None, oversample_b=1, oversample_s=20):
+
+        self.pkl_paths = pkl_paths
+        self.df = pd.read_pickle(self.pkl_paths[0])
+
+        y_b = self.df[
+            [
+                "MgenjetAK8_pt",
+                "MgenjetAK8_phi",
+                "MgenjetAK8_eta",
+                "MgenjetAK8_hadronFlavour",
+                "MgenjetAK8_partonFlavour",
+                "MgenjetAK8_mass",
+                "MgenjetAK8_ncFlavour",
+                "MgenjetAK8_nbFlavour",
+                "is_signal",
+            ]
+        ].values[start_b:limit_b]
+        y_s = self.df[
+            [
+                "MgenjetAK8_pt",
+                "MgenjetAK8_phi",
+                "MgenjetAK8_eta",
+                "MgenjetAK8_hadronFlavour",
+                "MgenjetAK8_partonFlavour",
+                "MgenjetAK8_mass",
+                "MgenjetAK8_ncFlavour",
+                "MgenjetAK8_nbFlavour",
+                "is_signal"
+            ]
+        ].values[start_s:limit_s]
+                
+        x_b = self.df[
+            [
+                "Mpt_ratio",
+                "Meta_sub",
+                "Mphi_sub",
+                "Mfatjet_msoftdrop",
+                "Mfatjet_particleNetMD_XbbvsQCD",
+            ]
+        ].values[start_b:limit_b]
+        x_s = self.df[
+            [
+                "Mpt_ratio",
+                "Meta_sub",
+                "Mphi_sub",
+                "Mfatjet_msoftdrop",
+                "Mfatjet_particleNetMD_XbbvsQCD",
+            ]
+        ].values[start_s:limit_s]
+
+        x_b = np.repeat(x_b, oversample_b, axis=0)
+        y_b = np.repeat(y_b, oversample_b, axis=0)
+        x_s = np.repeat(x_s, oversample_s, axis=0)
+        y_s = np.repeat(y_s, oversample_s, axis=0)
+
+        self.x_train = torch.tensor(np.concatenate((x_b, x_s)), dtype=torch.float32)  # .to(device)
+        self.y_train = torch.tensor(np.concatenate((y_b, y_s)), dtype=torch.float32)  # .to(device)
+        
+        perm = torch.randperm(self.x_train.shape[0])
+        self.x_train = self.x_train[perm]
+        self.y_train = self.y_train[perm]
+
+    def __len__(self):
+        return len(self.y_train)
+
+    def __getitem__(self, idx):
+        return self.x_train[idx], self.y_train[idx]
+
+
 class FakesDataset(Dataset):
     """Very simple Dataset for reading hdf5 data for fakes
         divides each row into 3 parts: reco (x), gen (y), N of fakes (N)

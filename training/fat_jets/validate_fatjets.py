@@ -480,9 +480,80 @@ def validate_fatjets(
         writer.add_figure(f"{epoch}/ROC2v0", fig)
     plt.close()
 
-    fig = make_corner(reco, samples, labels=["Mfatjet_msoftdrop", "Mfatjet_particleNetMD_XbbvsQCD"], title="softdrop mass vs XbbvsQCD",
-                      ranges=[[0, 500], [0,1]])
+    fig = make_corner(reco, samples, labels=["Mfatjet_msoftdrop", "Mfatjet_particleNetMD_XbbvsQCD"], title="Total softdrop mass vs XbbvsQCD",
+                      ranges=[[0, 200], [0,1]])
     if isinstance(epoch, int):
         writer.add_figure("corner", fig, global_step=epoch)
     else:
         writer.add_figure(f"{epoch}/corner", fig)
+
+    sig_reco = reco[reco["is_signal"] == 1]
+    sig_samples = samples[samples["is_signal"] == 1]
+    bkg_reco = reco[reco["is_signal"] == 0]
+    bkg_samples = samples[samples["is_signal"] == 0]
+
+    fig = make_corner(sig_reco, sig_samples, labels=["Mfatjet_msoftdrop", "Mfatjet_particleNetMD_XbbvsQCD"], title="Signal softdrop mass vs XbbvsQCD",
+                        ranges=[[0, 200], [0,1]])
+    if isinstance(epoch, int):
+        writer.add_figure("corner_signal", fig, global_step=epoch)
+    else:
+        writer.add_figure(f"{epoch}/corner_signal", fig)
+
+    fig = make_corner(bkg_reco, bkg_samples, labels=["Mfatjet_msoftdrop", "Mfatjet_particleNetMD_XbbvsQCD"], title="Background softdrop mass vs XbbvsQCD",
+                        ranges=[[0, 200], [0,1]])
+    if isinstance(epoch, int):
+        writer.add_figure("corner_background", fig, global_step=epoch)
+    else:
+        writer.add_figure(f"{epoch}/corner_background", fig)
+    
+    # 1 d plot of softdrop mass for total, sig and bkg, fullsim vs flash
+    recos = [reco, sig_reco, bkg_reco]
+    samples1 = [samples, sig_samples, bkg_samples]
+    titles = ["Fatjet_softdrop", "Fatjet_softdrop (signal)", "Fatjet_softdrop (bkg)"]
+    for i in range(0, 3):
+        reco = recos[i][["Mfatjet_msoftdrop"]].values
+        samples = samples1[i][["Mfatjet_msoftdrop"]].values
+        ws = wasserstein_distance(reco, samples)
+
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
+
+        _, rangeR, _ = ax1.hist(
+            reco, histtype="step", label="FullSim", lw=1, bins=100
+        )
+        samples = np.where(
+            samples < rangeR.min(), rangeR.min(), samples
+        )
+        samples = np.where(
+            samples > rangeR.max(), rangeR.max(), samples
+        )
+        ax1.hist(
+            samples,
+            bins=100,
+            histtype="step",
+            lw=1,
+            range=[rangeR.min(), rangeR.max()],
+            label=f"FlashSim, ws={round(ws, 4)}",
+        )
+        fig.suptitle(f"Comparison of {titles[i]}", fontsize=16)
+        ax1.legend(frameon=False, loc="upper right")
+
+        ax1.spines["right"].set_visible(False)
+        ax1.spines["top"].set_visible(False)
+        ax2.spines["right"].set_visible(False)
+        ax2.spines["top"].set_visible(False)
+        ax2.set_yscale("log")
+
+        ax2.hist(reco, histtype="step", lw=1, bins=100)
+        ax2.hist(
+            samples,
+            bins=100,
+            histtype="step",
+            lw=1,
+            range=[rangeR.min(), rangeR.max()],
+        )
+        if isinstance(epoch, int):
+            writer.add_figure(f"{titles[i]}", fig, global_step=epoch)
+        else:
+            writer.add_figure(f"{epoch}/{titles[i]}", fig)
+
+        plt.savefig(f"{save_dir}/{titles[i]}.png")

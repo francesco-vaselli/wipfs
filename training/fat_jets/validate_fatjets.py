@@ -35,7 +35,7 @@ def make_corner(reco, samples, labels, title, ranges=None, *args, **kwargs):
         range=ranges,
         labels=labels,
         color="tab:blue",
-        levels=[0.5, 0.9, 0.99],
+        levels=[0.5, 0.9, 0.95],
         hist_bin_factor=3,
         scale_hist=True,
         plot_datapoints=False,
@@ -47,7 +47,7 @@ def make_corner(reco, samples, labels, title, ranges=None, *args, **kwargs):
         range=ranges,
         fig=fig,
         color="tab:orange",
-        levels=[0.5, 0.9, 0.99],
+        levels=[0.5, 0.9, 0.95],
         hist_bin_factor=3,
         scale_hist=True,
         plot_datapoints=False,
@@ -322,10 +322,10 @@ def validate_fatjets(
         samples["Mfatjet_msoftdrop"] * df["MgenjetAK8_mass"].values
     )
     reco["Mfatjet_msoftdrop"] = np.where(
-        reco["Mfatjet_msoftdrop"] < 0, -1, reco["Mfatjet_msoftdrop"]
+        reco["Mfatjet_msoftdrop"] < 0, -10, reco["Mfatjet_msoftdrop"]
     )
     samples["Mfatjet_msoftdrop"] = np.where(
-        samples["Mfatjet_msoftdrop"] < 0, -1, samples["Mfatjet_msoftdrop"]
+        samples["Mfatjet_msoftdrop"] < 0, -10, samples["Mfatjet_msoftdrop"]
     )
     # reco["Mfatjet_msoftdrop"] = reco["Mfatjet_msoftdrop"].clip(upper=500)
     # samples["Mfatjet_msoftdrop"] = samples["Mfatjet_msoftdrop"].clip(upper=500)

@@ -511,8 +511,8 @@ def validate_fatjets(
     samples1 = [samples, sig_samples, bkg_samples]
     titles = ["Fatjet_softdrop", "Fatjet_softdrop (signal)", "Fatjet_softdrop (bkg)"]
     for i in range(0, 3):
-        reco = recos[i][["Mfatjet_msoftdrop"]].values
-        samples = samples1[i][["Mfatjet_msoftdrop"]].values
+        reco = recos[i][["Mfatjet_msoftdrop"]].values.flatten()
+        samples = samples1[i][["Mfatjet_msoftdrop"]].values.flatten()
         ws = wasserstein_distance(reco, samples)
 
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)

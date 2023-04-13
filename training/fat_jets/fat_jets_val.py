@@ -211,7 +211,7 @@ def validator(gpu, save_dir, ngpus_per_node, args, val_func):
         start_b=args.test_start_b,
         limit_b=args.test_limit_b,
         start_s=args.test_start_s,
-        limit_s=args.test_limit_s,
+        limit_s=args.test_limit_s+1818,
         oversample_b=args.test_oversample_b,
         oversample_s=args.test_oversample_s,
     )

@@ -557,3 +557,72 @@ def validate_fatjets(
             writer.add_figure(f"{epoch}/{titles[i]}", fig)
 
         plt.savefig(f"{save_dir}/{titles[i]}.png")
+
+    targets = ["Mfatjet_msoftdrop"]
+
+    ranges = [[0, 250]]
+
+    conds = [0, 1]
+
+    names = [
+        "bkg",
+        "sig",
+    ]
+
+    colors = ["tab:red", "tab:green"]
+
+    for target, rangeR in zip(targets, ranges):
+
+        fig, axs = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
+
+        axs[0].set_xlabel(f"{target}")
+        axs[1].set_xlabel(f"{target}")
+
+        axs[1].set_yscale("log")
+
+        inf = rangeR[0]
+        sup = rangeR[1]
+
+        for cond, color, name in zip(conds, colors, names):
+            nb = df["is_signal"].values
+            mask = np.where(nb == cond, True, False)
+            full = reco[target].values
+            full = full[mask]
+            full = full[~np.isnan(full)]
+            full = np.where(full > sup, sup, full)
+            full = np.where(full < inf, inf, full)
+
+            flash = samples[target].values
+            flash = flash[mask]
+            flash = flash[~np.isnan(flash)]
+            flash = np.where(flash > sup, sup, flash)
+            flash = np.where(flash < inf, inf, flash)
+
+            axs[0].hist(
+                full, bins=50, range=rangeR, histtype="step", ls="--", color=color
+            )
+            axs[0].hist(
+                flash,
+                bins=50,
+                range=rangeR,
+                histtype="step",
+                label=f"{name}",
+                color=color,
+            )
+
+            axs[1].hist(
+                full, bins=50, range=rangeR, histtype="step", ls="--", color=color
+            )
+            axs[1].hist(
+                flash,
+                bins=50,
+                range=rangeR,
+                histtype="step",
+                label=f"{name}",
+                color=color,
+            )
+            axs[0].legend(frameon=False, loc="upper right")
+            if isinstance(epoch, int):
+                writer.add_figure(f"Softrdop_comp", fig, global_step=epoch)
+            else:
+                writer.add_figure(f"{epoch}/Softrdop_comp", fig)

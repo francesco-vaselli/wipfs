@@ -189,7 +189,7 @@ def validate_fakes(
         plt.close()
 
     n_pt = np.arange(1, 11)
-    for i in range(0, len(pts)):
+    for i in range(0, len(n_pt)):
 
         test_values = pts[:, i].flatten()[N_sel >= n_pt[i]]
         generated_sample = pts_flash[:, i].flatten()[N_sel >= n_pt[i]]

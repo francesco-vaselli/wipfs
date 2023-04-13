@@ -513,7 +513,7 @@ def validate_fatjets(
     for i in range(0, 3):
         reco1 = recos[i][["Mfatjet_msoftdrop"]].values.flatten()
         samples = samples1[i][["Mfatjet_msoftdrop"]].values.flatten()
-        ws = wasserstein_distance(reco, samples)
+        ws = wasserstein_distance(reco1, samples)
 
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
 

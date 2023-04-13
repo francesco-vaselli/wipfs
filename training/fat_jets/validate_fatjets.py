@@ -512,22 +512,22 @@ def validate_fatjets(
     titles = ["Fatjet_softdrop", "Fatjet_softdrop (signal)", "Fatjet_softdrop (bkg)"]
     for i in range(0, 3):
         reco1 = recos[i][["Mfatjet_msoftdrop"]].values.flatten()
-        samples = samples1[i][["Mfatjet_msoftdrop"]].values.flatten()
-        ws = wasserstein_distance(reco1, samples)
+        samples2 = samples1[i][["Mfatjet_msoftdrop"]].values.flatten()
+        ws = wasserstein_distance(reco1, samples2)
 
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
 
         _, rangeR, _ = ax1.hist(
             reco1, histtype="step", label="FullSim", lw=1, bins=100
         )
-        samples = np.where(
-            samples < rangeR.min(), rangeR.min(), samples
+        samples2 = np.where(
+            samples2 < rangeR.min(), rangeR.min(), samples2
         )
-        samples = np.where(
-            samples > rangeR.max(), rangeR.max(), samples
+        samples2 = np.where(
+            samples2 > rangeR.max(), rangeR.max(), samples2
         )
         ax1.hist(
-            samples,
+            samples2,
             bins=100,
             histtype="step",
             lw=1,
@@ -545,7 +545,7 @@ def validate_fatjets(
 
         ax2.hist(reco1, histtype="step", lw=1, bins=100)
         ax2.hist(
-            samples,
+            samples2,
             bins=100,
             histtype="step",
             lw=1,

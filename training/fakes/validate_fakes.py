@@ -216,7 +216,7 @@ def validate_fakes(
             range=[rangeR.min(), rangeR.max()],
             label=f"FlashSim, ws={round(ws, 4)}",
         )
-        fig.suptitle(f"Comparison of {names[i]} @ epoch {epoch}", fontsize=16)
+        fig.suptitle(f"Comparison of pt{i} @ epoch {epoch}", fontsize=16)
         ax1.legend(frameon=False, loc="upper right")
 
         ax1.spines["right"].set_visible(False)

@@ -392,8 +392,8 @@ def validate_fatjets(
             legend_elements.append(Patch(edgecolor=color, fill=False, lw=2, label=f'{name}'))
 
         legend_elements += [
-                   Patch(edgecolor=color, fill=False, color='k', ls='-',lw=2, label='FlashSim'),
-                   Patch(edgecolor=color, fill=False, color='k', ls='--', lw=2, label='FullSim')]
+                   Patch(edgecolor='k', fill=False, ls='-',lw=2, label='FlashSim'),
+                   Patch(edgecolor='k', fill=False, ls='--', lw=2, label='FullSim')]
 
         axs.legend(frameon=False, loc="upper center", handles=legend_elements)
         plt.savefig(f"{save_dir}/XbbvsQCD for b content.png")

@@ -354,7 +354,7 @@ def validate_fatjets(
         hep.style.use("CMS")
 
         fig, axs = plt.subplots(1, 1) #, figsize=(9, 4.5), tight_layout=False)
-
+        hep.cms.text('Simulation Preliminary')
         axs.set_xlabel(f"ParticleNet Xbb vs QCD")
 
         axs.set_yscale("log")
@@ -378,11 +378,12 @@ def validate_fatjets(
             flash = np.where(flash < inf, inf, flash)
 
             axs.hist(
-                full, bins=50, range=rangeR, histtype="step", ls="--", color=color
+                full, bins=50, range=rangeR, histtype="step", ls="--", lw=2, color=color
             )
             axs.hist(
                 flash,
                 bins=50,
+                lw=2,
                 range=rangeR,
                 histtype="step",
                 color=color,
@@ -393,7 +394,7 @@ def validate_fatjets(
                    Line2D([0], [0], color='k', ls='-',lw=2, label='FlashSim'),
                    Line2D([0], [0], color='k', ls='--', lw=2, label='FullSim')]
 
-        axs.legend(frameon=False, loc="upper right", handles=legend_elements)
+        axs.legend(frameon=False, loc="upper center", handles=legend_elements)
         plt.savefig(f"{save_dir}/XbbvsQCD for b content.png")
         plt.savefig(f"{save_dir}/XbbvsQCD for b content.pdf")
         if isinstance(epoch, int):

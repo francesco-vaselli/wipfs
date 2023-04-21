@@ -776,6 +776,8 @@ def validate_electrons(
     red_line = mlines.Line2D([], [], color="tab:orange", label="FlashSim")
 
     plt.rcParams.update(plt.rcParamsDefault)
+    fig = plt.figure()
+    mplhep.cms.text("Simulation Preliminary", loc=0)
 
     fig = corner.corner(
         reco[labels],
@@ -800,7 +802,6 @@ def validate_electrons(
         scale_hist=True,
         plot_datapoints=False,
     )
-    mplhep.cms.text("Simulation Preliminary", loc=0)
     plt.legend(
         fontsize=24,
         frameon=False,

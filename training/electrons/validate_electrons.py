@@ -808,4 +808,6 @@ def validate_electrons(
         loc="upper right",
     )
     plt.savefig(f"{save_dir}/Supercluster_corner_cms.png", format="png")
+    plt.savefig(f"{save_dir}/Supercluster_corner_cms.pdf", format="pdf")
+
     # writer.add_figure("Corner_plots/Supercluster", fig, global_step=epoch)

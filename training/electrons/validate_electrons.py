@@ -516,7 +516,7 @@ def validate_electrons(
 
     for target, rangeR in zip(targets, ranges):
         mplhep.style.use("CMS")
-        fig, axs = plt.subplots(1, 1, figsize=(10, 10), tight_layout=False)
+        fig, axs = plt.subplots(1, 1, figsize=(12, 12), tight_layout=False)
         mplhep.cms.text("Simulation Preliminary")
 
         axs.set_xlabel(f"pfRelIso03 all")

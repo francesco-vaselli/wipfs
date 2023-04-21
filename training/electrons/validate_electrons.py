@@ -7,6 +7,7 @@ import pandas as pd
 
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
+from matplotlib.lines import Line2D
 import corner
 
 from scipy.stats import wasserstein_distance
@@ -14,10 +15,8 @@ from scipy.stats import wasserstein_distance
 from postprocessing import postprocessing, gen_columns, reco_columns
 from post_actions import target_dictionary, context_dictionary
 from corner_plots import make_corner
+
 import mplhep
-
-mplhep.set_style("CMS")
-
 
 def validate_electrons(
     test_loader,
@@ -379,7 +378,15 @@ def validate_electrons(
     # Normalized version
 
     for target, rangeR in zip(targets, ranges):
+        mplhep.style.use("CMS")
+
         fig, axs = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
+
+        # write cms label
+
+        mplhep.cms.text("Simulation Preliminary")
+
+
 
         axs[0].set_xlabel(f"{target}")
         axs[1].set_xlabel(f"{target}")
@@ -499,6 +506,109 @@ def validate_electrons(
         del full, flash
 
         axs[0].legend(frameon=False, loc="upper right")
+        plt.savefig(f"{save_dir}/{target}_conditioning_normalized.png", format="png")
+        # writer.add_figure(
+        #     f"Conditioning/{target}_conditioning_normalized.png", fig, global_step=epoch
+        # )
+        plt.close()
+
+   # Normalized version
+
+    for target, rangeR in zip(targets, ranges):
+        mplhep.style.use("CMS")
+        fig, axs = plt.subplots(1, 1, tight_layout=False)
+
+        axs.set_xlabel(f"{target}")
+
+        axs.set_yscale("log")
+
+        inf = rangeR[0]
+        sup = rangeR[1]
+
+        labels = []
+
+        for cond, color, name in zip(conds, colors, names):
+            mask = gen[cond].values.astype(bool)
+            full = reco[target].values
+            full = full[mask]
+            full = full[~np.isnan(full)]
+            full = np.where(full > sup, sup, full)
+            full = np.where(full < inf, inf, full)
+
+            flash = samples[target].values
+            flash = flash[mask]
+            flash = flash[~np.isnan(flash)]
+            flash = np.where(flash > sup, sup, flash)
+            flash = np.where(flash < inf, inf, flash)
+
+            axs.hist(
+                full,
+                bins=50,
+                range=rangeR,
+                histtype="step",
+                ls="--",
+                lw=2,
+                color=color,
+                density=True,
+            )
+            axs.hist(
+                flash,
+                bins=50,
+                range=rangeR,
+                histtype="step",
+                lw=2,
+                color=color,
+                density=True,
+            )
+
+            labels.append(Line2D([0], [0], color=color, lw=2, label=f"{name}"))
+
+            del full, flash
+
+        mask = (
+            gen["ClosestJet_EncodedPartonFlavour_gluon"].values
+            + gen["ClosestJet_EncodedPartonFlavour_light"].values
+        ).astype(bool)
+        full = reco[target].values
+        full = full[mask]
+        full = full[~np.isnan(full)]
+        full = np.where(full > sup, sup, full)
+        full = np.where(full < inf, inf, full)
+
+        flash = samples[target].values
+        flash = flash[mask]
+        flash = flash[~np.isnan(flash)]
+        flash = np.where(flash > sup, sup, flash)
+        flash = np.where(flash < inf, inf, flash)
+
+        axs.hist(
+            full,
+            bins=50,
+            range=rangeR,
+            histtype="step",
+            ls="--",
+            lw=2,
+            color="tab:purple",
+            density=True,
+        )
+        axs.hist(
+            flash,
+            bins=50,
+            range=rangeR,
+            histtype="step",
+            lw=2,
+            color="tab:purple",
+            density=True,
+        )
+
+        labels.append(Line2D([0], [0], color="tab:purple", lw=2, label="ClosestJet_partonFlavour_is_guds"))
+
+        del full, flash
+
+        labels.append(Line2D([0], [0], color="black", lw=2, ls="--", label="FullSim"))
+        labels.append(Line2D([0], [0], color="black", lw=2, label="FlashSim"))
+
+        axs.legend(handles=labels, frameon=False, loc="upper right")
         plt.savefig(f"{save_dir}/{target}_conditioning_normalized.png", format="png")
         # writer.add_figure(
         #     f"Conditioning/{target}_conditioning_normalized.png", fig, global_step=epoch

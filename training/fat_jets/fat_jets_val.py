@@ -21,7 +21,7 @@ from dataset import FatJetsDataset, ValFatJetsDataset
 from modded_basic_nflow import create_mixture_flow_model, save_model, load_mixture_model
 
 from args import get_args
-from validate_fatjets import validate_fatjets_newstyling
+from validate_fatjets_newstyling import validate_fatjets
 
 # import torch._dynamo as dynamo
 # torch._dynamo.config.verbose=True
@@ -268,7 +268,7 @@ def main():
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
-    val_func = validate_fatjets_newstyling
+    val_func = validate_fatjets
     ngpus_per_node = torch.cuda.device_count()
     if args.distributed:
         args.world_size = ngpus_per_node * args.world_size

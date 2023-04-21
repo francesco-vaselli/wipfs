@@ -20,7 +20,7 @@ from masks import create_block_binary_mask, create_identity_mask
 from permutations import BlockPermutation, IdentityPermutation
 
 from nflows.transforms.base import Transform
-from nflows.transforms.autoregressive import (AutoregressiveTransform)
+from nflows.transforms.autoregressive import AutoregressiveTransform
 from nflows.transforms import made as made_module
 from nflows.transforms.splines.cubic import cubic_spline
 from nflows.transforms.splines.linear import linear_spline
@@ -28,14 +28,19 @@ from nflows.transforms.splines.quadratic import (
     quadratic_spline,
     unconstrained_quadratic_spline,
 )
+
 # from nflows.transforms.splines import rational_quadratic
 # from nflows.transforms.splines.rational_quadratic import (
 #    rational_quadratic_spline,
 #    unconstrained_rational_quadratic_spline,)
 
-from modded_spline import unconstrained_rational_quadratic_spline, rational_quadratic_spline
+from modded_spline import (
+    unconstrained_rational_quadratic_spline,
+    rational_quadratic_spline,
+)
 import modded_spline
 from nflows.utils import torchutils
+
 # from nflows.transforms import splines
 from torch.nn.functional import softplus
 
@@ -55,7 +60,7 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
         activation=F.relu,
         dropout_probability=0.0,
         use_batch_norm=False,
-        init_identity = True
+        init_identity=True,
     ):
         self.features = features
         made = made_module.MADE(
@@ -73,11 +78,10 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
         self._epsilon = 1e-3
         self.init_identity = init_identity
         if init_identity:
-          torch.nn.init.constant_(made.final_layer.weight, 0.0)
-          torch.nn.init.constant_(
-              made.final_layer.bias,
-              0.5414 # the value k to get softplus(k) = 1.0
-          )
+            torch.nn.init.constant_(made.final_layer.weight, 0.0)
+            torch.nn.init.constant_(
+                made.final_layer.bias, 0.5414  # the value k to get softplus(k) = 1.0
+            )
 
         super(MaskedAffineAutoregressiveTransformM, self).__init__(made)
 
@@ -164,11 +168,11 @@ class MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(AutoregressiveTra
         )
 
         if init_identity:
-          torch.nn.init.constant_(autoregressive_net.final_layer.weight, 0.0)
-          torch.nn.init.constant_(
-              autoregressive_net.final_layer.bias,
-              np.log(np.exp(1 - min_derivative) - 1),
-          )
+            torch.nn.init.constant_(autoregressive_net.final_layer.weight, 0.0)
+            torch.nn.init.constant_(
+                autoregressive_net.final_layer.bias,
+                np.log(np.exp(1 - min_derivative) - 1),
+            )
 
         super().__init__(autoregressive_net)
 
@@ -213,7 +217,7 @@ class MaskedPiecewiseRationalQuadraticAutoregressiveTransformM(AutoregressiveTra
             min_bin_width=self.min_bin_width,
             min_bin_height=self.min_bin_height,
             min_derivative=self.min_derivative,
-            **spline_kwargs
+            **spline_kwargs,
         )
 
         return outputs, torchutils.sum_except_batch(logabsdet)
@@ -240,7 +244,6 @@ class PiecewiseRationalQuadraticCouplingTransformM(PiecewiseCouplingTransformM):
         min_bin_height=modded_spline.DEFAULT_MIN_BIN_HEIGHT,
         min_derivative=modded_spline.DEFAULT_MIN_DERIVATIVE,
     ):
-
         self.num_bins = num_bins
         self.min_bin_width = min_bin_width
         self.min_bin_height = min_bin_height
@@ -305,7 +308,7 @@ class PiecewiseRationalQuadraticCouplingTransformM(PiecewiseCouplingTransformM):
             min_bin_width=self.min_bin_width,
             min_bin_height=self.min_bin_height,
             min_derivative=self.min_derivative,
-            **spline_kwargs
+            **spline_kwargs,
         )
 
 
@@ -366,7 +369,7 @@ def create_base_transform(
     dropout_probability=0.0,
     batch_norm=False,
     num_bins=8,
-    tail_bound=3.0, # new value also passed in args
+    tail_bound=3.0,  # new value also passed in args
     apply_unconditional_transform=False,
     base_transform_type="rq-coupling",
     mask_type="block-binary",
@@ -451,7 +454,7 @@ def create_base_transform(
             tails="linear",
             tail_bound=tail_bound,
             apply_unconditional_transform=apply_unconditional_transform,
-            init_identity=init_identity
+            init_identity=init_identity,
         )
 
     elif base_transform_type == "rq-autoregressive":
@@ -468,7 +471,7 @@ def create_base_transform(
             activation=activation_fn,
             dropout_probability=dropout_probability,
             use_batch_norm=batch_norm,
-            init_identity=init_identity # modded version with init_identity
+            init_identity=init_identity,  # modded version with init_identity
         )
 
     else:
@@ -518,7 +521,7 @@ def create_transform(
                     create_base_transform(
                         i, param_dim, context_dim=context_dim, **base_transform_kwargs
                     ),
-                    selected_transform
+                    selected_transform,
                 ]
             )
             for i in range(num_flow_steps)
@@ -568,9 +571,7 @@ def create_NDE_model(
     return flow
 
 
-def create_mixture_flow_model(
-    input_dim, context_dim, base_kwargs, transform_type
-):
+def create_mixture_flow_model(input_dim, context_dim, base_kwargs, transform_type):
     """Build NSF (neural spline flow) model. This uses the nsf module
     available at https://github.com/bayesiains/nsf.
     This models the posterior distribution p(x|y).
@@ -697,7 +698,11 @@ def train_epoch(
             )
 
     train_loss = train_loss.item() / len(train_loader.dataset)
-    print("Model:{} Train Epoch: {} \tAverage Loss: {:.4f}".format(args.log_name, epoch, train_loss))
+    print(
+        "Model:{} Train Epoch: {} \tAverage Loss: {:.4f}".format(
+            args.log_name, epoch, train_loss
+        )
+    )
 
     return train_loss
 
@@ -717,7 +722,6 @@ def test_epoch(flow, test_loader, epoch, device=None):
         flow.eval()
         test_loss = 0.0
         for z, y in test_loader:
-
             if device is not None:
                 z = z.to(device, non_blocking=True)
                 y = y.to(device, non_blocking=True)
@@ -735,7 +739,22 @@ def test_epoch(flow, test_loader, epoch, device=None):
         return test_loss
 
 
-def train(model, train_loader, test_loader, epochs, optimizer, device, name, model_dir, args, writer=None, output_freq=100, save_freq=10, res_epoch=0, val_func=None):
+def train(
+    model,
+    train_loader,
+    test_loader,
+    epochs,
+    optimizer,
+    device,
+    name,
+    model_dir,
+    args,
+    writer=None,
+    output_freq=100,
+    save_freq=10,
+    res_epoch=0,
+    val_func=None,
+):
     """Train the model.
     Args:
             epochs:     number of epochs to train for
@@ -749,8 +768,7 @@ def train(model, train_loader, test_loader, epochs, optimizer, device, name, mod
         T_max=epochs,
     )
 
-    for epoch in range(0+res_epoch, epochs + 1 + res_epoch):
-
+    for epoch in range(0 + res_epoch, epochs + 1 + res_epoch):
         print(
             "Learning rate: {}".format(optimizer.state_dict()["param_groups"][0]["lr"])
         )
@@ -770,27 +788,42 @@ def train(model, train_loader, test_loader, epochs, optimizer, device, name, mod
 
         if epoch % args.val_freq == 0:
             val_func(
-                test_loader, model, epoch, writer, save_dir=args.log_name, args=args, device=args.device, clf_loaders=None
+                test_loader,
+                model,
+                epoch,
+                writer,
+                save_dir=args.log_name,
+                args=args,
+                device=args.device,
+                clf_loaders=None,
             )
 
         if epoch % save_freq == 0:
-
             save_model(
                 epoch,
                 model,
                 scheduler,
                 train_history,
                 test_history,
-		        name,
+                name,
                 model_dir=model_dir,
-                optimizer=optimizer
+                optimizer=optimizer,
             )
             print("saving model")
 
     return train_history, test_history
 
 
-def save_model(epoch, model, scheduler, train_history, test_history, name, model_dir=None, optimizer=None):
+def save_model(
+    epoch,
+    model,
+    scheduler,
+    train_history,
+    test_history,
+    name,
+    model_dir=None,
+    optimizer=None,
+):
     """Save a model and optimizer to file.
     Args:
         model:      model to be saved
@@ -804,7 +837,7 @@ def save_model(epoch, model, scheduler, train_history, test_history, name, model
         raise NameError("Model directory must be specified.")
 
     filename = name + f"_@epoch_{epoch}.pt"
-    resume_filename = 'checkpoint-latest.pt'
+    resume_filename = "checkpoint-latest.pt"
 
     p = Path(model_dir)
     p.mkdir(parents=True, exist_ok=True)
@@ -892,15 +925,16 @@ def load_mixture_model(device, model_dir=None, filename=None):
 
     p = Path(model_dir)
     checkpoint = torch.load(p / filename, map_location="cpu")
-
-    model_hyperparams = checkpoint["model_hyperparams"]
-    # added because of a bug in the old create_mixture_flow_model function
     try:
         if checkpoint["model_hyperparams"]["base_transform_kwargs"] is not None:
-            checkpoint["model_hyperparams"]["base_kwargs"] = checkpoint["model_hyperparams"]["base_transform_kwargs"]
+            checkpoint["model_hyperparams"]["base_kwargs"] = checkpoint[
+                "model_hyperparams"
+            ]["base_transform_kwargs"]
             del checkpoint["model_hyperparams"]["base_transform_kwargs"]
     except KeyError:
         pass
+    model_hyperparams = checkpoint["model_hyperparams"]
+    # added because of a bug in the old create_mixture_flow_model function
     train_history = checkpoint["train_history"]
     test_history = checkpoint["test_history"]
 

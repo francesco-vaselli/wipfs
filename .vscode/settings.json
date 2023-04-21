@@ -3,7 +3,7 @@
     "files.associations": {
         "gen_jet_graph.C": "cpp",
         "extraction.C": "cpp",
-        "counter.C": "cpp",
-        "preliminar.C": "cpp"
+        "prova.C": "cpp",
+        "zMass.C": "cpp"
     }
 }

@@ -400,12 +400,12 @@ def validate_fatjets(
                 color=color,
             )
             axs[0].legend(frameon=False, loc="upper right")
-            plt.savefig(f"{save_dir}/XbbvsQCD for b content.png")
-            plt.savefig(f"{save_dir}/XbbvsQCD for b content.pdf")
-            if isinstance(epoch, int):
-                writer.add_figure(f"XbbvsQCD for b content", fig, global_step=epoch)
-            else:
-                writer.add_figure(f"{epoch}/XbbvsQCD for b content", fig)
+        plt.savefig(f"{save_dir}/XbbvsQCD for b content.png")
+        plt.savefig(f"{save_dir}/XbbvsQCD for b content.pdf")
+        if isinstance(epoch, int):
+            writer.add_figure(f"XbbvsQCD for b content", fig, global_step=epoch)
+        else:
+            writer.add_figure(f"{epoch}/XbbvsQCD for b content", fig)
 
     print(gen.shape)
 
@@ -638,10 +638,10 @@ def validate_fatjets(
                 label=f"{name}",
                 color=color,
             )
-            plt.savefig(f"{save_dir}/Softrdop_comp.png")
-            plt.savefig(f"{save_dir}/Softrdop_comp.pdf")
-            axs[0].legend(frameon=False, loc="upper right")
-            if isinstance(epoch, int):
-                writer.add_figure(f"Softrdop_comp", fig, global_step=epoch)
-            else:
-                writer.add_figure(f"{epoch}/Softrdop_comp", fig)
+        plt.savefig(f"{save_dir}/Softrdop_comp.png")
+        plt.savefig(f"{save_dir}/Softrdop_comp.pdf")
+        axs[0].legend(frameon=False, loc="upper right")
+        if isinstance(epoch, int):
+            writer.add_figure(f"Softrdop_comp", fig, global_step=epoch)
+        else:
+            writer.add_figure(f"{epoch}/Softrdop_comp", fig)

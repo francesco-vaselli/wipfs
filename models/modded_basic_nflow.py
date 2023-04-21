@@ -22,7 +22,6 @@ from permutations import BlockPermutation, IdentityPermutation
 from nflows.transforms.base import Transform
 from nflows.transforms.autoregressive import AutoregressiveTransform
 from nflows.transforms import made as made_module
-from nflows.transforms import CompositeTransform
 from nflows.transforms.splines.cubic import cubic_spline
 from nflows.transforms.splines.linear import linear_spline
 from nflows.transforms.splines.quadratic import (
@@ -245,6 +244,7 @@ class PiecewiseRationalQuadraticCouplingTransformM(PiecewiseCouplingTransformM):
         min_bin_height=modded_spline.DEFAULT_MIN_BIN_HEIGHT,
         min_derivative=modded_spline.DEFAULT_MIN_DERIVATIVE,
     ):
+
         self.num_bins = num_bins
         self.min_bin_width = min_bin_width
         self.min_bin_height = min_bin_height
@@ -602,6 +602,7 @@ def create_mixture_flow_model(input_dim, context_dim, base_kwargs, transform_typ
                 context_features=context_dim,
                 dropout_probability=base_kwargs["dropout_probability_maf"],
                 use_batch_norm=base_kwargs["batch_norm_maf"],
+                init_identity=base_kwargs["init_identity"],
             )
         )
         transform.append(create_random_transform(param_dim=input_dim))
@@ -619,11 +620,12 @@ def create_mixture_flow_model(input_dim, context_dim, base_kwargs, transform_typ
                 context_features=context_dim,
                 dropout_probability=base_kwargs["dropout_probability_arqs"],
                 use_batch_norm=base_kwargs["batch_norm_arqs"],
+                init_identity=base_kwargs["init_identity"],
             )
         )
         transform.append(create_random_transform(param_dim=input_dim))
 
-    transform_fnal = CompositeTransform(transform)
+    transform_fnal = transforms.CompositeTransform(transform)
 
     flow = FlowM(transform_fnal, distribution)
 
@@ -723,6 +725,7 @@ def test_epoch(flow, test_loader, epoch, device=None):
         flow.eval()
         test_loss = 0.0
         for z, y in test_loader:
+
             if device is not None:
                 z = z.to(device, non_blocking=True)
                 y = y.to(device, non_blocking=True)
@@ -770,6 +773,7 @@ def train(
     )
 
     for epoch in range(0 + res_epoch, epochs + 1 + res_epoch):
+
         print(
             "Learning rate: {}".format(optimizer.state_dict()["param_groups"][0]["lr"])
         )
@@ -800,6 +804,7 @@ def train(
             )
 
         if epoch % save_freq == 0:
+
             save_model(
                 epoch,
                 model,
@@ -926,6 +931,9 @@ def load_mixture_model(device, model_dir=None, filename=None):
 
     p = Path(model_dir)
     checkpoint = torch.load(p / filename, map_location="cpu")
+
+    model_hyperparams = checkpoint["model_hyperparams"]
+    # added because of a bug in the old create_mixture_flow_model function
     try:
         if checkpoint["model_hyperparams"]["base_transform_kwargs"] is not None:
             checkpoint["model_hyperparams"]["base_kwargs"] = checkpoint[
@@ -934,8 +942,6 @@ def load_mixture_model(device, model_dir=None, filename=None):
             del checkpoint["model_hyperparams"]["base_transform_kwargs"]
     except KeyError:
         pass
-    model_hyperparams = checkpoint["model_hyperparams"]
-    # added because of a bug in the old create_mixture_flow_model function
     train_history = checkpoint["train_history"]
     test_history = checkpoint["test_history"]
 

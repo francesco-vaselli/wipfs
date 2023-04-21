@@ -767,10 +767,10 @@ def validate_electrons(
     ranges = [
         (0, 200),
         (-0.1, 0.1),
-        (0, 0.4),
-        (0, 0.09),
-        (0, 1.5),
-        (-0.5, 0.5),
+        (0, 0.16),
+        (0, 0.05),
+        (0.3, 1.2),
+        (-0.1, 0.1),
     ]
     blue_line = mlines.Line2D([], [], color="tab:blue", ls="--", label="FullSim")
     red_line = mlines.Line2D([], [], color="tab:orange", label="FlashSim")

@@ -598,10 +598,10 @@ def validate_fatjets(
         fig, axs = plt.subplots(1, 1) #, figsize=(9, 4.5), tight_layout=False)
         hep.cms.text('Simulation Preliminary')
 
-        axs[0].set_xlabel(f"{target}")
+        axs.set_xlabel(f"{target}")
         # axs[1].set_xlabel(f"{target}")
 
-        axs[0].set_yscale("log")
+        axs.set_yscale("log")
 
         inf = rangeR[0]
         sup = rangeR[1]
@@ -633,10 +633,10 @@ def validate_fatjets(
             #     color=color,
             # )
 
-            axs[0].hist(
+            axs.hist(
                 full, bins=50, range=rangeR, histtype="step", ls="--", color=color, label=f"FullSim {name}"
             )
-            axs[0].hist(
+            axs.hist(
                 flash,
                 bins=50,
                 range=rangeR,
@@ -646,7 +646,7 @@ def validate_fatjets(
             )
         plt.savefig(f"{save_dir}/Softrdop_comp.png")
         plt.savefig(f"{save_dir}/Softrdop_comp.pdf")
-        axs[0].legend(frameon=False, loc="upper right")
+        axs.legend(frameon=False, loc="upper right")
         if isinstance(epoch, int):
             writer.add_figure(f"Softrdop_comp", fig, global_step=epoch)
         else:

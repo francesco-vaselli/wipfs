@@ -19,6 +19,7 @@ from corner_plots import make_corner
 
 import mplhep
 
+
 def validate_electrons(
     test_loader,
     model,
@@ -261,7 +262,12 @@ def validate_electrons(
 
     # Conditioning
 
-    targets = ["MElectron_ip3d", "MElectron_sip3d", "MElectron_jetRelIso", "MElectron_pfRelIso03_all"]
+    targets = [
+        "MElectron_ip3d",
+        "MElectron_sip3d",
+        "MElectron_jetRelIso",
+        "MElectron_pfRelIso03_all",
+    ]
 
     ranges = [[0, 0.1], [0, 10], [0, 5], [0, 1]]
 
@@ -379,14 +385,11 @@ def validate_electrons(
     # Normalized version
 
     for target, rangeR in zip(targets, ranges):
-
         fig, axs = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
 
         # write cms label
 
         mplhep.cms.text("Simulation Preliminary")
-
-
 
         axs[0].set_xlabel(f"{target}")
         axs[1].set_xlabel(f"{target}")
@@ -512,7 +515,7 @@ def validate_electrons(
         # )
         plt.close()
 
-   # Normalized version
+    # Normalized version
 
     for target, rangeR in zip(targets, ranges):
         mplhep.style.use("CMS")
@@ -602,16 +605,29 @@ def validate_electrons(
             density=True,
         )
 
-        labels.append(Patch(edgecolor="tab:purple", fill=False, lw=2, label="ClosestJet partonFlavour is udsg"))
+        labels.append(
+            Patch(
+                edgecolor="tab:purple",
+                fill=False,
+                lw=2,
+                label="ClosestJet partonFlavour is udsg",
+            )
+        )
 
         del full, flash
 
-        labels.append(Patch(edgecolor="black", fill=False, lw=2, ls="--", label="FullSim"))
+        labels.append(
+            Patch(edgecolor="black", fill=False, lw=2, ls="--", label="FullSim")
+        )
         labels.append(Patch(edgecolor="black", fill=False, lw=2, label="FlashSim"))
 
         axs.legend(handles=labels, frameon=False, loc="upper center")
-        plt.savefig(f"{save_dir}/{target}_conditioning_normalized_cms.png", format="png")
-        plt.savefig(f"{save_dir}/{target}_conditioning_normalized_cms.pdf", format="pdf")
+        plt.savefig(
+            f"{save_dir}/{target}_conditioning_normalized_cms.png", format="png"
+        )
+        plt.savefig(
+            f"{save_dir}/{target}_conditioning_normalized_cms.pdf", format="pdf"
+        )
         # writer.add_figure(
         #     f"Conditioning/{target}_conditioning_normalized.png", fig, global_step=epoch
         # )
@@ -739,27 +755,57 @@ def validate_electrons(
 
     labels = [
         "MElectron_pt",
-        "MElectron_eta",
+        "MElectron_deltaEtaSC",
+        "MElectron_hoe",
         "MElectron_sieie",
         "MElectron_r9",
-        "MElectron_mvaFall17V1Iso",
-        "MElectron_mvaFall17V1noIso",
-        "MElectron_mvaFall17V2Iso",
-        "MElectron_mvaFall17V2noIso",
+        "MElectron_eInvMinusPInv",
     ]
+
+    names = ["pt", "deltaEtaSC", "hoe", "sieie", "r9", "eInvMinusPInv"]
 
     ranges = [
         (0, 200),
-        (-2, 2),
+        (-0.1, 0.1),
+        (0, 0.4),
         (0, 0.09),
         (0, 1.5),
-        (-1, 1),
-        (-1, 1),
-        (-1, 1),
-        (-1, 1),
+        (-0.5, 0.5),
     ]
+    blue_line = mlines.Line2D([], [], color="tab:blue", ls="--", label="FullSim")
+    red_line = mlines.Line2D([], [], color="tab:orange", label="FlashSim")
 
-    fig = make_corner(reco, saturated_samples, labels, "Supercluster", ranges=ranges)
-    plt.gcf()
+    plt.rcParams.update(plt.rcParamsDefault)
+
+    fig = corner.corner(
+        reco[labels],
+        range=ranges,
+        labels=names,
+        color="tab:blue",
+        levels=[0.5, 0.9, 0.99],
+        hist_bin_factor=3,
+        scale_hist=True,
+        plot_datapoints=False,
+        hist_kwargs={"linestyles": "--"},
+        contour_kwargs={"linestyles": "--"},
+    )
+    corner.corner(
+        samples[labels],
+        range=ranges,
+        fig=fig,
+        color="tab:orange",
+        levels=[0.5, 0.9, 0.99],
+        hist_bin_factor=3,
+        scale_hist=True,
+        plot_datapoints=False,
+    )
+    mplhep.cms.text("Simulation Preliminary", loc=0)
+    plt.legend(
+        fontsize=24,
+        frameon=False,
+        handles=[blue_line, red_line],
+        bbox_to_anchor=(0.0, 1.0, 1.0, 4.0),
+        loc="upper right",
+    )
     plt.savefig(f"{save_dir}/Supercluster_corner_cms.png", format="png")
     # writer.add_figure("Corner_plots/Supercluster", fig, global_step=epoch)

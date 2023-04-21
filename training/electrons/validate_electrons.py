@@ -261,7 +261,7 @@ def validate_electrons(
 
     # Conditioning
 
-    targets = ["MElectron_ip3d", "MElectron_sip3d", "MElectron_jetRelIso"]
+    targets = ["MElectron_ip3d", "MElectron_sip3d", "MElectron_jetRelIso", "MElectron_pfRelIso03_all"]
 
     ranges = [[0, 0.1], [0, 10], [0, 5]]
 
@@ -519,7 +519,7 @@ def validate_electrons(
         fig, axs = plt.subplots(1, 1, figsize=(10, 10), tight_layout=False)
         mplhep.cms.text("Simulation Preliminary")
 
-        axs.set_xlabel(f"JetRelIso")
+        axs.set_xlabel(f"pfRelIso03 all")
 
         axs.set_yscale("log")
 

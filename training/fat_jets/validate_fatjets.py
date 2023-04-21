@@ -492,12 +492,14 @@ def validate_fatjets(
 
     fig = make_corner(reco, samples, labels=["Mfatjet_msoftdrop", "Mfatjet_particleNetMD_XbbvsQCD"], title="Total softdrop mass vs XbbvsQCD",
                       ranges=[[0, 200], [0,1]])
+    plt.suptitle("softdrop vs tagger", fontsize=16)
     plt.savefig(f"{save_dir}/corner.png")
     plt.savefig(f"{save_dir}/corner.pdf")
     if isinstance(epoch, int):
         writer.add_figure("corner", fig, global_step=epoch)
     else:
         writer.add_figure(f"{epoch}/corner", fig)
+    plt.close()
 
     sig_reco = reco[df["is_signal"] == 1]
     sig_samples = samples[df["is_signal"] == 1]
@@ -512,6 +514,7 @@ def validate_fatjets(
         writer.add_figure("corner_signal", fig, global_step=epoch)
     else:
         writer.add_figure(f"{epoch}/corner_signal", fig)
+    plt.close()
 
     fig = make_corner(bkg_reco, bkg_samples, labels=["Mfatjet_msoftdrop", "Mfatjet_particleNetMD_XbbvsQCD"], title="Background softdrop mass vs XbbvsQCD",
                         ranges=[[0, 200], [0,1]])
@@ -521,6 +524,7 @@ def validate_fatjets(
         writer.add_figure("corner_background", fig, global_step=epoch)
     else:
         writer.add_figure(f"{epoch}/corner_background", fig)
+    plt.close()
     
     # 1 d plot of softdrop mass for total, sig and bkg, fullsim vs flash
     recos = [reco, sig_reco, bkg_reco]

@@ -124,8 +124,8 @@ def validate_electrons(
             bins=100,
         )
         plt.savefig(os.path.join(save_dir, f"{column}.png"))
-        writer.add_figure(f"1D_Distributions/{column}", fig, global_step=epoch)
-        writer.add_scalar(f"ws/{column}_wasserstein_distance", ws, global_step=epoch)
+        # writer.add_figure(f"1D_Distributions/{column}", fig, global_step=epoch)
+        # writer.add_scalar(f"ws/{column}_wasserstein_distance", ws, global_step=epoch)
         plt.close()
 
     # Return to physical kinematic variables
@@ -202,7 +202,7 @@ def validate_electrons(
             bins=100,
         )
         plt.savefig(f"{save_dir}/{column}_incriminated.png", format="png")
-        writer.add_figure(f"Zoom_in_1D_Distributions/{column}", fig, global_step=epoch)
+        # writer.add_figure(f"Zoom_in_1D_Distributions/{column}", fig, global_step=epoch)
         plt.close()
 
     # Return to physical kinematic variables
@@ -254,7 +254,7 @@ def validate_electrons(
             bins=100,
         )
         plt.savefig(os.path.join(save_dir, f"{column}.png"), format="png")
-        writer.add_figure(f"1D_Distributions/{column}", fig, global_step=epoch)
+        # writer.add_figure(f"1D_Distributions/{column}", fig, global_step=epoch)
         writer.add_scalar(f"ws/{column}_wasserstein_distance", ws, global_step=epoch)
         plt.close()
 
@@ -372,9 +372,9 @@ def validate_electrons(
 
         axs[0].legend(frameon=False, loc="upper right")
         plt.savefig(f"{save_dir}/{target}_conditioning.png", format="png")
-        writer.add_figure(
-            f"Conditioning/{target}_conditioning.png", fig, global_step=epoch
-        )
+        # writer.add_figure(
+        #     f"Conditioning/{target}_conditioning.png", fig, global_step=epoch
+        # )
         plt.close()
 
     # Normalized version
@@ -502,9 +502,9 @@ def validate_electrons(
 
         axs[0].legend(frameon=False, loc="upper right")
         plt.savefig(f"{save_dir}/{target}_conditioning_normalized.png", format="png")
-        writer.add_figure(
-            f"Conditioning/{target}_conditioning_normalized.png", fig, global_step=epoch
-        )
+        # writer.add_figure(
+        #     f"Conditioning/{target}_conditioning_normalized.png", fig, global_step=epoch
+        # )
         plt.close()
 
     # Corner plots:
@@ -527,7 +527,7 @@ def validate_electrons(
 
     fig = make_corner(reco, saturated_samples, labels, "Isolation")
     plt.savefig(f"{save_dir}/Isolation_corner.png", format="png")
-    writer.add_figure("Corner_plots/Isolation", fig, global_step=epoch)
+    # writer.add_figure("Corner_plots/Isolation", fig, global_step=epoch)
 
     # Impact parameter (range)
 
@@ -557,7 +557,7 @@ def validate_electrons(
         reco, saturated_samples, labels, "Impact parameter", ranges=ranges
     )
     plt.savefig(f"{save_dir}/Impact_parameter_corner.png", format="png")
-    writer.add_figure("Corner_plots/Impact parameter", fig, global_step=epoch)
+    # writer.add_figure("Corner_plots/Impact parameter", fig, global_step=epoch)
 
     # Impact parameter comparison
 
@@ -581,9 +581,9 @@ def validate_electrons(
         ranges=ranges,
     )
     plt.savefig(f"{save_dir}/Impact_parameter_v2_corner.png", format="png")
-    writer.add_figure(
-        r"Corner_plots/Impact parameter vs \sqrt(dxy^2 + dz^2)", fig, global_step=epoch
-    )
+    # writer.add_figure(
+    #     r"Corner_plots/Impact parameter vs \sqrt(dxy^2 + dz^2)", fig, global_step=epoch
+    # )
 
     # Kinematics
 
@@ -591,7 +591,7 @@ def validate_electrons(
 
     fig = make_corner(reco, saturated_samples, labels, "Kinematics")
     plt.savefig(f"{save_dir}/Kinematics_corner.png", format="png")
-    writer.add_figure("Corner_plots/Kinematics", fig, global_step=epoch)
+    # writer.add_figure("Corner_plots/Kinematics", fig, global_step=epoch)
 
     # Supercluster
 
@@ -619,4 +619,4 @@ def validate_electrons(
 
     fig = make_corner(reco, saturated_samples, labels, "Supercluster", ranges=ranges)
     plt.savefig(f"{save_dir}/Supercluster_corner.png", format="png")
-    writer.add_figure("Corner_plots/Supercluster", fig, global_step=epoch)
+    # writer.add_figure("Corner_plots/Supercluster", fig, global_step=epoch)

@@ -199,11 +199,13 @@ def validate_fatjets(
             lw=1,
             range=[rangeR.min(), rangeR.max()],
         )
+        plt.savefig(f"{save_dir}/{names[i]}.png")
+        plt.savefig(f"{save_dir}/{names[i]}.pdf")
         if isinstance(epoch, int):
             writer.add_figure(f"{names[i]}", fig, global_step=epoch)
         else:
             writer.add_figure(f"{epoch}/{names[i]}", fig)
-        plt.savefig(f"{save_dir}/{names[i]}.png")
+
 
     plt.close()
 
@@ -296,12 +298,14 @@ def validate_fatjets(
             lw=1,
             range=[rangeR.min(), rangeR.max()],
         )
+        plt.savefig(f"{save_dir}/{names[i]}.png")
+        plt.savefig(f"{save_dir}/{names[i]}.pdf")
         if isinstance(epoch, int):
             writer.add_figure(f"{names[i]}", fig, global_step=epoch)
         else:
             writer.add_figure(f"{epoch}/{names[i]}", fig)
 
-        plt.savefig(f"{save_dir}/{names[i]}.png")
+
 
     plt.close()
 
@@ -396,6 +400,8 @@ def validate_fatjets(
                 color=color,
             )
             axs[0].legend(frameon=False, loc="upper right")
+            plt.savefig(f"{save_dir}/{target}.png")
+            plt.savefig(f"{save_dir}/{target}.pdf")
             if isinstance(epoch, int):
                 writer.add_figure(f"XbbvsQCD for b content", fig, global_step=epoch)
             else:
@@ -436,6 +442,8 @@ def validate_fatjets(
     ax.spines['top'].set_visible(False)
     plt.title("Receiver operating characteristic 2bvs1b", fontsize=16)
     plt.legend(fontsize=16, frameon=False,loc="best")
+    plt.savefig(f"{save_dir}/ROC2v1.png")
+    plt.savefig(f"{save_dir}/ROC2v1.pdf")
     if isinstance(epoch, int):
         writer.add_figure("ROC2v1", fig, global_step=epoch)
     else:
@@ -474,6 +482,8 @@ def validate_fatjets(
     ax.spines['top'].set_visible(False)
     plt.title("Receiver operating characteristic 2bvs0b", fontsize=16)
     plt.legend(fontsize=16, frameon=False,loc="best")
+    plt.savefig(f"{save_dir}/ROC2v0.png")
+    plt.savefig(f"{save_dir}/ROC2v0.pdf")
     if isinstance(epoch, int):
         writer.add_figure("ROC2v0", fig, global_step=epoch)
     else:
@@ -551,12 +561,13 @@ def validate_fatjets(
             lw=1,
             range=[rangeR.min(), rangeR.max()],
         )
+        plt.savefig(f"{save_dir}/{titles[i]}.png")
+        plt.savefig(f"{save_dir}/{titles[i]}.pdf")
         if isinstance(epoch, int):
             writer.add_figure(f"{titles[i]}", fig, global_step=epoch)
         else:
             writer.add_figure(f"{epoch}/{titles[i]}", fig)
 
-        plt.savefig(f"{save_dir}/{titles[i]}.png")
 
     targets = ["Mfatjet_msoftdrop"]
 
@@ -621,6 +632,8 @@ def validate_fatjets(
                 label=f"{name}",
                 color=color,
             )
+            plt.savefig(f"{save_dir}/{target}.png")
+            plt.savefig(f"{save_dir}/{target}.pdf")
             axs[0].legend(frameon=False, loc="upper right")
             if isinstance(epoch, int):
                 writer.add_figure(f"Softrdop_comp", fig, global_step=epoch)

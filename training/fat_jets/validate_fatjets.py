@@ -13,6 +13,7 @@ from sklearn.utils import shuffle
 from scipy.stats import wasserstein_distance
 import pandas as pd
 import corner
+import mplhep as hep
 
 
 def make_corner(reco, samples, labels, title, ranges=None, *args, **kwargs):
@@ -591,61 +592,63 @@ def validate_fatjets(
     ]
 
     colors = ["tab:red", "tab:green"]
+    with hep.style.use("CMS"):
+        for target, rangeR in zip(targets, ranges):
 
-    for target, rangeR in zip(targets, ranges):
+            fig, axs = plt.subplots(1, 1) #, figsize=(9, 4.5), tight_layout=False)
+            hep.cms.text('Simulation Preliminary')
 
-        fig, axs = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
+            axs[0].set_xlabel(f"{target}")
+            # axs[1].set_xlabel(f"{target}")
 
-        axs[0].set_xlabel(f"{target}")
-        axs[1].set_xlabel(f"{target}")
+            axs[0].set_yscale("log")
 
-        axs[1].set_yscale("log")
+            inf = rangeR[0]
+            sup = rangeR[1]
 
-        inf = rangeR[0]
-        sup = rangeR[1]
+            for cond, color, name in zip(conds, colors, names):
+                nb = df["is_signal"].values
+                mask = np.where(nb == cond, True, False)
+                full = reco[target].values
+                full = full[mask]
+                full = full[~np.isnan(full)]
+                full = np.where(full > sup, sup, full)
+                full = np.where(full < inf, inf, full)
 
-        for cond, color, name in zip(conds, colors, names):
-            nb = df["is_signal"].values
-            mask = np.where(nb == cond, True, False)
-            full = reco[target].values
-            full = full[mask]
-            full = full[~np.isnan(full)]
-            full = np.where(full > sup, sup, full)
-            full = np.where(full < inf, inf, full)
+                flash = samples[target].values
+                flash = flash[mask]
+                flash = flash[~np.isnan(flash)]
+                flash = np.where(flash > sup, sup, flash)
+                flash = np.where(flash < inf, inf, flash)
 
-            flash = samples[target].values
-            flash = flash[mask]
-            flash = flash[~np.isnan(flash)]
-            flash = np.where(flash > sup, sup, flash)
-            flash = np.where(flash < inf, inf, flash)
+                # axs[0].hist(
+                #     full, bins=50, range=rangeR, histtype="step", ls="--", color=color, l
+                # )
+                # axs[0].hist(
+                #     flash,
+                #     bins=50,
+                #     range=rangeR,
+                #     histtype="step",
+                #     label=f"{name}",
+                #     color=color,
+                # )
 
-            axs[0].hist(
-                full, bins=50, range=rangeR, histtype="step", ls="--", color=color
-            )
-            axs[0].hist(
-                flash,
-                bins=50,
-                range=rangeR,
-                histtype="step",
-                label=f"{name}",
-                color=color,
-            )
-
-            axs[1].hist(
-                full, bins=50, range=rangeR, histtype="step", ls="--", color=color
-            )
-            axs[1].hist(
-                flash,
-                bins=50,
-                range=rangeR,
-                histtype="step",
-                label=f"{name}",
-                color=color,
-            )
-        plt.savefig(f"{save_dir}/Softrdop_comp.png")
-        plt.savefig(f"{save_dir}/Softrdop_comp.pdf")
-        axs[0].legend(frameon=False, loc="upper right")
-        if isinstance(epoch, int):
-            writer.add_figure(f"Softrdop_comp", fig, global_step=epoch)
-        else:
-            writer.add_figure(f"{epoch}/Softrdop_comp", fig)
+                axs[0].hist(
+                    full, bins=50, range=rangeR, histtype="step", ls="--", color=color, label=f"FullSim {name}"
+                )
+                axs[0].hist(
+                    flash,
+                    bins=50,
+                    range=rangeR,
+                    histtype="step",
+                    label=f"{name}",
+                    color=color,
+                    label=f"FlashSim {name}"
+                )
+            plt.savefig(f"{save_dir}/Softrdop_comp.png")
+            plt.savefig(f"{save_dir}/Softrdop_comp.pdf")
+            axs[0].legend(frameon=False, loc="upper right")
+            if isinstance(epoch, int):
+                writer.add_figure(f"Softrdop_comp", fig, global_step=epoch)
+            else:
+                writer.add_figure(f"{epoch}/Softrdop_comp", fig)

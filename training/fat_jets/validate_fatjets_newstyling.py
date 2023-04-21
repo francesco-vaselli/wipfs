@@ -14,6 +14,7 @@ from scipy.stats import wasserstein_distance
 import pandas as pd
 import corner
 import mplhep as hep
+from matplotlib.lines import Line2D
 
 
 def make_corner(reco, samples, labels, title, ranges=None, *args, **kwargs):
@@ -386,11 +387,11 @@ def validate_fatjets(
                 histtype="step",
                 color=color,
             )
-            legend_elements.append(plt.Line2D([0], [0], color=color,lw=2, label=f'{name}'))
+            legend_elements.append(Line2D([0], [0], color=color,lw=2, label=f'{name}'))
 
         legend_elements += [
-                   plt.Line2D([0], [0], color='k', ls='-',lw=2, label='FlashSim'),
-                   plt.Line2D([0], [0], color='k', ls='--', lw=2, label='FullSim')]
+                   Line2D([0], [0], color='k', ls='-',lw=2, label='FlashSim'),
+                   Line2D([0], [0], color='k', ls='--', lw=2, label='FullSim')]
 
         axs.legend(frameon=False, loc="upper right", handles=legend_elements)
         plt.savefig(f"{save_dir}/XbbvsQCD for b content.png")

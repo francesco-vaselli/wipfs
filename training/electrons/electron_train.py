@@ -30,7 +30,6 @@ def init_np_seed(worker_id):
 
 
 def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
-
     # basic setup
     cudnn.benchmark = False  # to be tried later
     args.gpu = gpu
@@ -193,6 +192,21 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
     train_history = []
     test_history = []
 
+    if not args.distributed or (args.rank % ngpus_per_node == 0):
+        if val_func is not None:
+            if args.validate_at_0:
+                model.eval()
+                val_func(
+                    test_loader,
+                    model,
+                    start_epoch,
+                    writer,
+                    save_dir,
+                    args,
+                    args.gpu,
+                )
+                print("done with validation")
+
     if args.distributed:
         print("[Rank %d] World size : %d" % (args.rank, dist.get_world_size()))
 
@@ -203,7 +217,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
 
         if writer is not None:
             writer.add_scalar("lr/optimizer", scheduler.get_last_lr(), epoch)
-            
+
         # train for one epoch
         train_loss = 0.0
         train_log_p = 0.0
@@ -268,7 +282,6 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
             test_log_det = 0.0
 
             for z, y in test_loader:
-
                 if gpu is not None:
                     z = z.cuda(args.gpu, non_blocking=True)
                     y = y.cuda(args.gpu, non_blocking=True)
@@ -357,5 +370,4 @@ def main():
 
 
 if __name__ == "__main__":
-
     main()

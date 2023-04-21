@@ -15,6 +15,7 @@ from postprocessing import postprocessing, gen_columns, reco_columns
 from post_actions import target_dictionary, context_dictionary
 from corner_plots import make_corner
 
+
 def validate_electrons(
     test_loader,
     model,
@@ -25,7 +26,6 @@ def validate_electrons(
     device,
     clf_loaders=None,
 ):
-
     if writer is not None:
         save_dir = os.path.join(save_dir, f"./figures/validation@epoch-{epoch}")
         if not os.path.isdir(save_dir):
@@ -36,13 +36,11 @@ def validate_electrons(
     model.eval()
     # Generate samples
     with torch.no_grad():
-
         gen = []
         reco = []
         samples = []
 
         for bid, data in enumerate(test_loader):
-
             z, y = data[0], data[1]
             inputs_y = y.cuda(device)
 
@@ -123,6 +121,7 @@ def validate_electrons(
             range=[np.min(rangeR), np.max(rangeR)],
             bins=100,
         )
+        plt.savefig(os.path.join(save_dir, f"{column}.png"))
         writer.add_figure(f"1D_Distributions/{column}", fig, global_step=epoch)
         writer.add_scalar(f"ws/{column}_wasserstein_distance", ws, global_step=epoch)
         plt.close()
@@ -200,14 +199,14 @@ def validate_electrons(
             range=rangeR,
             bins=100,
         )
-        # plt.savefig(f"{save_dir}/{column}_incriminated.png", format="png")
+        plt.savefig(f"{save_dir}/{column}_incriminated.png", format="png")
         writer.add_figure(f"Zoom_in_1D_Distributions/{column}", fig, global_step=epoch)
         plt.close()
 
     # Return to physical kinematic variables
 
     physical = ["MElectron_pt", "MElectron_eta", "MElectron_phi"]
-    
+
     for column in physical:
         ws = wasserstein_distance(reco[column], samples[column])
 
@@ -252,6 +251,7 @@ def validate_electrons(
             range=[np.min(rangeR), np.max(rangeR)],
             bins=100,
         )
+        plt.savefig(os.path.join(save_dir, f"{column}.png"))
         writer.add_figure(f"1D_Distributions/{column}", fig, global_step=epoch)
         writer.add_scalar(f"ws/{column}_wasserstein_distance", ws, global_step=epoch)
         plt.close()
@@ -265,7 +265,6 @@ def validate_electrons(
     conds = [f"MGenElectron_statusFlag{i}" for i in (0, 2, 7)]
     conds.append("ClosestJet_EncodedPartonFlavour_b")
 
-
     names = [
         "isPrompt",
         "isTauDecayProduct",
@@ -276,7 +275,6 @@ def validate_electrons(
     colors = ["tab:red", "tab:green", "tab:blue", "tab:orange"]
 
     for target, rangeR in zip(targets, ranges):
-
         fig, axs = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
 
         axs[0].set_xlabel(f"{target}")
@@ -369,7 +367,7 @@ def validate_electrons(
         del full, flash
 
         axs[0].legend(frameon=False, loc="upper right")
-        # plt.savefig(f"{save_dir}/{target}_conditioning.png", format="png")
+        plt.savefig(f"{save_dir}/{target}_conditioning.png", format="png")
         writer.add_figure(
             f"Conditioning/{target}_conditioning.png", fig, global_step=epoch
         )
@@ -378,7 +376,6 @@ def validate_electrons(
     # Normalized version
 
     for target, rangeR in zip(targets, ranges):
-
         fig, axs = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
 
         axs[0].set_xlabel(f"{target}")
@@ -499,7 +496,7 @@ def validate_electrons(
         del full, flash
 
         axs[0].legend(frameon=False, loc="upper right")
-        # plt.savefig(f"{save_dir}/{target}_conditioning_normalized.png", format="png")
+        plt.savefig(f"{save_dir}/{target}_conditioning_normalized.png", format="png")
         writer.add_figure(
             f"Conditioning/{target}_conditioning_normalized.png", fig, global_step=epoch
         )
@@ -524,6 +521,7 @@ def validate_electrons(
     ]
 
     fig = make_corner(reco, saturated_samples, labels, "Isolation")
+    plt.savefig(f"{save_dir}/Isolation_corner.png", format="png")
     writer.add_figure("Corner_plots/Isolation", fig, global_step=epoch)
 
     # Impact parameter (range)
@@ -553,6 +551,7 @@ def validate_electrons(
     fig = make_corner(
         reco, saturated_samples, labels, "Impact parameter", ranges=ranges
     )
+    plt.savefig(f"{save_dir}/Impact_parameter_corner.png", format="png")
     writer.add_figure("Corner_plots/Impact parameter", fig, global_step=epoch)
 
     # Impact parameter comparison
@@ -576,6 +575,7 @@ def validate_electrons(
         r"Impact parameter vs $\sqrt{dxy^2 + dz^2}$",
         ranges=ranges,
     )
+    plt.savefig(f"{save_dir}/Impact_parameter_vs_sqrt_xy_z_corner.png", format="png")
     writer.add_figure(
         r"Corner_plots/Impact parameter vs \sqrt(dxy^2 + dz^2)", fig, global_step=epoch
     )
@@ -585,6 +585,7 @@ def validate_electrons(
     labels = ["MElectron_pt", "MElectron_eta", "MElectron_phi"]
 
     fig = make_corner(reco, saturated_samples, labels, "Kinematics")
+    plt.savefig(f"{save_dir}/Kinematics_corner.png", format="png")
     writer.add_figure("Corner_plots/Kinematics", fig, global_step=epoch)
 
     # Supercluster
@@ -612,4 +613,5 @@ def validate_electrons(
     ]
 
     fig = make_corner(reco, saturated_samples, labels, "Supercluster", ranges=ranges)
+    plt.savefig(f"{save_dir}/Supercluster_corner.png", format="png")
     writer.add_figure("Corner_plots/Supercluster", fig, global_step=epoch)

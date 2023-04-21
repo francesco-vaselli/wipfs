@@ -643,8 +643,9 @@ def validate_fatjets(
                 label=f"FlashSim {name}",
                 lw=2,
             )
-            axs.legend(frameon=False, loc="upper right")
-            
+        
+        axs.legend(frameon=False, loc="upper right")
+
         plt.savefig(f"{save_dir}/Softrdop_comp.png")
         plt.savefig(f"{save_dir}/Softrdop_comp.pdf")
         

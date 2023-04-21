@@ -926,14 +926,14 @@ def load_mixture_model(device, model_dir=None, filename=None):
 
     p = Path(model_dir)
     checkpoint = torch.load(p / filename, map_location="cpu")
-    # try:
-    #     if checkpoint["model_hyperparams"]["base_transform_kwargs"] is not None:
-    #         checkpoint["model_hyperparams"]["base_kwargs"] = checkpoint[
-    #             "model_hyperparams"
-    #         ]["base_transform_kwargs"]
-    #         del checkpoint["model_hyperparams"]["base_transform_kwargs"]
-    # except KeyError:
-    #     pass
+    try:
+        if checkpoint["model_hyperparams"]["base_transform_kwargs"] is not None:
+            checkpoint["model_hyperparams"]["base_kwargs"] = checkpoint[
+                "model_hyperparams"
+            ]["base_transform_kwargs"]
+            del checkpoint["model_hyperparams"]["base_transform_kwargs"]
+    except KeyError:
+        pass
     model_hyperparams = checkpoint["model_hyperparams"]
     # added because of a bug in the old create_mixture_flow_model function
     train_history = checkpoint["train_history"]

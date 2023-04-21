@@ -187,7 +187,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
 
     test_loader = torch.utils.data.DataLoader(
         dataset=te_dataset,
-        batch_size=args.batch_size,  # manually set batch size to avoid diff shapes
+        batch_size=8192,  # manually set batch size to avoid diff shapes
         shuffle=False,
         num_workers=0,
         pin_memory=True,
@@ -205,6 +205,20 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
     output_freq = 50
     train_history = []
     test_history = []
+
+    if not args.distributed or (args.rank % ngpus_per_node == 0):
+        if val_func is not None:
+            if args.validate_at_0:
+                model.eval()
+                val_func(
+                    test_loader,
+                    model,
+                    start_epoch,
+                    writer,
+                    save_dir,
+                    args,
+                    args.gpu,                                                                                                                                         )
+                print('done with validation')
 
     if args.distributed:
         print("[Rank %d] World size : %d" % (args.rank, dist.get_world_size()))

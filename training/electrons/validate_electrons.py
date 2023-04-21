@@ -786,7 +786,7 @@ def validate_electrons(
         hist_bin_factor=3,
         scale_hist=True,
         plot_datapoints=False,
-        hist_kwargs={"linestyles": "--"},
+        hist_kwargs={"ls": "--"},
         contour_kwargs={"linestyles": "--"},
     )
     corner.corner(

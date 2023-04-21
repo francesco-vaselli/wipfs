@@ -400,8 +400,8 @@ def validate_fatjets(
                 color=color,
             )
             axs[0].legend(frameon=False, loc="upper right")
-            plt.savefig(f"{save_dir}/{target}.png")
-            plt.savefig(f"{save_dir}/{target}.pdf")
+            plt.savefig(f"{save_dir}/XbbvsQCD for b content.png")
+            plt.savefig(f"{save_dir}/XbbvsQCD for b content.pdf")
             if isinstance(epoch, int):
                 writer.add_figure(f"XbbvsQCD for b content", fig, global_step=epoch)
             else:
@@ -492,6 +492,8 @@ def validate_fatjets(
 
     fig = make_corner(reco, samples, labels=["Mfatjet_msoftdrop", "Mfatjet_particleNetMD_XbbvsQCD"], title="Total softdrop mass vs XbbvsQCD",
                       ranges=[[0, 200], [0,1]])
+    plt.savefig(f"{save_dir}/corner.png")
+    plt.savefig(f"{save_dir}/corner.pdf")
     if isinstance(epoch, int):
         writer.add_figure("corner", fig, global_step=epoch)
     else:
@@ -504,6 +506,8 @@ def validate_fatjets(
 
     fig = make_corner(sig_reco, sig_samples, labels=["Mfatjet_msoftdrop", "Mfatjet_particleNetMD_XbbvsQCD"], title="Signal softdrop mass vs XbbvsQCD",
                         ranges=[[0, 200], [0,1]])
+    plt.savefig(f"{save_dir}/corner_signal.png")
+    plt.savefig(f"{save_dir}/corner_signal.pdf")
     if isinstance(epoch, int):
         writer.add_figure("corner_signal", fig, global_step=epoch)
     else:
@@ -511,6 +515,8 @@ def validate_fatjets(
 
     fig = make_corner(bkg_reco, bkg_samples, labels=["Mfatjet_msoftdrop", "Mfatjet_particleNetMD_XbbvsQCD"], title="Background softdrop mass vs XbbvsQCD",
                         ranges=[[0, 200], [0,1]])
+    plt.savefig(f"{save_dir}/corner_background.png")
+    plt.savefig(f"{save_dir}/corner_background.pdf")
     if isinstance(epoch, int):
         writer.add_figure("corner_background", fig, global_step=epoch)
     else:
@@ -632,8 +638,8 @@ def validate_fatjets(
                 label=f"{name}",
                 color=color,
             )
-            plt.savefig(f"{save_dir}/{target}.png")
-            plt.savefig(f"{save_dir}/{target}.pdf")
+            plt.savefig(f"{save_dir}/Softrdop_comp.png")
+            plt.savefig(f"{save_dir}/Softrdop_comp.pdf")
             axs[0].legend(frameon=False, loc="upper right")
             if isinstance(epoch, int):
                 writer.add_figure(f"Softrdop_comp", fig, global_step=epoch)

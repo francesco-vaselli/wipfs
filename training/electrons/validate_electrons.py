@@ -516,7 +516,7 @@ def validate_electrons(
 
     for target, rangeR in zip(targets, ranges):
         mplhep.style.use("CMS")
-        fig, axs = plt.subplots(1, 1, figsize=(10, 10), tight_layout=False)
+        fig, axs = plt.subplots(1, 1, figsize=(20, 20), tight_layout=False)
         mplhep.cms.text("Simulation Preliminary")
 
         axs.set_xlabel(f"pfRelIso03 all")
@@ -610,7 +610,7 @@ def validate_electrons(
         labels.append(Patch(edgecolor="black", fill=False, lw=2, label="FlashSim"))
 
         axs.legend(handles=labels, frameon=False, loc="upper right")
-        plt.savefig(f"{save_dir}/{target}_conditioning_normalized.png", format="png")
+        plt.savefig(f"{save_dir}/{target}_conditioning_normalized_cms.png", format="png")
         # writer.add_figure(
         #     f"Conditioning/{target}_conditioning_normalized.png", fig, global_step=epoch
         # )
@@ -734,4 +734,31 @@ def validate_electrons(
     fig = make_corner(reco, saturated_samples, labels, "Supercluster", ranges=ranges)
     plt.gcf()
     plt.savefig(f"{save_dir}/Supercluster_corner.png", format="png")
+    # writer.add_figure("Corner_plots/Supercluster", fig, global_step=epoch)
+
+    labels = [
+        "MElectron_pt",
+        "MElectron_eta",
+        "MElectron_sieie",
+        "MElectron_r9",
+        "MElectron_mvaFall17V1Iso",
+        "MElectron_mvaFall17V1noIso",
+        "MElectron_mvaFall17V2Iso",
+        "MElectron_mvaFall17V2noIso",
+    ]
+
+    ranges = [
+        (0, 200),
+        (-2, 2),
+        (0, 0.09),
+        (0, 1.5),
+        (-1, 1),
+        (-1, 1),
+        (-1, 1),
+        (-1, 1),
+    ]
+
+    fig = make_corner(reco, saturated_samples, labels, "Supercluster", ranges=ranges)
+    plt.gcf()
+    plt.savefig(f"{save_dir}/Supercluster_corner_cms.png", format="png")
     # writer.add_figure("Corner_plots/Supercluster", fig, global_step=epoch)

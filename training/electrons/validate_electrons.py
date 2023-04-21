@@ -611,6 +611,7 @@ def validate_electrons(
 
         axs.legend(handles=labels, frameon=False, loc="upper center")
         plt.savefig(f"{save_dir}/{target}_conditioning_normalized_cms.png", format="png")
+        plt.savefig(f"{save_dir}/{target}_conditioning_normalized_cms.pdf", format="pdf")
         # writer.add_figure(
         #     f"Conditioning/{target}_conditioning_normalized.png", fig, global_step=epoch
         # )

@@ -15,6 +15,7 @@ import pandas as pd
 import corner
 import mplhep as hep
 from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
 
 
 def make_corner(reco, samples, labels, title, ranges=None, *args, **kwargs):
@@ -388,11 +389,11 @@ def validate_fatjets(
                 histtype="step",
                 color=color,
             )
-            legend_elements.append(Line2D([0], [0], color=color,lw=2, label=f'{name}'))
+            legend_elements.append(Patch(edgecolor=color, fill=False, lw=2, label=f'{name}'))
 
         legend_elements += [
-                   Line2D([0], [0], color='k', ls='-',lw=2, label='FlashSim'),
-                   Line2D([0], [0], color='k', ls='--', lw=2, label='FullSim')]
+                   Patch(edgecolor=color, fill=False, color='k', ls='-',lw=2, label='FlashSim'),
+                   Patch(edgecolor=color, fill=False, color='k', ls='--', lw=2, label='FullSim')]
 
         axs.legend(frameon=False, loc="upper center", handles=legend_elements)
         plt.savefig(f"{save_dir}/XbbvsQCD for b content.png")

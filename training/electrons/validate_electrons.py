@@ -792,6 +792,7 @@ def validate_electrons(
     corner.corner(
         samples[labels],
         range=ranges,
+        labels=names,
         fig=fig,
         color="tab:orange",
         levels=[0.5, 0.9, 0.99],

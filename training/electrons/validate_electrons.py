@@ -516,7 +516,7 @@ def validate_electrons(
 
     for target, rangeR in zip(targets, ranges):
         mplhep.style.use("CMS")
-        fig, axs = plt.subplots(1, 1, figsize=(20, 20), tight_layout=False)
+        fig, axs = plt.subplots(1, 1, figsize=(10, 10), tight_layout=False)
         mplhep.cms.text("Simulation Preliminary")
 
         axs.set_xlabel(f"pfRelIso03 all")
@@ -609,7 +609,7 @@ def validate_electrons(
         labels.append(Patch(edgecolor="black", fill=False, lw=2, ls="--", label="FullSim"))
         labels.append(Patch(edgecolor="black", fill=False, lw=2, label="FlashSim"))
 
-        axs.legend(handles=labels, frameon=False, loc="upper right")
+        axs.legend(handles=labels, frameon=False, loc="upper center", ncol=2)
         plt.savefig(f"{save_dir}/{target}_conditioning_normalized_cms.png", format="png")
         # writer.add_figure(
         #     f"Conditioning/{target}_conditioning_normalized.png", fig, global_step=epoch

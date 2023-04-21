@@ -384,7 +384,6 @@ def validate_fatjets(
                 bins=50,
                 range=rangeR,
                 histtype="step",
-                label=f"{name}",
                 color=color,
             )
             legend_elements.append(plt.Line2D([0], [0], color=color,lw=2, label=f'{name}'))

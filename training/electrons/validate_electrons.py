@@ -8,6 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
 import corner
 
 from scipy.stats import wasserstein_distance
@@ -378,7 +379,6 @@ def validate_electrons(
     # Normalized version
 
     for target, rangeR in zip(targets, ranges):
-        mplhep.style.use("CMS")
 
         fig, axs = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
 
@@ -499,7 +499,7 @@ def validate_electrons(
             bins=50,
             range=rangeR,
             histtype="step",
-            label="ClosestJet_partonFlavour_is_guds",
+            label="ClosestJet_partonFlavour_is_udsg",
             color="tab:purple",
             density=True,
         )
@@ -517,8 +517,9 @@ def validate_electrons(
     for target, rangeR in zip(targets, ranges):
         mplhep.style.use("CMS")
         fig, axs = plt.subplots(1, 1, tight_layout=False)
+        mplhep.cms.text("Simulation Preliminary")
 
-        axs.set_xlabel(f"{target}")
+        axs.set_xlabel(f"JetRelIso")
 
         axs.set_yscale("log")
 
@@ -561,7 +562,7 @@ def validate_electrons(
                 density=True,
             )
 
-            labels.append(Line2D([0], [0], color=color, lw=2, label=f"{name}"))
+            labels.append(Patch(edgecolor=color, fill=False, lw=2, label=f"{name}"))
 
             del full, flash
 
@@ -601,12 +602,12 @@ def validate_electrons(
             density=True,
         )
 
-        labels.append(Line2D([0], [0], color="tab:purple", lw=2, label="ClosestJet_partonFlavour_is_guds"))
+        labels.append(Patch(edgecolor="tab:purple", fill=False, lw=2, label="ClosestJet partonFlavour is udsg"))
 
         del full, flash
 
-        labels.append(Line2D([0], [0], color="black", lw=2, ls="--", label="FullSim"))
-        labels.append(Line2D([0], [0], color="black", lw=2, label="FlashSim"))
+        labels.append(Patch(edgecolor="black", fill=False, lw=2, ls="--", label="FullSim"))
+        labels.append(Patch(edgecolor="black", fill=False, lw=2, label="FlashSim"))
 
         axs.legend(handles=labels, frameon=False, loc="upper right")
         plt.savefig(f"{save_dir}/{target}_conditioning_normalized.png", format="png")

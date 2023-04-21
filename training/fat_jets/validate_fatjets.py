@@ -641,7 +641,6 @@ def validate_fatjets(
                     bins=50,
                     range=rangeR,
                     histtype="step",
-                    label=f"{name}",
                     color=color,
                     label=f"FlashSim {name}"
                 )

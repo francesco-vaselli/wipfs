@@ -403,7 +403,70 @@ def validate_fatjets(
         else:
             writer.add_figure(f"{epoch}/XbbvsQCD for b content", fig)
 
-    print(gen.shape)
+    targets = ["Mfatjet_particleNetMD_XbbvsQCD"]
+
+    ranges = [[-0.1, 1]]
+
+    conds = [0, 1]
+
+    names = [
+        "bkg",
+        "sig",
+    ]
+
+    colors = ["tab:red", "tab:green"]
+
+    for target, rangeR in zip(targets, ranges):
+        hep.style.use("CMS")
+
+        fig, axs = plt.subplots(1, 1) #, figsize=(9, 4.5), tight_layout=False)
+        hep.cms.text('Simulation Preliminary')
+        axs.set_xlabel(f"ParticleNet Xbb vs QCD")
+
+        axs.set_yscale("log")
+
+        inf = rangeR[0]
+        sup = rangeR[1]
+        legend_elements = []
+        for cond, color, name in zip(conds, colors, names):
+            nb = df["is_signal"].values
+            mask = np.where(nb == cond, True, False)
+            full = reco[target].values
+            full = full[mask]
+            full = full[~np.isnan(full)]
+            full = np.where(full > sup, sup, full)
+            full = np.where(full < inf, inf, full)
+
+            flash = samples[target].values
+            flash = flash[mask]
+            flash = flash[~np.isnan(flash)]
+            flash = np.where(flash > sup, sup, flash)
+            flash = np.where(flash < inf, inf, flash)
+
+            axs.hist(
+                full, bins=50, range=rangeR, histtype="step", ls="--", lw=2, color=color
+            )
+            axs.hist(
+                flash,
+                bins=50,
+                lw=2,
+                range=rangeR,
+                histtype="step",
+                color=color,
+            )
+            legend_elements.append(Patch(edgecolor=color, fill=False, lw=2, label=f'{name}'))
+
+        legend_elements += [
+                   Patch(edgecolor='k', fill=False, ls='-',lw=2, label='FlashSim'),
+                   Patch(edgecolor='k', fill=False, ls='--', lw=2, label='FullSim')]
+
+        axs.legend(frameon=False, loc="upper center", handles=legend_elements)
+        plt.savefig(f"{save_dir}/XbbvsQCD for b content_SVB.png")
+        plt.savefig(f"{save_dir}/XbbvsQCD for b content_SVB.pdf")
+        if isinstance(epoch, int):
+            writer.add_figure(f"XbbvsQCD for b content_SVB", fig, global_step=epoch)
+        else:
+            writer.add_figure(f"{epoch}/XbbvsQCD for b content_SVB", fig)
 
     # ROC
     fpr, tpr, roc_auc, bs, nbs = makeROC(samples.values, df.values, 1)

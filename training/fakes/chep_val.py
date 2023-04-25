@@ -381,9 +381,9 @@ def validate_fakes(
 
     blue_line = mlines.Line2D([], [], color='tab:blue', label='FullSim', lw=2,  ls='--')
     red_line = mlines.Line2D([], [], color='tab:orange', label='FlashSim', lw=2)
-    fig = corner.corner(full_df[:, [0, 1, 2]], labels=[r'p_T', 'Eta', 'Phi'], color='tab:blue',hist_kwargs ={"ls":'--'}, contour_kwargs ={"linestyles":"--"},
+    fig = corner.corner(full_df.iloc[:, [0, 1, 2]].values, labels=[r'p_T', 'Eta', 'Phi'], color='tab:blue',hist_kwargs ={"ls":'--'}, contour_kwargs ={"linestyles":"--"},
                         levels=(0.5,0.9, 0.99), hist_bin_factor=3, scale_hist=True, plot_datapoints=False)
-    corner.corner(flash_df[:, [0, 1, 2,]], levels=[0.5, 0.9, 0.99], hist_bin_factor=3, color='tab:orange',
+    corner.corner(flash_df.iloc[:, [0, 1, 2,]].values, levels=[0.5, 0.9, 0.99], hist_bin_factor=3, color='tab:orange',
                 scale_hist=True, plot_datapoints=False, fig=fig)
     plt.legend(fontsize=24, frameon=False, handles=[blue_line,red_line], bbox_to_anchor=(0., 1.0, 1., 4.0), loc='upper right')
     #weights=weights * len(bilby_samples) / len(params_samples), range=dom)

@@ -252,9 +252,9 @@ def validate_fatjets(
 
     # Plots
     names = [
-        "Mpt_phys",
-        "Meta_phys",
-        "Mphi_phys",
+        "p_T",
+        "Eta",
+        "Phi",
     ]
 
     for i in range(0, 3):
@@ -289,6 +289,7 @@ def validate_fatjets(
         )
         # fig.suptitle(f"Comparison of {names[i]}", fontsize=16)
         ax1.legend(frameon=False, loc="upper right")
+        ax1.set_xlabel(f"{names[i]}")
         plt.savefig(f"{save_dir}/{names[i]}.png")
         plt.savefig(f"{save_dir}/{names[i]}.pdf")
 
@@ -319,6 +320,7 @@ def validate_fatjets(
             label=f"FlashSim",
         )
         ax2.legend(frameon=False, loc='upper right')
+        ax2.set_xlabel(f"{names[i]}")
         plt.savefig(f"{save_dir}/{names[i]}_log.png")
         plt.savefig(f"{save_dir}/{names[i]}_log.pdf")
         if isinstance(epoch, int):

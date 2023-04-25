@@ -244,6 +244,8 @@ def validate_fakes(
             range=[rangeR.min(), rangeR.max()],
             label=f"FlashSim",
         )
+        ax2.set_xlabel(fr"$\Delta$ p_T 1v{i} [GeV]")
+        ax2.legend(frameon=False, loc="upper right")
         # ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
         # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
         # plt.savefig(os.path.join(save_dir, f"comparison_{names[i]}.png"))
@@ -286,7 +288,7 @@ def validate_fakes(
             label=f"FlashSim",
         )
         #fig.suptitle(f"Comparison of pt{i} @ epoch {epoch}", fontsize=16)
-        ax1.set_xlabel(fr"$\Delta$ phi 1v{i}")
+        ax1.set_xlabel(fr"$\Delta \phi$ 1v{i}")
         ax1.legend(frameon=False, loc="upper right")
         plt.savefig(os.path.join(save_dir, f"comparison_dphi{i}_{epoch}.png"))
         plt.savefig(os.path.join(save_dir, f"comparison_dphi{i}_{epoch}.pdf"))
@@ -304,7 +306,8 @@ def validate_fakes(
             range=[rangeR.min(), rangeR.max()],
             label=f"FlashSim",
         )
-        ax2.set_xlabel(fr"$\Delta$ phi 1v{i}")
+        ax2.set_xlabel(fr"$\Delta \phi$ 1v{i}")
+        ax2.legend(frameon=False, loc="upper right")
         # ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
         # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
         # plt.savefig(os.path.join(save_dir, f"comparison_{names[i]}.png"))
@@ -349,7 +352,7 @@ def validate_fakes(
             label=f"FlashSim",
         )
         #fig.suptitle(f"Comparison of pt{i} @ epoch {epoch}", fontsize=16)
-        ax1.set_xlabel(fr"$\Delta$ p$_T$ 1v{i} [GeV]")
+        ax1.set_xlabel(fr"$\Delta$p$_T$ 1v{i} [GeV]")
         ax1.legend(frameon=False, loc="upper right")
         plt.savefig(os.path.join(save_dir, f"comparison_dpt{i}_{epoch}.png"))
         plt.savefig(os.path.join(save_dir, f"comparison_dpt{i}_{epoch}.pdf"))
@@ -367,7 +370,8 @@ def validate_fakes(
             range=[rangeR.min(), rangeR.max()],
             label=f"FlashSim",
         )
-        ax2.set_xlabel(fr"$\Delta$ p$_T$ 1v{i} [GeV]")
+        ax2.set_xlabel(fr"$\Delta$p$_T$ 1v{i} [GeV]")
+        ax2.legend(frameon=False, loc="upper right")
         # ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
         # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
         # plt.savefig(os.path.join(save_dir, f"comparison_{names[i]}.png"))
@@ -377,7 +381,8 @@ def validate_fakes(
         writer.add_scalar(f"ws/dpt{i}_wasserstein_distance", ws, global_step=epoch)
 
     print("Done with dpt")
-
+    full_df["pt0"] = full_df["pt0"].apply(lambda x: np.exp(x+3))
+    flash_df["pt0"] = flash_df["pt0"].apply(lambda x: np.exp(x+3))
     plt.rcParams.update(plt.rcParamsDefault)
     ranges = [[0, 100], [-5.5, 5.5], [-3.14, 3.14]]
     blue_line = mlines.Line2D([], [], color='tab:blue', label='FullSim', lw=2,  ls='--')

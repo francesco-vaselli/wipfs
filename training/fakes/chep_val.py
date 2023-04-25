@@ -13,6 +13,7 @@ from sklearn.utils import shuffle
 from scipy.stats import wasserstein_distance
 import pandas as pd
 import mplhep as hep
+import matplotlib.lines as mlines
 
 
 def D_phi1v9(N, phis):
@@ -285,7 +286,7 @@ def validate_fakes(
             label=f"FlashSim",
         )
         #fig.suptitle(f"Comparison of pt{i} @ epoch {epoch}", fontsize=16)
-        ax1.set_xlabel(fr"$\Delta$ phi 1v{i} [GeV]")
+        ax1.set_xlabel(fr"$\Delta$ phi 1v{i}")
         ax1.legend(frameon=False, loc="upper right")
         plt.savefig(os.path.join(save_dir, f"comparison_dphi{i}_{epoch}.png"))
         plt.savefig(os.path.join(save_dir, f"comparison_dphi{i}_{epoch}.pdf"))
@@ -303,7 +304,7 @@ def validate_fakes(
             range=[rangeR.min(), rangeR.max()],
             label=f"FlashSim",
         )
-        ax2.set_xlabel(fr"$\Delta$ phi 1v{i} [GeV]")
+        ax2.set_xlabel(fr"$\Delta$ phi 1v{i}")
         # ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
         # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
         # plt.savefig(os.path.join(save_dir, f"comparison_{names[i]}.png"))
@@ -348,7 +349,7 @@ def validate_fakes(
             label=f"FlashSim",
         )
         #fig.suptitle(f"Comparison of pt{i} @ epoch {epoch}", fontsize=16)
-        ax1.set_xlabel(fr"$\Delta$ p_T 1v{i} [GeV]")
+        ax1.set_xlabel(fr"$\Delta$ p$_T$ 1v{i} [GeV]")
         ax1.legend(frameon=False, loc="upper right")
         plt.savefig(os.path.join(save_dir, f"comparison_dpt{i}_{epoch}.png"))
         plt.savefig(os.path.join(save_dir, f"comparison_dpt{i}_{epoch}.pdf"))
@@ -366,7 +367,7 @@ def validate_fakes(
             range=[rangeR.min(), rangeR.max()],
             label=f"FlashSim",
         )
-        ax2.set_xlabel(fr"$\Delta$ p_T 1v{i} [GeV]")
+        ax2.set_xlabel(fr"$\Delta$ p$_T$ 1v{i} [GeV]")
         # ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
         # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
         # plt.savefig(os.path.join(save_dir, f"comparison_{names[i]}.png"))
@@ -378,17 +379,17 @@ def validate_fakes(
     print("Done with dpt")
 
     plt.rcParams.update(plt.rcParamsDefault)
-    ranges = [[0, 500], [-5.5, 5.5], [-3.14, 3.14]]
+    ranges = [[0, 100], [-5.5, 5.5], [-3.14, 3.14]]
     blue_line = mlines.Line2D([], [], color='tab:blue', label='FullSim', lw=2,  ls='--')
     red_line = mlines.Line2D([], [], color='tab:orange', label='FlashSim', lw=2)
-    fig = corner.corner(full_df.iloc[:, [0, 1, 2]].values, labels=[r'p_T', 'Eta', 'Phi'], range=ranges, color='tab:blue',hist_kwargs ={"ls":'--'}, contour_kwargs ={"linestyles":"--"},
+    fig = corner.corner(full_df.iloc[:, [0, 1, 2]].values, labels=[r'p$_T$ [GeV]', 'Eta', 'Phi'], range=ranges, color='tab:blue',hist_kwargs ={"ls":'--'}, contour_kwargs ={"linestyles":"--"},
                         levels=(0.5,0.9, 0.99), hist_bin_factor=3, scale_hist=True, plot_datapoints=False)
     corner.corner(flash_df.iloc[:, [0, 1, 2,]].values, levels=[0.5, 0.9, 0.99], hist_bin_factor=3, color='tab:orange', range=ranges,
                 scale_hist=True, plot_datapoints=False, fig=fig)
     plt.legend(fontsize=24, frameon=False, handles=[blue_line,red_line], bbox_to_anchor=(0., 1.0, 1., 4.0), loc='upper right')
     #weights=weights * len(bilby_samples) / len(params_samples), range=dom)
     # plt.suptitle('Jet tagging distributions correlations', fontsize=20)
-    plt.suptitle(r'$\bf{CMS}$ $\it{Simulation \; Preliminary}$', fontsize=16, x=0.45, y=1.0005, horizontalalignment='right', **{'fontname':"sans-serif"})
+    plt.suptitle(r'$\bf{CMS}$ $\it{Simulation \; Preliminary}$', fontsize=16, x=0.5, y=1.0005, horizontalalignment='right', **{'fontname':"sans-serif"})
 
     plt.savefig(os.path.join(save_dir, f"corner{i}_{epoch}_log.png"))
     plt.savefig(os.path.join(save_dir, f"corner{i}_{epoch}_log.pdf"))

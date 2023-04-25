@@ -120,10 +120,14 @@ def validate_fakes(
     N_sel = np.array(gen[:, 6]).flatten()
     print(N_sel)
     names = np.array([[f"pt{i}", f"eta{i}", f"phi{i}"]  for i in range(0, 10)]).flatten()
+    full_df = pd.DataFrame(full_sim, columns=names)
+    flash_df = pd.DataFrame(flash_sim, columns=names)
 
     pts = full_sim[:, 0::3]
+    etas = full_sim[:, 1::3]
     phis = full_sim[:, 2::3]
     pts_flash = flash_sim[:, 0::3]
+    etas_flash = flash_sim[:, 1::3]
     phis_flash = flash_sim[:, 2::3]
 
     dphi = delta_phi1v9(pts, phis)
@@ -202,7 +206,7 @@ def validate_fakes(
         hep.cms.text('Simulation Preliminary')
 
         _, rangeR, _ = ax1.hist(
-            test_values, histtype="step", label="FullSim", lw=1, bins=100
+            test_values, histtype="step", label="FullSim", lw=2, bins=100, ls="--",
         )
         print(rangeR.shape)
         generated_sample = np.where(
@@ -216,32 +220,34 @@ def validate_fakes(
             generated_sample,
             bins=100,
             histtype="step",
-            lw=1,
+            lw=2,
             range=[rangeR.min(), rangeR.max()],
-            label=f"FlashSim, ws={round(ws, 4)}",
+            label=f"FlashSim",
         )
-        fig.suptitle(f"Comparison of pt{i} @ epoch {epoch}", fontsize=16)
+        #fig.suptitle(f"Comparison of pt{i} @ epoch {epoch}", fontsize=16)
+        ax1.set_xlabel(fr"\Delta p_T 1v{i} [GeV]")
         ax1.legend(frameon=False, loc="upper right")
+        plt.savefig(os.path.join(save_dir, f"comparison_pt{i}_{epoch}.png"))
+        plt.savefig(os.path.join(save_dir, f"comparison_pt{i}_{epoch}.pdf"))
 
-        ax1.spines["right"].set_visible(False)
-        ax1.spines["top"].set_visible(False)
-        ax2.spines["right"].set_visible(False)
-        ax2.spines["top"].set_visible(False)
+        fig, ax2 = plt.subplots(1, 1) # figsize=(9, 4.5), tight_layout=False)
+        hep.cms.text('Simulation Preliminary')
         ax2.set_yscale("log")
 
-        ax2.hist(test_values, histtype="step", lw=1, bins=100)
+        ax2.hist(test_values, histtype="step", lw=2, bins=100, ls="--", label="FullSim")
         ax2.hist(
             generated_sample,
             bins=100,
             histtype="step",
-            lw=1,
+            lw=2,
             range=[rangeR.min(), rangeR.max()],
+            label=f"FlashSim",
         )
         # ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
         # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
         # plt.savefig(os.path.join(save_dir, f"comparison_{names[i]}.png"))
-        plt.savefig(os.path.join(save_dir, f"comparison_pt{i}_{epoch}.png"))
-        plt.savefig(os.path.join(save_dir, f"comparison_pt{i}_{epoch}.pdf"))
+        plt.savefig(os.path.join(save_dir, f"comparison_pt{i}_{epoch}_log.png"))
+        plt.savefig(os.path.join(save_dir, f"comparison_pt{i}_{epoch}_log.pdf"))
         writer.add_figure(f"phys_pt{i}", fig, global_step=epoch)
         writer.add_scalar(f"ws/phys_pt{i}_wasserstein_distance", ws, global_step=epoch)
         plt.close()
@@ -256,10 +262,11 @@ def validate_fakes(
         print(generated_sample.shape)
         ws = wasserstein_distance(test_values, generated_sample)
         print(generated_sample.shape)
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
+        fig, ax1 = plt.subplots(1, 1) # figsize=(9, 4.5), tight_layout=False)
+        hep.cms.text('Simulation Preliminary')
 
         _, rangeR, _ = ax1.hist(
-            test_values, histtype="step", label="FullSim", lw=1, bins=100
+            test_values, histtype="step", label="FullSim", lw=2, bins=100, ls="--",
         )
         print(rangeR.shape)
         generated_sample = np.where(
@@ -273,34 +280,37 @@ def validate_fakes(
             generated_sample,
             bins=100,
             histtype="step",
-            lw=1,
+            lw=2,
             range=[rangeR.min(), rangeR.max()],
-            label=f"FlashSim, ws={round(ws, 4)}",
+            label=f"FlashSim",
         )
-        fig.suptitle(f"comparison_deltaphi1v{i} @ epoch {epoch}", fontsize=16)
+        #fig.suptitle(f"Comparison of pt{i} @ epoch {epoch}", fontsize=16)
+        ax1.set_xlabel(fr"\Delta phi 1v{i} [GeV]")
         ax1.legend(frameon=False, loc="upper right")
+        plt.savefig(os.path.join(save_dir, f"comparison_dphi{i}_{epoch}.png"))
+        plt.savefig(os.path.join(save_dir, f"comparison_dphi{i}_{epoch}.pdf"))
 
-        ax1.spines["right"].set_visible(False)
-        ax1.spines["top"].set_visible(False)
-        ax2.spines["right"].set_visible(False)
-        ax2.spines["top"].set_visible(False)
+        fig, ax2 = plt.subplots(1, 1) # figsize=(9, 4.5), tight_layout=False)
+        hep.cms.text('Simulation Preliminary')
         ax2.set_yscale("log")
 
-        ax2.hist(test_values, histtype="step", lw=1, bins=100)
+        ax2.hist(test_values, histtype="step", lw=2, bins=100, ls="--", label="FullSim")
         ax2.hist(
             generated_sample,
             bins=100,
             histtype="step",
-            lw=1,
+            lw=2,
             range=[rangeR.min(), rangeR.max()],
+            label=f"FlashSim",
         )
+        ax2.set_xlabel(fr"\Delta phi 1v{i} [GeV]")
         # ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
         # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
         # plt.savefig(os.path.join(save_dir, f"comparison_{names[i]}.png"))
-        plt.savefig(os.path.join(save_dir, f"comparison_deltaphi1v{i}_{epoch}.png"))
-        plt.savefig(os.path.join(save_dir, f"comparison_deltaphi1v{i}_{epoch}.pdf"))
-        writer.add_figure(f"comparison_deltaphi1v{i}", fig, global_step=epoch)
-        writer.add_scalar(f"ws/dphi1v{i}_wasserstein_distance", ws, global_step=epoch)
+        plt.savefig(os.path.join(save_dir, f"comparison_dphi{i}_{epoch}_log.png"))
+        plt.savefig(os.path.join(save_dir, f"comparison_dphi{i}_{epoch}_log.pdf"))
+        writer.add_figure(f"dphi{i}", fig, global_step=epoch)
+        writer.add_scalar(f"ws/dphi{i}_wasserstein_distance", ws, global_step=epoch)
         plt.close()
 
     print("Done with dphi")
@@ -315,10 +325,11 @@ def validate_fakes(
         print(generated_sample.shape)
         ws = wasserstein_distance(test_values, generated_sample)
         print(generated_sample.shape)
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
+        fig, ax1 = plt.subplots(1, 1) # figsize=(9, 4.5), tight_layout=False)
+        hep.cms.text('Simulation Preliminary')
 
         _, rangeR, _ = ax1.hist(
-            test_values, histtype="step", label="FullSim", lw=1, bins=100
+            test_values, histtype="step", label="FullSim", lw=2, bins=100, ls="--",
         )
         print(rangeR.shape)
         generated_sample = np.where(
@@ -332,34 +343,52 @@ def validate_fakes(
             generated_sample,
             bins=100,
             histtype="step",
-            lw=1,
+            lw=2,
             range=[rangeR.min(), rangeR.max()],
-            label=f"FlashSim, ws={round(ws, 4)}",
+            label=f"FlashSim",
         )
-        fig.suptitle(f"comparison_deltaphi1v{i} @ epoch {epoch}", fontsize=16)
+        #fig.suptitle(f"Comparison of pt{i} @ epoch {epoch}", fontsize=16)
+        ax1.set_xlabel(fr"\Delta p_T 1v{i} [GeV]")
         ax1.legend(frameon=False, loc="upper right")
+        plt.savefig(os.path.join(save_dir, f"comparison_dpt{i}_{epoch}.png"))
+        plt.savefig(os.path.join(save_dir, f"comparison_dpt{i}_{epoch}.pdf"))
 
-        ax1.spines["right"].set_visible(False)
-        ax1.spines["top"].set_visible(False)
-        ax2.spines["right"].set_visible(False)
-        ax2.spines["top"].set_visible(False)
+        fig, ax2 = plt.subplots(1, 1) # figsize=(9, 4.5), tight_layout=False)
+        hep.cms.text('Simulation Preliminary')
         ax2.set_yscale("log")
 
-        ax2.hist(test_values, histtype="step", lw=1, bins=100)
+        ax2.hist(test_values, histtype="step", lw=2, bins=100, ls="--", label="FullSim")
         ax2.hist(
             generated_sample,
             bins=100,
             histtype="step",
-            lw=1,
+            lw=2,
             range=[rangeR.min(), rangeR.max()],
+            label=f"FlashSim",
         )
+        ax2.set_xlabel(fr"\Delta p_T 1v{i} [GeV]")
         # ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
         # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
         # plt.savefig(os.path.join(save_dir, f"comparison_{names[i]}.png"))
-        plt.savefig(os.path.join(save_dir, f"comparison_deltapt1v{i}_{epoch}.png"))
-        plt.savefig(os.path.join(save_dir, f"comparison_deltapt1v{i}_{epoch}.pdf"))
-        writer.add_figure(f"comparison_deltapt1v{i}", fig, global_step=epoch)
-        writer.add_scalar(f"ws/dpt1v{i}_wasserstein_distance", ws, global_step=epoch)
-        plt.close()
+        plt.savefig(os.path.join(save_dir, f"comparison_dpt{i}_{epoch}_log.png"))
+        plt.savefig(os.path.join(save_dir, f"comparison_dpt{i}_{epoch}_log.pdf"))
+        writer.add_figure(f"dpt{i}", fig, global_step=epoch)
+        writer.add_scalar(f"ws/dpt{i}_wasserstein_distance", ws, global_step=epoch)
 
     print("Done with dpt")
+
+    plt.rcParams.update(plt.rcParamsDefault)
+
+    blue_line = mlines.Line2D([], [], color='tab:blue', label='FullSim', lw=2,  ls='--')
+    red_line = mlines.Line2D([], [], color='tab:orange', label='FlashSim', lw=2)
+    fig = corner.corner(full_df[:, [0, 1, 2]], labels=[r'p_T', 'Eta', 'Phi'], color='tab:blue',hist_kwargs ={"ls":'--'}, contour_kwargs ={"linestyles":"--"},
+                        levels=(0.5,0.9, 0.99), hist_bin_factor=3, scale_hist=True, plot_datapoints=False)
+    corner.corner(flash_df[:, [0, 1, 2,]], levels=[0.5, 0.9, 0.99], hist_bin_factor=3, color='tab:orange',
+                scale_hist=True, plot_datapoints=False, fig=fig)
+    plt.legend(fontsize=24, frameon=False, handles=[blue_line,red_line], bbox_to_anchor=(0., 1.0, 1., 4.0), loc='upper right')
+    #weights=weights * len(bilby_samples) / len(params_samples), range=dom)
+    # plt.suptitle('Jet tagging distributions correlations', fontsize=20)
+    plt.suptitle(r'$\bf{CMS}$ $\it{Simulation \; Preliminary}$', fontsize=16, x=0.35, y=1.0005, horizontalalignment='right', **{'fontname':"sans-serif"})
+
+    plt.savefig(os.path.join(save_dir, f"corner{i}_{epoch}_log.png"))
+    plt.savefig(os.path.join(save_dir, f"corner{i}_{epoch}_log.pdf"))

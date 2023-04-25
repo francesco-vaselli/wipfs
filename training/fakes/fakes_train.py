@@ -21,7 +21,7 @@ from dataset import MyDataset, NewFakesDataset, MaskAllFakesDataset # x, y, z or
 from modded_basic_nflow import create_mixture_flow_model, load_model, save_model, create_NDE_model
 
 from args import get_args
-from validate_fakes import validate_fakes
+from chep_val import validate_fakes
 
 
 def init_np_seed(worker_id):

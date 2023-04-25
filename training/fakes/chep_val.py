@@ -387,14 +387,14 @@ def validate_fakes(
     ranges = [[0, 100], [-5.5, 5.5], [-3.14, 3.14]]
     blue_line = mlines.Line2D([], [], color='tab:blue', label='FullSim', lw=2,  ls='--')
     red_line = mlines.Line2D([], [], color='tab:orange', label='FlashSim', lw=2)
-    fig = corner.corner(full_df.iloc[:, [0, 1, 2]].values, labels=[r'p$_T$ [GeV]', 'Eta', 'Phi'], range=ranges, color='tab:blue',hist_kwargs ={"ls":'--'}, contour_kwargs ={"linestyles":"--"},
+    fig = corner.corner(full_df.iloc[:, [0, 1, 2]].values, labels=[r'p$_T$ [GeV]', '$\eta$', '$\phi$'], range=ranges, color='tab:blue',hist_kwargs ={"ls":'--'}, contour_kwargs ={"linestyles":"--"},
                         levels=(0.5,0.9, 0.99), hist_bin_factor=3, scale_hist=True, plot_datapoints=False)
     corner.corner(flash_df.iloc[:, [0, 1, 2,]].values, levels=[0.5, 0.9, 0.99], hist_bin_factor=3, color='tab:orange', range=ranges,
                 scale_hist=True, plot_datapoints=False, fig=fig)
     plt.legend(fontsize=24, frameon=False, handles=[blue_line,red_line], bbox_to_anchor=(0., 1.0, 1., 4.0), loc='upper right')
     #weights=weights * len(bilby_samples) / len(params_samples), range=dom)
     # plt.suptitle('Jet tagging distributions correlations', fontsize=20)
-    plt.suptitle(r'$\bf{CMS}$ $\it{Simulation \; Preliminary}$', fontsize=16, x=0.55, y=1.0005, horizontalalignment='right', **{'fontname':"sans-serif"})
+    plt.suptitle(r'$\bf{CMS}$ $\it{Simulation \; Preliminary}$', fontsize=16, x=0.54, y=1.0005, horizontalalignment='right', **{'fontname':"sans-serif"})
 
     plt.savefig(os.path.join(save_dir, f"corner{i}_{epoch}_log.png"))
     plt.savefig(os.path.join(save_dir, f"corner{i}_{epoch}_log.pdf"))

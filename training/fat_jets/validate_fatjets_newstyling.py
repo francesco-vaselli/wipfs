@@ -30,7 +30,7 @@ def make_corner(reco, samples, labels, title, ranges=None, *args, **kwargs):
 
     Returns:
         _type_: _description_
-    """    
+    """
     blue_line = mlines.Line2D([], [], color="tab:blue", label="FullSim")
     red_line = mlines.Line2D([], [], color="tab:orange", label="FlashSim")
     fig = corner.corner(
@@ -43,7 +43,7 @@ def make_corner(reco, samples, labels, title, ranges=None, *args, **kwargs):
         scale_hist=True,
         plot_datapoints=False,
         *args,
-        **kwargs
+        **kwargs,
     )
     corner.corner(
         samples[labels],
@@ -55,7 +55,7 @@ def make_corner(reco, samples, labels, title, ranges=None, *args, **kwargs):
         scale_hist=True,
         plot_datapoints=False,
         *args,
-        **kwargs
+        **kwargs,
     )
     plt.legend(
         fontsize=24,
@@ -70,20 +70,20 @@ def make_corner(reco, samples, labels, title, ranges=None, *args, **kwargs):
 
 def makeROC(gen, gen_df, nb):
     truth = np.abs(gen_df)
-    mask_b = np.where(truth[:, 7]==nb)
-    mask_s = np.where(truth[:, 7]==2)
+    mask_b = np.where(truth[:, 7] == nb)
+    mask_s = np.where(truth[:, 7] == 2)
 
     s = gen[mask_s, 4].flatten()
     b = gen[mask_b, 4].flatten()
 
-    s = s[s >=-0.05]
-    b = b[b >=-0.05]
+    s = s[s >= -0.05]
+    b = b[b >= -0.05]
 
-    s = np.where(s<0, 0, s)
-    b = np.where(b<0, 0, b)
+    s = np.where(s < 0, 0, s)
+    b = np.where(b < 0, 0, b)
 
-    s = np.where(s>1, 1, s)
-    b = np.where(b>1, 1, b)
+    s = np.where(s > 1, 1, s)
+    b = np.where(b > 1, 1, b)
 
     y_bs = np.ones(len(s))
     y_nbs = np.zeros(len(b))
@@ -118,14 +118,12 @@ def validate_fatjets(
 
     # samples
     with torch.no_grad():
-
         gen = []
         reco = []
         samples = []
         signal_flag = []
 
         for bid, (z, y) in enumerate(test_loader):
-
             inputs_y = y.cuda(device)[:, : args.y_dim]
             is_signal = y.cuda(device)[:, -1]
 
@@ -208,7 +206,6 @@ def validate_fatjets(
         else:
             writer.add_figure(f"{epoch}/{names[i]}", fig)
 
-
     plt.close()
 
     # Samples postprocessing
@@ -222,11 +219,10 @@ def validate_fatjets(
         "MgenjetAK8_mass",
         "MgenjetAK8_ncFlavour",
         "MgenjetAK8_nbFlavour",
-        "is_signal"
+        "is_signal",
     ]
 
     df = pd.DataFrame(data=gen, columns=jet_cond)
-
 
     samples[:, 1] = samples[:, 1] + df["MgenjetAK8_eta"].values
     # samples[:, 9] = samples[:, 9] * df['GenJet_mass'].values
@@ -264,10 +260,17 @@ def validate_fatjets(
     for i in range(0, 3):
         ws = wasserstein_distance(reco[:, i], samples[:, i])
 
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
+        fig, ax1 = plt.subplots(1, 1)  # , figsize=(9, 4.5), tight_layout=False)
+        hep.cms.text("Simulation Preliminary")
 
         _, rangeR, _ = ax1.hist(
-            reco[:, i], histtype="step", label="FullSim", lw=1, bins=100
+            reco[:, i],
+            histtype="step",
+            label="FullSim",
+            lw=2,
+            bins=100,
+            ls="--",
+            color="tab:blue",
         )
         samples[:, i] = np.where(
             samples[:, i] < rangeR.min(), rangeR.min(), samples[:, i]
@@ -279,35 +282,49 @@ def validate_fatjets(
             samples[:, i],
             bins=100,
             histtype="step",
-            lw=1,
+            lw=2,
             range=[rangeR.min(), rangeR.max()],
-            label=f"FlashSim, ws={round(ws, 4)}",
+            label=f"FlashSim",
+            color="tab:orange",
         )
-        fig.suptitle(f"Comparison of {names[i]}", fontsize=16)
+        # fig.suptitle(f"Comparison of {names[i]}", fontsize=16)
         ax1.legend(frameon=False, loc="upper right")
+        plt.savefig(f"{save_dir}/{names[i]}.png")
+        plt.savefig(f"{save_dir}/{names[i]}.pdf")
 
-        ax1.spines["right"].set_visible(False)
-        ax1.spines["top"].set_visible(False)
-        ax2.spines["right"].set_visible(False)
-        ax2.spines["top"].set_visible(False)
+        # ax1.spines["right"].set_visible(False)
+        # ax1.spines["top"].set_visible(False)
+        # ax2.spines["right"].set_visible(False)
+        # ax2.spines["top"].set_visible(False)
+        fig, ax2 = plt.subplots(1, 1)  # , figsize=(9, 4.5), tight_layout=False)
+        hep.cms.text("Simulation Preliminary")
         ax2.set_yscale("log")
 
-        ax2.hist(reco[:, i], histtype="step", lw=1, bins=100)
+        ax2.hist(
+            reco[:, i],
+            histtype="step",
+            lw=2,
+            bins=100,
+            ls="--",
+            color="tab:blue",
+            label="FullSim",
+        )
         ax2.hist(
             samples[:, i],
             bins=100,
             histtype="step",
-            lw=1,
+            lw=2,
             range=[rangeR.min(), rangeR.max()],
+            color="tab:orange",
+            label=f"FlashSim",
         )
-        plt.savefig(f"{save_dir}/{names[i]}.png")
-        plt.savefig(f"{save_dir}/{names[i]}.pdf")
+        ax2.legend(frameon=False, loc='upper right')
+        plt.savefig(f"{save_dir}/{names[i]}_log.png")
+        plt.savefig(f"{save_dir}/{names[i]}_log.pdf")
         if isinstance(epoch, int):
             writer.add_figure(f"{names[i]}", fig, global_step=epoch)
         else:
             writer.add_figure(f"{epoch}/{names[i]}", fig)
-
-
 
     plt.close()
 
@@ -336,7 +353,6 @@ def validate_fatjets(
     # reco["Mfatjet_msoftdrop"] = reco["Mfatjet_msoftdrop"].clip(upper=500)
     # samples["Mfatjet_msoftdrop"] = samples["Mfatjet_msoftdrop"].clip(upper=500)
 
-
     targets = ["Mfatjet_particleNetMD_XbbvsQCD"]
 
     ranges = [[-0.1, 1]]
@@ -354,8 +370,8 @@ def validate_fatjets(
     for target, rangeR in zip(targets, ranges):
         hep.style.use("CMS")
 
-        fig, axs = plt.subplots(1, 1) #, figsize=(9, 4.5), tight_layout=False)
-        hep.cms.text('Simulation Preliminary')
+        fig, axs = plt.subplots(1, 1)  # , figsize=(9, 4.5), tight_layout=False)
+        hep.cms.text("Simulation Preliminary")
         axs.set_xlabel(f"ParticleNet Xbb vs QCD")
 
         axs.set_yscale("log")
@@ -389,11 +405,14 @@ def validate_fatjets(
                 histtype="step",
                 color=color,
             )
-            legend_elements.append(Patch(edgecolor=color, fill=False, lw=2, label=f'{name}'))
+            legend_elements.append(
+                Patch(edgecolor=color, fill=False, lw=2, label=f"{name}")
+            )
 
         legend_elements += [
-                   Patch(edgecolor='k', fill=False, ls='-',lw=2, label='FlashSim'),
-                   Patch(edgecolor='k', fill=False, ls='--', lw=2, label='FullSim')]
+            Patch(edgecolor="k", fill=False, ls="-", lw=2, label="FlashSim"),
+            Patch(edgecolor="k", fill=False, ls="--", lw=2, label="FullSim"),
+        ]
 
         axs.legend(frameon=False, loc="upper center", handles=legend_elements)
         plt.savefig(f"{save_dir}/XbbvsQCD for b content.png")
@@ -419,8 +438,8 @@ def validate_fatjets(
     for target, rangeR in zip(targets, ranges):
         hep.style.use("CMS")
 
-        fig, axs = plt.subplots(1, 1) #, figsize=(9, 4.5), tight_layout=False)
-        hep.cms.text('Simulation Preliminary')
+        fig, axs = plt.subplots(1, 1)  # , figsize=(9, 4.5), tight_layout=False)
+        hep.cms.text("Simulation Preliminary")
         axs.set_xlabel(f"ParticleNet Xbb vs QCD")
 
         axs.set_yscale("log")
@@ -454,11 +473,14 @@ def validate_fatjets(
                 histtype="step",
                 color=color,
             )
-            legend_elements.append(Patch(edgecolor=color, fill=False, lw=2, label=f'{name}'))
+            legend_elements.append(
+                Patch(edgecolor=color, fill=False, lw=2, label=f"{name}")
+            )
 
         legend_elements += [
-                   Patch(edgecolor='k', fill=False, ls='-',lw=2, label='FlashSim'),
-                   Patch(edgecolor='k', fill=False, ls='--', lw=2, label='FullSim')]
+            Patch(edgecolor="k", fill=False, ls="-", lw=2, label="FlashSim"),
+            Patch(edgecolor="k", fill=False, ls="--", lw=2, label="FullSim"),
+        ]
 
         axs.legend(frameon=False, loc="upper center", handles=legend_elements)
         plt.savefig(f"{save_dir}/XbbvsQCD for b content_SVB.png")
@@ -470,7 +492,7 @@ def validate_fatjets(
 
     # ROC
     fpr, tpr, roc_auc, bs, nbs = makeROC(samples.values, df.values, 1)
-    cfpr, ctpr, croc_auc, cbs, cnbs  = makeROC(reco.values, df.values, 1)
+    cfpr, ctpr, croc_auc, cbs, cnbs = makeROC(reco.values, df.values, 1)
 
     fig = plt.figure(figsize=(9, 6.5))
     lw = 2
@@ -481,7 +503,7 @@ def validate_fatjets(
         lw=lw,
         label=f"ROC curve (area = %0.2f) FlashSim" % roc_auc,
     )
-    
+
     plt.plot(
         ctpr,
         cfpr,
@@ -490,17 +512,17 @@ def validate_fatjets(
         label="ROC curve (area = %0.2f) FullSim" % croc_auc,
     )
 
-    #plt.plot([0, 1], [0, 1], color="navy", lw=lw, linestyle="--")
-    #plt.xlim([0.0, 1.0])
+    # plt.plot([0, 1], [0, 1], color="navy", lw=lw, linestyle="--")
+    # plt.xlim([0.0, 1.0])
     # plt.yscale("log")
     plt.ylim([0.0005, 1.05])
     plt.xlabel("Efficency for b-jet (TP)", fontsize=16)
     plt.ylabel("Mistagging prob (FP)", fontsize=16)
     ax = plt.gca()
-    ax.spines['right'].set_visible(False)
-    ax.spines['top'].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["top"].set_visible(False)
     plt.title("Receiver operating characteristic 2bvs1b", fontsize=16)
-    plt.legend(fontsize=16, frameon=False,loc="best")
+    plt.legend(fontsize=16, frameon=False, loc="best")
     plt.savefig(f"{save_dir}/ROC2v1.png")
     plt.savefig(f"{save_dir}/ROC2v1.pdf")
     if isinstance(epoch, int):
@@ -509,7 +531,7 @@ def validate_fatjets(
         writer.add_figure(f"{epoch}/ROC2v1", fig)
 
     fpr, tpr, roc_auc, bs, nbs = makeROC(samples.values, df.values, 0)
-    cfpr, ctpr, croc_auc, cbs, cnbs  = makeROC(reco.values, df.values, 0)
+    cfpr, ctpr, croc_auc, cbs, cnbs = makeROC(reco.values, df.values, 0)
 
     fig = plt.figure(figsize=(9, 6.5))
     lw = 2
@@ -520,7 +542,7 @@ def validate_fatjets(
         lw=lw,
         label=f"ROC curve (area = %0.2f) FlashSim" % roc_auc,
     )
-    
+
     plt.plot(
         ctpr,
         cfpr,
@@ -529,17 +551,17 @@ def validate_fatjets(
         label="ROC curve (area = %0.2f) FullSim" % croc_auc,
     )
 
-    #plt.plot([0, 1], [0, 1], color="navy", lw=lw, linestyle="--")
-    #plt.xlim([0.0, 1.0])
+    # plt.plot([0, 1], [0, 1], color="navy", lw=lw, linestyle="--")
+    # plt.xlim([0.0, 1.0])
     plt.yscale("log")
     plt.ylim([0.0005, 1.05])
     plt.xlabel("Efficency for b-jet (TP)", fontsize=16)
     plt.ylabel("Mistagging prob (FP)", fontsize=16)
     ax = plt.gca()
-    ax.spines['right'].set_visible(False)
-    ax.spines['top'].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["top"].set_visible(False)
     plt.title("Receiver operating characteristic 2bvs0b", fontsize=16)
-    plt.legend(fontsize=16, frameon=False,loc="best")
+    plt.legend(fontsize=16, frameon=False, loc="best")
     plt.savefig(f"{save_dir}/ROC2v0.png")
     plt.savefig(f"{save_dir}/ROC2v0.pdf")
     if isinstance(epoch, int):
@@ -547,9 +569,13 @@ def validate_fatjets(
     else:
         writer.add_figure(f"{epoch}/ROC2v0", fig)
 
-
-    fig = make_corner(reco, samples, labels=["Mfatjet_msoftdrop", "Mfatjet_particleNetMD_XbbvsQCD"], title="Total softdrop mass vs XbbvsQCD",
-                      ranges=[[0, 200], [0,1]])
+    fig = make_corner(
+        reco,
+        samples,
+        labels=["Mfatjet_msoftdrop", "Mfatjet_particleNetMD_XbbvsQCD"],
+        title="Total softdrop mass vs XbbvsQCD",
+        ranges=[[0, 200], [0, 1]],
+    )
     plt.suptitle("softdrop vs tagger", fontsize=16)
     plt.savefig(f"{save_dir}/corner.png")
     plt.savefig(f"{save_dir}/corner.pdf")
@@ -558,14 +584,18 @@ def validate_fatjets(
     else:
         writer.add_figure(f"{epoch}/corner", fig)
 
-
     sig_reco = reco[df["is_signal"] == 1]
     sig_samples = samples[df["is_signal"] == 1]
     bkg_reco = reco[df["is_signal"] == 0]
     bkg_samples = samples[df["is_signal"] == 0]
 
-    fig = make_corner(sig_reco, sig_samples, labels=["Mfatjet_msoftdrop", "Mfatjet_particleNetMD_XbbvsQCD"], title="Signal softdrop mass vs XbbvsQCD",
-                        ranges=[[0, 200], [0,1]])
+    fig = make_corner(
+        sig_reco,
+        sig_samples,
+        labels=["Mfatjet_msoftdrop", "Mfatjet_particleNetMD_XbbvsQCD"],
+        title="Signal softdrop mass vs XbbvsQCD",
+        ranges=[[0, 200], [0, 1]],
+    )
     plt.savefig(f"{save_dir}/corner_signal.png")
     plt.savefig(f"{save_dir}/corner_signal.pdf")
     if isinstance(epoch, int):
@@ -573,9 +603,13 @@ def validate_fatjets(
     else:
         writer.add_figure(f"{epoch}/corner_signal", fig)
 
-
-    fig = make_corner(bkg_reco, bkg_samples, labels=["Mfatjet_msoftdrop", "Mfatjet_particleNetMD_XbbvsQCD"], title="Background softdrop mass vs XbbvsQCD",
-                        ranges=[[0, 200], [0,1]])
+    fig = make_corner(
+        bkg_reco,
+        bkg_samples,
+        labels=["Mfatjet_msoftdrop", "Mfatjet_particleNetMD_XbbvsQCD"],
+        title="Background softdrop mass vs XbbvsQCD",
+        ranges=[[0, 200], [0, 1]],
+    )
     plt.savefig(f"{save_dir}/corner_background.png")
     plt.savefig(f"{save_dir}/corner_background.pdf")
     if isinstance(epoch, int):
@@ -583,7 +617,6 @@ def validate_fatjets(
     else:
         writer.add_figure(f"{epoch}/corner_background", fig)
 
-    
     # 1 d plot of softdrop mass for total, sig and bkg, fullsim vs flash
     recos = [reco, sig_reco, bkg_reco]
     samples1 = [samples, sig_samples, bkg_samples]
@@ -595,15 +628,9 @@ def validate_fatjets(
 
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 4.5), tight_layout=False)
 
-        _, rangeR, _ = ax1.hist(
-            reco1, histtype="step", label="FullSim", lw=1, bins=100
-        )
-        samples2 = np.where(
-            samples2 < rangeR.min(), rangeR.min(), samples2
-        )
-        samples2 = np.where(
-            samples2 > rangeR.max(), rangeR.max(), samples2
-        )
+        _, rangeR, _ = ax1.hist(reco1, histtype="step", label="FullSim", lw=1, bins=100)
+        samples2 = np.where(samples2 < rangeR.min(), rangeR.min(), samples2)
+        samples2 = np.where(samples2 > rangeR.max(), rangeR.max(), samples2)
         ax1.hist(
             samples2,
             bins=100,
@@ -636,7 +663,6 @@ def validate_fatjets(
         else:
             writer.add_figure(f"{epoch}/{titles[i]}", fig)
 
-
     targets = ["Mfatjet_msoftdrop"]
 
     ranges = [[0, 250]]
@@ -651,9 +677,8 @@ def validate_fatjets(
     colors = ["tab:red", "tab:green"]
     hep.style.use("CMS")
     for target, rangeR in zip(targets, ranges):
-
-        fig, axs = plt.subplots(1, 1) #, figsize=(9, 4.5), tight_layout=False)
-        hep.cms.text('Simulation Preliminary')
+        fig, axs = plt.subplots(1, 1)  # , figsize=(9, 4.5), tight_layout=False)
+        hep.cms.text("Simulation Preliminary")
 
         axs.set_xlabel(f"FatJet Softdrop Mass [GeV]")
         # axs[1].set_xlabel(f"{target}")
@@ -691,7 +716,14 @@ def validate_fatjets(
             # )
 
             axs.hist(
-                full, bins=50, range=rangeR, histtype="step", ls="--", lw=2, color=color, label=f"{name} FullSim"
+                full,
+                bins=50,
+                range=rangeR,
+                histtype="step",
+                ls="--",
+                lw=2,
+                color=color,
+                label=f"{name} FullSim",
             )
             axs.hist(
                 flash,
@@ -702,12 +734,12 @@ def validate_fatjets(
                 label=f"{name} FlashSim",
                 lw=2,
             )
-        
+
         axs.legend(frameon=False, loc="upper right")
 
         plt.savefig(f"{save_dir}/Softrdop_comp.png")
         plt.savefig(f"{save_dir}/Softrdop_comp.pdf")
-        
+
         if isinstance(epoch, int):
             writer.add_figure(f"Softrdop_comp", fig, global_step=epoch)
         else:

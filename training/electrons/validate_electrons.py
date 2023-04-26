@@ -809,7 +809,7 @@ def validate_electrons(
         bbox_to_anchor=(0.0, 1.0, 1.0, 4.0),
         loc="upper right",
     )
-    plt.suptitle(r'$\bf{CMS}$ $\it{Simulation \; Preliminary}$', fontsize=16, x=0.75, horizontalalignment='right', fontname="sans-serif")
+    plt.suptitle(r'$\bf{CMS}$ $\it{Simulation \; Preliminary}$', fontsize=16, x=0.25, y=1., horizontalalignment='right', fontname="sans-serif")
     plt.savefig(f"{save_dir}/Supercluster_corner_cms.png", format="png")
     plt.savefig(f"{save_dir}/Supercluster_corner_cms.pdf", format="pdf")
 

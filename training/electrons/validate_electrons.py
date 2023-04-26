@@ -790,6 +790,7 @@ def validate_electrons(
         plot_datapoints=False,
         hist_kwargs={"ls": "--"},
         contour_kwargs={"linestyles": "--"},
+        label_kwargs={"fontsize": 24},
     )
     corner.corner(
         samples[labels],
@@ -801,6 +802,7 @@ def validate_electrons(
         hist_bin_factor=3,
         scale_hist=True,
         plot_datapoints=False,
+        label_kwargs={"fontsize": 24},
     )
     plt.legend(
         fontsize=24,
@@ -809,7 +811,14 @@ def validate_electrons(
         bbox_to_anchor=(0.0, 1.0, 1.0, 4.0),
         loc="upper right",
     )
-    plt.suptitle(r'$\bf{CMS}$ $\it{Simulation \; Preliminary}$', fontsize=16, x=0.3, y=1., horizontalalignment='right', fontname="sans-serif")
+    plt.suptitle(
+        r"$\bf{CMS}$ $\it{Simulation \; Preliminary}$",
+        fontsize=16,
+        x=0.3,
+        y=1.0,
+        horizontalalignment="right",
+        fontname="sans-serif",
+    )
     plt.savefig(f"{save_dir}/Supercluster_corner_cms.png", format="png")
     plt.savefig(f"{save_dir}/Supercluster_corner_cms.pdf", format="pdf")
 

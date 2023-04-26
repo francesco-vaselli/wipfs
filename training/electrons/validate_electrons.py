@@ -790,7 +790,7 @@ def validate_electrons(
         plot_datapoints=False,
         hist_kwargs={"ls": "--"},
         contour_kwargs={"linestyles": "--"},
-        label_kwargs={"fontsize": 24},
+        label_kwargs={"fontsize": 16},
     )
     corner.corner(
         samples[labels],
@@ -802,7 +802,7 @@ def validate_electrons(
         hist_bin_factor=3,
         scale_hist=True,
         plot_datapoints=False,
-        label_kwargs={"fontsize": 24},
+        label_kwargs={"fontsize": 16},
     )
     plt.legend(
         fontsize=24,
@@ -814,7 +814,7 @@ def validate_electrons(
     plt.suptitle(
         r"$\bf{CMS}$ $\it{Simulation \; Preliminary}$",
         fontsize=16,
-        x=0.3,
+        x=0.29,
         y=1.0,
         horizontalalignment="right",
         fontname="sans-serif",

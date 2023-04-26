@@ -252,12 +252,13 @@ def validate_fatjets(
 
     # Plots
     names = [
-        "p_T",
-        "Eta",
-        "Phi",
+        r"p$_T$ [GeV]",
+        r"$\eta$",
+        r"$\phi$",
     ]
 
     for i in range(0, 3):
+        hep.style.use("CMS")
         ws = wasserstein_distance(reco[:, i], samples[:, i])
 
         fig, ax1 = plt.subplots(1, 1)  # , figsize=(9, 4.5), tight_layout=False)

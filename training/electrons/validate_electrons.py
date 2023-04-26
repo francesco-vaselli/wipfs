@@ -762,7 +762,7 @@ def validate_electrons(
         "MElectron_eInvMinusPInv",
     ]
 
-    names = [r"p_T [GeV]", "deltaEtaSC", "hoe", "sieie", "r9", "eInvMinusPInv"]
+    names = [r"$p_T$ [GeV]", "deltaEtaSC", "hoe", "sieie", "r9", "eInvMinusPInv"]
 
     ranges = [
         (0, 200),

@@ -39,7 +39,7 @@ def get_data_tensors(
     oversample_b,
     oversample_s):
 
-    df = pd.read_pickle(data_path)
+    df = pd.read_pickle(data_path[0])
 
     y_b = df[
         [

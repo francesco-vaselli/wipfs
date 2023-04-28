@@ -265,18 +265,25 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
     x_train = x_train.cuda(args.gpu)
     y_train = y_train.cuda(args.gpu)
 
-    # x_test, y_test = get_data_tensors(
-    #     [os.path.join(dirpath, "..", "datasets", "preprocessed.pkl")],
-    #     start_b=args.test_start_b,
-    #     limit_b=args.test_limit_b,
-    #     start_s=args.test_start_s,
-    #     limit_s=args.test_limit_s,
-    #     oversample_b = args.test_oversample_b,
-    #     oversample_s = args.test_oversample_s,
-    # )
+    torch.save(x_train, "x_train.pt")
+    torch.save(y_train, "y_train.pt")
 
-    # x_test = x_test.cuda(args.gpu)
-    # y_test = y_test.cuda(args.gpu)
+    x_test, y_test = get_data_tensors(
+        [os.path.join(dirpath, "..", "datasets", "preprocessed.pkl")],
+        start_b=args.test_start_b,
+        limit_b=args.test_limit_b,
+        start_s=args.test_start_s,
+        limit_s=args.test_limit_s,
+        oversample_b = args.test_oversample_b,
+        oversample_s = args.test_oversample_s,
+    )
+
+    x_test = x_test.cuda(args.gpu)
+    y_test = y_test.cuda(args.gpu)
+
+    torch.save(x_test, "x_test.pt")
+    torch.save(y_test, "y_test.pt")
+    
     te_dataset = FatJetsDataset(
         [os.path.join(dirpath, "..", "datasets", "preprocessed.pkl")],
         start_b=args.test_start_b,

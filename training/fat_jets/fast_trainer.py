@@ -346,7 +346,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
             optimizer.zero_grad()
 
             # Compute log prob
-            print(x_train.shape, y_train.shape)
+            # print(x_train.shape, y_train.shape)
             log_p, log_det = ddp_model(x_train[b*batchsize:(b+1)*batchsize], context=y_train[b*batchsize:(b+1)*batchsize])
             loss = -log_p - log_det
 
@@ -406,7 +406,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
                         y = y.cuda(args.gpu, non_blocking=True)
 
                     # Compute log prob
-                    print(z.shape, y.shape)
+                    # print(z.shape, y.shape)
                     log_p, log_det = ddp_model(z, context=y)
                     loss = -log_p - log_det
 

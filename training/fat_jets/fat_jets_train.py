@@ -274,16 +274,17 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
             log_p, log_det = ddp_model(z, context=y)
             loss = -log_p - log_det
 
-            # Keep track of total loss.
-            train_loss += (loss.detach()).sum()
-            train_log_p += (-log_p.detach()).sum()
-            train_log_det += (-log_det.detach()).sum()
+            if ~(torch.isnan(loss) | torch.isinf(loss)):
+                # Keep track of total loss.
+                train_loss += (loss.detach()).sum()
+                train_log_p += (-log_p.detach()).sum()
+                train_log_det += (-log_det.detach()).sum()
 
-            # loss = (w * loss).sum() / w.sum()
-            loss = (loss).mean()
+                # loss = (w * loss).sum() / w.sum()
+                loss = (loss).mean()
 
-            loss.backward()
-            optimizer.step()
+                loss.backward()
+                optimizer.step()
 
             if (output_freq is not None) and (batch_idx % output_freq == 0):
                 duration = time.time() - start_time

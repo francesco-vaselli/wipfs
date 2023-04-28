@@ -590,11 +590,11 @@ def validate_fatjets(
     ]
 
     colors = ["tab:red", "tab:green"]
-    hep.style.use("CMS")
+    # hep.style.use("CMS")
     for target, rangeR in zip(targets, ranges):
 
         fig, axs = plt.subplots(1, 1) #, figsize=(9, 4.5), tight_layout=False)
-        hep.cms.text('Simulation Preliminary')
+        # hep.cms.text('Simulation Preliminary')
 
         axs.set_xlabel(f"FatJet Softdrop Mass [GeV]")
         # axs[1].set_xlabel(f"{target}")

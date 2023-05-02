@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.join("..", "..", "utils"))
 sys.path.insert(0, os.path.join("..", "..", "models"))
 sys.path.insert(0, "..")
 
-from dataset import FatJetsDataset
+from dataset import FatJetsDataset, ValFatJetsDataset
 from modded_basic_nflow import create_mixture_flow_model, save_model, load_mixture_model
 
 from args import get_args
@@ -284,7 +284,7 @@ def trainer(gpu, save_dir, ngpus_per_node, args, val_func):
     torch.save(x_test, "x_test.pt")
     torch.save(y_test, "y_test.pt")
     
-    te_dataset = FatJetsDataset(
+    te_dataset = ValFatJetsDataset(
         [os.path.join(dirpath, "..", "datasets", "preprocessed.pkl")],
         start_b=args.test_start_b,
         limit_b=args.test_limit_b,

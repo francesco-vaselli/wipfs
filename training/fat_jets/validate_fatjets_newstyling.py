@@ -290,7 +290,7 @@ def validate_fatjets(
         )
         # fig.suptitle(f"Comparison of {names[i]}", fontsize=16)
         ax1.legend(frameon=False, loc="upper right")
-        ax1.set_xlabel(f"{names[i]}")
+        ax1.set_xlabel(f"{names[i]}", fontsize=35)
         plt.savefig(f"{save_dir}/{names[i]}.png")
         plt.savefig(f"{save_dir}/{names[i]}.pdf")
 
@@ -321,7 +321,7 @@ def validate_fatjets(
             label=f"FlashSim",
         )
         ax2.legend(frameon=False, loc='upper right')
-        ax2.set_xlabel(f"{names[i]}")
+        ax2.set_xlabel(f"{names[i]}", fontsize=35)
         plt.savefig(f"{save_dir}/{names[i]}_log.png")
         plt.savefig(f"{save_dir}/{names[i]}_log.pdf")
         if isinstance(epoch, int):
@@ -375,7 +375,7 @@ def validate_fatjets(
 
         fig, axs = plt.subplots(1, 1)  # , figsize=(9, 4.5), tight_layout=False)
         hep.cms.text("Simulation Preliminary")
-        axs.set_xlabel(f"ParticleNet Xbb vs QCD")
+        axs.set_xlabel(f"ParticleNet Xbb vs QCD", fontsize=35)
 
         axs.set_yscale("log")
 
@@ -443,7 +443,7 @@ def validate_fatjets(
 
         fig, axs = plt.subplots(1, 1)  # , figsize=(9, 4.5), tight_layout=False)
         hep.cms.text("Simulation Preliminary")
-        axs.set_xlabel(f"ParticleNet Xbb vs QCD")
+        axs.set_xlabel(f"ParticleNet Xbb vs QCD", fontsize=35)
 
         axs.set_yscale("log")
 
@@ -683,7 +683,7 @@ def validate_fatjets(
         fig, axs = plt.subplots(1, 1)  # , figsize=(9, 4.5), tight_layout=False)
         hep.cms.text("Simulation Preliminary")
 
-        axs.set_xlabel(f"FatJet Softdrop Mass [GeV]")
+        axs.set_xlabel(f"FatJet Softdrop Mass [GeV]", fontsize=35)
         # axs[1].set_xlabel(f"{target}")
 
         axs.set_yscale("log")

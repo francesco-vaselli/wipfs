@@ -811,6 +811,7 @@ def validate_electrons(
         bbox_to_anchor=(0.0, 1.0, 1.0, 4.0),
         loc="upper right",
     )
+    
     plt.suptitle(
         r"$\bf{CMS}$ $\it{Simulation \; Preliminary}$",
         fontsize=16,

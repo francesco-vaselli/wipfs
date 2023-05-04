@@ -287,7 +287,7 @@ def validate_fakes(
             label=f"FlashSim",
         )
         #fig.suptitle(f"Comparison of pt{i} @ epoch {epoch}", fontsize=16)
-        ax1.set_xlabel(fr"$\Delta \phi$ 1v{i}")
+        ax1.set_xlabel(fr"$\Delta \phi$ 1v{i}", fontsize=35)
         ax1.legend(frameon=False, loc="upper right")
         plt.savefig(os.path.join(save_dir, f"comparison_dphi{i}_{epoch}.png"))
         plt.savefig(os.path.join(save_dir, f"comparison_dphi{i}_{epoch}.pdf"))
@@ -305,7 +305,7 @@ def validate_fakes(
             range=[rangeR.min(), rangeR.max()],
             label=f"FlashSim",
         )
-        ax2.set_xlabel(fr"$\Delta \phi$ 1v{i}")
+        ax2.set_xlabel(fr"$\Delta \phi$ 1v{i}", fontsize=35)
         ax2.legend(frameon=False, loc="upper right")
         # ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
         # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
@@ -351,7 +351,7 @@ def validate_fakes(
             label=f"FlashSim",
         )
         #fig.suptitle(f"Comparison of pt{i} @ epoch {epoch}", fontsize=16)
-        ax1.set_xlabel(fr"$\Delta$p$_T$ 1v{i} [GeV]")
+        ax1.set_xlabel(fr"$\Delta$p$_T$ 1v{i} [GeV]", fontsize=35)
         ax1.legend(frameon=False, loc="upper right")
         plt.savefig(os.path.join(save_dir, f"comparison_dpt{i}_{epoch}.png"))
         plt.savefig(os.path.join(save_dir, f"comparison_dpt{i}_{epoch}.pdf"))
@@ -369,7 +369,7 @@ def validate_fakes(
             range=[rangeR.min(), rangeR.max()],
             label=f"FlashSim",
         )
-        ax2.set_xlabel(fr"$\Delta$p$_T$ 1v{i} [GeV]")
+        ax2.set_xlabel(fr"$\Delta$p$_T$ 1v{i} [GeV]", fontsize=35)
         ax2.legend(frameon=False, loc="upper right")
         # ax2.title(f"Log Comparison of {list(dff_test_reco)[i]}")
         # plt.savefig(f"./figures/{list(dff_test_reco)[i]}.png")
@@ -386,7 +386,7 @@ def validate_fakes(
     ranges = [[0, 100], [-5.5, 5.5], [-3.14, 3.14]]
     blue_line = mlines.Line2D([], [], color='tab:blue', label='FullSim', lw=2,  ls='--')
     red_line = mlines.Line2D([], [], color='tab:orange', label='FlashSim', lw=2)
-    fig = corner.corner(full_df.iloc[:, [0, 1, 2]].values, labels=[r'p$_T$ [GeV]', '$\eta$', '$\phi$'], range=ranges, color='tab:blue',hist_kwargs ={"ls":'--'}, contour_kwargs ={"linestyles":"--"},
+    fig = corner.corner(full_df.iloc[:, [0, 1, 2]].values, labels=[r'p$_T$ [GeV]', '$\eta$', '$\phi$'], range=ranges, color='tab:blue',hist_kwargs ={"ls":'--'}, contour_kwargs ={"linestyles":"--"}, label_kwargs={"fontsize": 20},
                         levels=(0.5,0.9, 0.99), hist_bin_factor=3, scale_hist=True, plot_datapoints=False)
     corner.corner(flash_df.iloc[:, [0, 1, 2,]].values, levels=[0.5, 0.9, 0.99], hist_bin_factor=3, color='tab:orange', range=ranges,
                 scale_hist=True, plot_datapoints=False, fig=fig)

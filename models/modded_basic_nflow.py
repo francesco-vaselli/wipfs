@@ -69,7 +69,7 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
             dropout_probability=dropout_probability,
             use_batch_norm=use_batch_norm,
         )
-        self._epsilon = 1e-3
+        self._epsilon = 1e-2 
         self.init_identity = init_identity
         if init_identity:
             torch.nn.init.constant_(made.final_layer.weight, 0.0)
@@ -87,7 +87,7 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
             autoregressive_params
         )
         # scale = torch.sigmoid(unconstrained_scale + 2.0) + self._epsilon
-        scale = F.softplus(unconstrained_scale) + self._epsilon
+        scale = (F.softplus(unconstrained_scale) + self._epsilon).clamp(0, 1)
         log_scale = torch.log(scale)
         outputs = scale * inputs + shift
         logabsdet = torchutils.sum_except_batch(log_scale, num_batch_dims=1)
@@ -98,7 +98,7 @@ class MaskedAffineAutoregressiveTransformM(AutoregressiveTransform):
             autoregressive_params
         )
         # scale = torch.sigmoid(unconstrained_scale + 2.0) + self._epsilon
-        scale = F.softplus(unconstrained_scale) + self._epsilon
+        scale = (F.softplus(unconstrained_scale) + self._epsilon).clamp(0, 1)
         log_scale = torch.log(scale)
         # print(scale, shift)
         outputs = (inputs - shift) / scale

@@ -105,17 +105,12 @@ def validate_fakes(
     full_sim = np.array(reco).reshape((-1, args.x_dim))
     flash_sim = np.array(samples).reshape((-1, args.x_dim))
 
-    # Samples postprocessing 
-    # flash_sim[:, [1, 2]] = flash_sim[:, [1, 2]] * 200
-    # full_sim[:, [1, 2]] = full_sim[:, [1, 2]] * 200
-    # flash_sim[:, :10] = flash_sim[:, 4:14] * 200
-    # full_sim[:, :10] = full_sim[:, 4:14] * 200
-
-    # Plots
-    # PU_n_true_int = gen[:, 2]
-    # N_true_fakes_full = full_sim[:, 0]
-    # N_true_fakes_flash = flash_sim[:, 0]
-
+    # postprocess full and flash
+    full_sim[:, 1::3] = full_sim[:, 1::3] * 5
+    flash_sim[:, 1::3] = flash_sim[:, 1::3] * 5
+    full_sim[:, 2::3] = full_sim[:, 2::3] * np.pi
+    flash_sim[:, 2::3] = flash_sim[:, 2::3] * np.pi
+    
     N_sel = np.array(gen[:, 6]).flatten()
     print(N_sel)
     names = np.array([[f"pt{i}", f"eta{i}", f"phi{i}"]  for i in range(0, 10)]).flatten()

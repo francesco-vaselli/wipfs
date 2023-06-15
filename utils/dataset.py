@@ -134,7 +134,8 @@ class MaskAllFakesDataset(Dataset):
             np.arange(x_dim + y_dim + z_dim, x_dim + y_dim + z_dim + x_dim)))]
         
         x = self.archives[0]["data"][start : start + limit, 0:x_dim]
-
+        x[:, 1::3] = x[:, 1::3] / 5
+        x[:, 2::3] = x[:, 2::3] / np.pi
         self.x_train = torch.tensor(x, dtype=torch.float32)
         self.y_train = torch.tensor(y, dtype=torch.float32)
         # self.z_train = torch.tensor(z, dtype=torch.float32)

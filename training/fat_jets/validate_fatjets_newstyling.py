@@ -591,6 +591,8 @@ def validate_fatjets(
     sig_samples = samples[df["is_signal"] == 1]
     bkg_reco = reco[df["is_signal"] == 0]
     bkg_samples = samples[df["is_signal"] == 0]
+    sig_df = df[df["is_signal"] == 1]
+    bkg_df = df[df["is_signal"] == 0]
 
     fig = make_corner(
         sig_reco,
@@ -620,6 +622,144 @@ def validate_fatjets(
     else:
         writer.add_figure(f"{epoch}/corner_background", fig)
 
+    # sig disc for b content
+    targets = ["Mfatjet_particleNetMD_XbbvsQCD"]
+
+    ranges = [[-0.1, 1]]
+
+    conds = [0, 1, 2]
+
+    names = [
+        "0 b",
+        "1 b",
+        "2 b",
+    ]
+
+    colors = ["tab:red", "tab:green", "tab:blue"]
+
+    for target, rangeR in zip(targets, ranges):
+        hep.style.use("CMS")
+
+        fig, axs = plt.subplots(1, 1)  # , figsize=(9, 4.5), tight_layout=False)
+        hep.cms.text("Simulation Preliminary")
+        axs.set_xlabel(f"ParticleNet Xbb vs QCD (sig only)", fontsize=35)
+
+        axs.set_yscale("log")
+
+        inf = rangeR[0]
+        sup = rangeR[1]
+        legend_elements = []
+        for cond, color, name in zip(conds, colors, names):
+            nb = sig_df["MgenjetAK8_nbFlavour"].values
+            mask = np.where(nb == cond, True, False)
+            full = sig_reco[target].values
+            full = full[mask]
+            full = full[~np.isnan(full)]
+            full = np.where(full > sup, sup, full)
+            full = np.where(full < inf, inf, full)
+
+            flash = sig_samples[target].values
+            flash = flash[mask]
+            flash = flash[~np.isnan(flash)]
+            flash = np.where(flash > sup, sup, flash)
+            flash = np.where(flash < inf, inf, flash)
+
+            axs.hist(
+                full, bins=50, range=rangeR, histtype="step", ls="--", lw=2, color=color
+            )
+            axs.hist(
+                flash,
+                bins=50,
+                lw=2,
+                range=rangeR,
+                histtype="step",
+                color=color,
+            )
+            legend_elements.append(
+                Patch(edgecolor=color, fill=False, lw=2, label=f"{name}")
+            )
+
+        legend_elements += [
+            Patch(edgecolor="k", fill=False, ls="-", lw=2, label="FlashSim"),
+            Patch(edgecolor="k", fill=False, ls="--", lw=2, label="FullSim"),
+        ]
+
+        axs.legend(frameon=False, loc="upper center", handles=legend_elements)
+        plt.savefig(f"{save_dir}/XbbvsQCD for b content (only sig).png")
+        plt.savefig(f"{save_dir}/XbbvsQCD for b content (only sig).pdf")
+        if isinstance(epoch, int):
+            writer.add_figure(f"XbbvsQCD for b content (only sig)", fig, global_step=epoch)
+        else:
+            writer.add_figure(f"{epoch}/XbbvsQCD for b content (only sig)", fig)
+    # bkg disc for b content
+    targets = ["Mfatjet_particleNetMD_XbbvsQCD"]
+
+    ranges = [[-0.1, 1]]
+
+    conds = [0, 1, 2]
+
+    names = [
+        "0 b",
+        "1 b",
+        "2 b",
+    ]
+
+    colors = ["tab:red", "tab:green", "tab:blue"]
+
+    for target, rangeR in zip(targets, ranges):
+        hep.style.use("CMS")
+
+        fig, axs = plt.subplots(1, 1)  # , figsize=(9, 4.5), tight_layout=False)
+        hep.cms.text("Simulation Preliminary")
+        axs.set_xlabel(f"ParticleNet Xbb vs QCD (sig only)", fontsize=35)
+
+        axs.set_yscale("log")
+
+        inf = rangeR[0]
+        sup = rangeR[1]
+        legend_elements = []
+        for cond, color, name in zip(conds, colors, names):
+            nb = bkg_df["MgenjetAK8_nbFlavour"].values
+            mask = np.where(nb == cond, True, False)
+            full = bkg_reco[target].values
+            full = full[mask]
+            full = full[~np.isnan(full)]
+            full = np.where(full > sup, sup, full)
+            full = np.where(full < inf, inf, full)
+
+            flash = bkg_samples[target].values
+            flash = flash[mask]
+            flash = flash[~np.isnan(flash)]
+            flash = np.where(flash > sup, sup, flash)
+            flash = np.where(flash < inf, inf, flash)
+
+            axs.hist(
+                full, bins=50, range=rangeR, histtype="step", ls="--", lw=2, color=color
+            )
+            axs.hist(
+                flash,
+                bins=50,
+                lw=2,
+                range=rangeR,
+                histtype="step",
+                color=color,
+            )
+            legend_elements.append(
+                Patch(edgecolor=color, fill=False, lw=2, label=f"{name}")
+            )
+
+        legend_elements += [
+            Patch(edgecolor="k", fill=False, ls="-", lw=2, label="FlashSim"),
+            Patch(edgecolor="k", fill=False, ls="--", lw=2, label="FullSim"),
+        ]
+
+        axs.legend(frameon=False, loc="upper center", handles=legend_elements)
+        plt.savefig(f"{save_dir}/XbbvsQCD for b content (only bkg).png")
+        plt.savefig(f"{save_dir}/XbbvsQCD for b content (only bkg).pdf")
+        if isinstance(epoch, int):
+            writer.add_figure(f"XbbvsQCD for b content (only bkg)", fig, global_step=epoch)
+        else:
+            writer.add_figure(f"{epoch}/XbbvsQCD for b content (only bkg)", fig)
     # 1 d plot of softdrop mass for total, sig and bkg, fullsim vs flash
     recos = [reco, sig_reco, bkg_reco]
     samples1 = [samples, sig_samples, bkg_samples]

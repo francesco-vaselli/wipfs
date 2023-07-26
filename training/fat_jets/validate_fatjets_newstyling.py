@@ -711,7 +711,7 @@ def validate_fatjets(
 
         fig, axs = plt.subplots(1, 1)  # , figsize=(9, 4.5), tight_layout=False)
         hep.cms.text("Simulation Preliminary")
-        axs.set_xlabel(f"ParticleNet Xbb vs QCD (sig only)", fontsize=35)
+        axs.set_xlabel(f"ParticleNet Xbb vs QCD (bkg only)", fontsize=35)
 
         axs.set_yscale("log")
 

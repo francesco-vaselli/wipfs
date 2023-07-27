@@ -734,7 +734,7 @@ def validate_fatjets(
             full = np.where(full > sup, sup, full)
             full = np.where(full < inf, inf, full)
 
-            nb = bkg_df_reco["MgenjetAK8_nbFlavour"].values
+            nb = bkg_df_samples["MgenjetAK8_nbFlavour"].values
             mask = np.where(nb == cond, True, False)
             flash = bkg_samples[target].values
             flash = flash[mask]

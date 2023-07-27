@@ -595,10 +595,9 @@ def validate_fatjets(
     sig_samples = samples[df["is_signal"] == 1 & (samples["Mpt_ratio"] <= 500) & (300 <= samples["Mpt_ratio"])]
     bkg_reco = reco[df["is_signal"] == 0 & (reco["Mpt_ratio"] <= 500) & (300 <= reco["Mpt_ratio"])]
     bkg_samples = samples[df["is_signal"] == 0 & (samples["Mpt_ratio"] <= 500) & (300 <= samples["Mpt_ratio"])]
-    sig_df_reco = df[df["is_signal"] == 1 & (reco["Mpt_ratio"] <= 500) & (300 <= reco["Mpt_ratio"])]
-    bkg_df_reco = df[df["is_signal"] == 0 & (reco["Mpt_ratio"] <= 500) & (300 <= reco["Mpt_ratio"])]
-    sig_df_samples = df[df["is_signal"] == 1 & (samples["Mpt_ratio"] <= 500) & (300 <= samples["Mpt_ratio"])]
-    bkg_df_samples = df[df["is_signal"] == 0 & (samples["Mpt_ratio"] <= 500) & (300 <= samples["Mpt_ratio"])]
+    sig_df = df[df["is_signal"] == 1]
+    bkg_df = df[df["is_signal"] == 0]
+
     fig = make_corner(
         sig_reco,
         sig_samples,
@@ -655,18 +654,22 @@ def validate_fatjets(
         sup = rangeR[1]
         legend_elements = []
         for cond, color, name in zip(conds, colors, names):
-            nb = sig_df_reco["MgenjetAK8_nbFlavour"].values
+            nb = sig_df["MgenjetAK8_nbFlavour"].values
             mask = np.where(nb == cond, True, False)
             full = sig_reco[target].values
+            pt_full = sig_reco["Mpt_ratio"].values
             full = full[mask]
+            pt_full = pt_full[mask]
+            full = full[(pt_full <= 500) & (300 <= pt_full)]
             full = full[~np.isnan(full)]
             full = np.where(full > sup, sup, full)
             full = np.where(full < inf, inf, full)
 
-            nb = sig_df_samples["MgenjetAK8_nbFlavour"].values
-            mask = np.where(nb == cond, True, False)
             flash = sig_samples[target].values
+            pt_flash = sig_samples["Mpt_ratio"].values
             flash = flash[mask]
+            pt_flash = pt_flash[mask]
+            flash = flash[(pt_flash <= 500) & (300 <= pt_flash)]
             flash = flash[~np.isnan(flash)]
             flash = np.where(flash > sup, sup, flash)
             flash = np.where(flash < inf, inf, flash)
@@ -726,19 +729,23 @@ def validate_fatjets(
         sup = rangeR[1]
         legend_elements = []
         for cond, color, name in zip(conds, colors, names):
-            nb = bkg_df_reco["MgenjetAK8_nbFlavour"].values
+            nb = bkg_df["MgenjetAK8_nbFlavour"].values
             mask = np.where(nb == cond, True, False)
             full = bkg_reco[target].values
+            pt_full = bkg_reco["Mpt_ratio"].values
             full = full[mask]
+            pt_full = pt_full[mask]
+            full = full[(pt_full <= 500) & (300 <= pt_full)]
             full = full[~np.isnan(full)]
             full = np.where(full > sup, sup, full)
             full = np.where(full < inf, inf, full)
 
-            nb = bkg_df_samples["MgenjetAK8_nbFlavour"].values
-            mask = np.where(nb == cond, True, False)
             flash = bkg_samples[target].values
+            pt_flash = bkg_samples["Mpt_ratio"].values
             flash = flash[mask]
+            pt_flash = pt_flash[mask]
             flash = flash[~np.isnan(flash)]
+            flash = flash[(pt_flash <= 500) & (300 <= pt_flash)]
             flash = np.where(flash > sup, sup, flash)
             flash = np.where(flash < inf, inf, flash)
 

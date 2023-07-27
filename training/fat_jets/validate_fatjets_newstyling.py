@@ -591,10 +591,10 @@ def validate_fatjets(
     print(reco["Mpt_ratio"].values)
 
     # select signal and background and filter on pt between 300 and 500
-    sig_reco = reco[df["is_signal"] == 1 & (reco["Mpt_ratio"] <= 500) & (300 <= reco["Mpt_ratio"])]
-    sig_samples = samples[df["is_signal"] == 1 & (samples["Mpt_ratio"] <= 500) & (300 <= samples["Mpt_ratio"])]
-    bkg_reco = reco[df["is_signal"] == 0 & (reco["Mpt_ratio"] <= 500) & (300 <= reco["Mpt_ratio"])]
-    bkg_samples = samples[df["is_signal"] == 0 & (samples["Mpt_ratio"] <= 500) & (300 <= samples["Mpt_ratio"])]
+    sig_reco = reco[df["is_signal"] == 1]
+    sig_samples = samples[df["is_signal"] == 1]
+    bkg_reco = reco[df["is_signal"] == 0]
+    bkg_samples = samples[df["is_signal"] == 0]
     sig_df = df[df["is_signal"] == 1]
     bkg_df = df[df["is_signal"] == 0]
 

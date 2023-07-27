@@ -587,16 +587,15 @@ def validate_fatjets(
     else:
         writer.add_figure(f"{epoch}/corner", fig)
 
-    # select signal and background and filter on pt
-    sig_reco = reco[df["is_signal"] == 1 & (300 <= reco["Mpt_ratio"] <= 500)]
-    sig_samples = samples[df["is_signal"] == 1 & (300 <= samples["Mpt_ratio"] <= 500)]
-    bkg_reco = reco[df["is_signal"] == 0 & (300 <= reco["Mpt_ratio"] <= 500)]
-    bkg_samples = samples[df["is_signal"] == 0 & (300 <= samples["Mpt_ratio"] <= 500)]
-    sig_df_reco = df[df["is_signal"] == 1 & (300 <= reco["Mpt_ratio"] <= 500)]
-    bkg_df_reco = df[df["is_signal"] == 0 & (300 <= reco["Mpt_ratio"] <= 500)]
-    sig_df_samples = df[df["is_signal"] == 1 & (300 <= samples["Mpt_ratio"] <= 500)]
-    bkg_df_samples = df[df["is_signal"] == 0 & (300 <= samples["Mpt_ratio"] <= 500)]
-
+    # select signal and background and filter on pt between 300 and 500
+    sig_reco = reco[df["is_signal"] == 1 & (reco["Mpt_ratio"] <= 500) & (300 <= reco["Mpt_ratio"])]
+    sig_samples = samples[df["is_signal"] == 1 & (samples["Mpt_ratio"] <= 500) & (300 <= samples["Mpt_ratio"])]
+    bkg_reco = reco[df["is_signal"] == 0 & (reco["Mpt_ratio"] <= 500) & (300 <= reco["Mpt_ratio"])]
+    bkg_samples = samples[df["is_signal"] == 0 & (samples["Mpt_ratio"] <= 500) & (300 <= samples["Mpt_ratio"])]
+    sig_df_reco = df[df["is_signal"] == 1 & (reco["Mpt_ratio"] <= 500) & (300 <= reco["Mpt_ratio"])]
+    bkg_df_reco = df[df["is_signal"] == 0 & (reco["Mpt_ratio"] <= 500) & (300 <= reco["Mpt_ratio"])]
+    sig_df_samples = df[df["is_signal"] == 1 & (samples["Mpt_ratio"] <= 500) & (300 <= samples["Mpt_ratio"])]
+    bkg_df_samples = df[df["is_signal"] == 0 & (samples["Mpt_ratio"] <= 500) & (300 <= samples["Mpt_ratio"])]
     fig = make_corner(
         sig_reco,
         sig_samples,
@@ -731,7 +730,7 @@ def validate_fatjets(
             full = full[~np.isnan(full)]
             full = np.where(full > sup, sup, full)
             full = np.where(full < inf, inf, full)
-            
+
             nb = bkg_df_reco["MgenjetAK8_nbFlavour"].values
             mask = np.where(nb == cond, True, False)
             flash = bkg_samples[target].values

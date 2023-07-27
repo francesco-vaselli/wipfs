@@ -587,12 +587,15 @@ def validate_fatjets(
     else:
         writer.add_figure(f"{epoch}/corner", fig)
 
-    sig_reco = reco[df["is_signal"] == 1]
-    sig_samples = samples[df["is_signal"] == 1]
-    bkg_reco = reco[df["is_signal"] == 0]
-    bkg_samples = samples[df["is_signal"] == 0]
-    sig_df = df[df["is_signal"] == 1]
-    bkg_df = df[df["is_signal"] == 0]
+    # select signal and background and filter on pt
+    sig_reco = reco[df["is_signal"] == 1 & (300 <= reco["Mpt_ratio"] <= 500)]
+    sig_samples = samples[df["is_signal"] == 1 & (300 <= samples["Mpt_ratio"] <= 500)]
+    bkg_reco = reco[df["is_signal"] == 0 & (300 <= reco["Mpt_ratio"] <= 500)]
+    bkg_samples = samples[df["is_signal"] == 0 & (300 <= samples["Mpt_ratio"] <= 500)]
+    sig_df_reco = df[df["is_signal"] == 1 & (300 <= reco["Mpt_ratio"] <= 500)]
+    bkg_df_reco = df[df["is_signal"] == 0 & (300 <= reco["Mpt_ratio"] <= 500)]
+    sig_df_samples = df[df["is_signal"] == 1 & (300 <= samples["Mpt_ratio"] <= 500)]
+    bkg_df_samples = df[df["is_signal"] == 0 & (300 <= samples["Mpt_ratio"] <= 500)]
 
     fig = make_corner(
         sig_reco,
@@ -650,7 +653,7 @@ def validate_fatjets(
         sup = rangeR[1]
         legend_elements = []
         for cond, color, name in zip(conds, colors, names):
-            nb = sig_df["MgenjetAK8_nbFlavour"].values
+            nb = sig_df_reco["MgenjetAK8_nbFlavour"].values
             mask = np.where(nb == cond, True, False)
             full = sig_reco[target].values
             full = full[mask]
@@ -658,6 +661,8 @@ def validate_fatjets(
             full = np.where(full > sup, sup, full)
             full = np.where(full < inf, inf, full)
 
+            nb = sig_df_samples["MgenjetAK8_nbFlavour"].values
+            mask = np.where(nb == cond, True, False)
             flash = sig_samples[target].values
             flash = flash[mask]
             flash = flash[~np.isnan(flash)]
@@ -719,14 +724,16 @@ def validate_fatjets(
         sup = rangeR[1]
         legend_elements = []
         for cond, color, name in zip(conds, colors, names):
-            nb = bkg_df["MgenjetAK8_nbFlavour"].values
+            nb = bkg_df_reco["MgenjetAK8_nbFlavour"].values
             mask = np.where(nb == cond, True, False)
             full = bkg_reco[target].values
             full = full[mask]
             full = full[~np.isnan(full)]
             full = np.where(full > sup, sup, full)
             full = np.where(full < inf, inf, full)
-
+            
+            nb = bkg_df_reco["MgenjetAK8_nbFlavour"].values
+            mask = np.where(nb == cond, True, False)
             flash = bkg_samples[target].values
             flash = flash[mask]
             flash = flash[~np.isnan(flash)]

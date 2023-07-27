@@ -586,6 +586,9 @@ def validate_fatjets(
         writer.add_figure("corner", fig, global_step=epoch)
     else:
         writer.add_figure(f"{epoch}/corner", fig)
+    
+    print("Plotting signal and background separately")
+    print(reco["Mpt_ratio"].values)
 
     # select signal and background and filter on pt between 300 and 500
     sig_reco = reco[df["is_signal"] == 1 & (reco["Mpt_ratio"] <= 500) & (300 <= reco["Mpt_ratio"])]

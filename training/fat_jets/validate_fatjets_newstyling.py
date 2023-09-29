@@ -346,29 +346,32 @@ def validate_fatjets(
         "nbFlavour",
         "is_signal",
     ]
+    label_names = ["bkg", "sig"]
 
-    for i in range(0,8):
-        hep.style.use("CMS")
-        fig = plt.figure(figsize=(9, 6.5))
-        hep.cms.text("Simulation Preliminary")
+    for j in [0, 1]:
 
-        _, rangeR, _ = plt.hist(
-            df_cut.values[:, i],
-            histtype="step",
-            label="FullSim",
-            lw=2,
-            bins=100,
-            ls="--",
-            color="tab:blue",
-        )
-        plt.legend(frameon=False, loc='upper right')
-        plt.xlabel(f"{names[i]}", fontsize=35)
-        plt.savefig(f"{save_dir}/{names[i]}_log.png")
-        plt.savefig(f"{save_dir}/{names[i]}_log.pdf")
-        if isinstance(epoch, int):
-            writer.add_figure(f"{names[i]}", fig, global_step=epoch)
-        else:
-            writer.add_figure(f"{epoch}/{names[i]}", fig)
+        for i in range(0,8):
+            hep.style.use("CMS")
+            fig = plt.figure(figsize=(9, 6.5))
+            hep.cms.text("Simulation Preliminary")
+
+            _, rangeR, _ = plt.hist(
+                df_cut[df_cut["is_signal"] == j].values[:, i],
+                histtype="step",
+                label="FullSim",
+                lw=2,
+                bins=100,
+                ls="--",
+                color="tab:blue",
+            )
+            plt.legend(frameon=False, loc='upper right')
+            plt.xlabel(f"{names[i]} for {label_names[j]}", fontsize=35)
+            plt.savefig(f"{save_dir}/{names[i]} for {label_names[j]}.png")
+            plt.savefig(f"{save_dir}/{names[i]} for {label_names[j]}.pdf")
+            if isinstance(epoch, int):
+                writer.add_figure(f"{names[i]} for {label_names[j]}", fig, global_step=epoch)
+            else:
+                writer.add_figure(f"{epoch}/{names[i]} for {label_names[j]}", fig)
 
 
     # Conditioning

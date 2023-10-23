@@ -517,7 +517,7 @@ def validate_fatjets(
             flash = flash[flash_disc > 0.95]
 
             axs.hist(
-                full, bins=25, range=rangeR, histtype="step", ls="--", lw=2, color=color
+                full, bins=25, range=rangeR, histtype="step", ls="--", lw=2, color=color, density=True,
             )
             axs.hist(
                 flash,
@@ -526,6 +526,8 @@ def validate_fatjets(
                 range=rangeR,
                 histtype="step",
                 color=color,
+                # normalize
+                density=True,
             )
             legend_elements.append(
                 Patch(edgecolor=color, fill=False, lw=2, label=f"{name}")

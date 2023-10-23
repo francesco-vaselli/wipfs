@@ -497,20 +497,24 @@ def validate_fatjets(
             nb = df["is_signal"].values
             mask = np.where(nb == cond, True, False)
             full = reco[target].values
+            full_disc = reco["Mfatjet_particleNetMD_XbbvsQCD"].values
             full = full[mask]
+            full_disc = full_disc[mask]
             full = full[~np.isnan(full)]
             full = np.where(full > sup, sup, full)
             full = np.where(full < inf, inf, full)
             # take only jets with discriminant > 0.95
-            full = full[reco["Mfatjet_particleNetMD_XbbvsQCD"] > 0.95]
+            full = full[ full_disc > 0.95]
 
             flash = samples[target].values
+            flash_disc = samples["Mfatjet_particleNetMD_XbbvsQCD"].values
             flash = flash[mask]
+            flash_disc = flash_disc[mask]
             flash = flash[~np.isnan(flash)]
             flash = np.where(flash > sup, sup, flash)
             flash = np.where(flash < inf, inf, flash)
             # take only jets with discriminant > 0.95
-            flash = flash[samples["Mfatjet_particleNetMD_XbbvsQCD"] > 0.95]
+            flash = flash[flash_disc > 0.95]
 
             axs.hist(
                 full, bins=25, range=rangeR, histtype="step", ls="--", lw=2, color=color

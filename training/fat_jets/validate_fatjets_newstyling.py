@@ -470,7 +470,7 @@ def validate_fatjets(
 
     targets = ["Mfatjet_particleNetMD_XbbvsQCD", "Mfatjet_msoftdrop"]
 
-    ranges = [[-0.1, 1], [40, 500]]
+    ranges = [[-0.1, 1], [50, 500]]
 
     conds = [0, 1]
 
